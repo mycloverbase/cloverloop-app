@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "getting-started",
+    "title": "Getting Started",
+    "order": 1
+  },
+  {
+    "slug": "creating-your-storefront",
+    "title": "Your Storefront",
+    "order": 2
+  },
+  {
+    "slug": "managing-products",
+    "title": "Products and Digital Downloads",
+    "order": 3
+  },
+  {
+    "slug": "razorpay-setup",
+    "title": "Razorpay Setup",
+    "order": 4
+  },
+  {
+    "slug": "payments-and-settlements",
+    "title": "Payments and Settlements",
+    "order": 5
+  },
+  {
+    "slug": "pricing-and-platform-fees",
+    "title": "Pricing and Platform Fees",
+    "order": 6
+  },
+  {
+    "slug": "free-products",
+    "title": "Free Products",
+    "order": 7
+  },
+  {
+    "slug": "account-and-security",
+    "title": "Account and Security",
+    "order": 8
+  },
+  {
+    "slug": "troubleshooting",
+    "title": "Troubleshooting",
+    "order": 9
+  }
+]

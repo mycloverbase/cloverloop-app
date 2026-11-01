@@ -1,0 +1,176 @@
+{
+  "inspectedAt": "2026-11-01",
+  "sourceDirectory": "image assets/",
+  "images": [
+    {
+      "source": "logo.png",
+      "format": "PNG",
+      "dimensions": "1024x379",
+      "alphaChannel": true,
+      "sourceBytes": 384476,
+      "projectAsset": "public/images/brand/logo.png",
+      "usage": "Header, footer, authentication, dashboard, Organization structured data"
+    },
+    {
+      "source": "favicon.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 582839,
+      "projectAsset": "public/favicon.png and public/apple-touch-icon.png (square transparent crops)",
+      "usage": "Browser and mobile icon derived from the supplied symbol"
+    },
+    {
+      "source": "hero.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1066514,
+      "projectAsset": "public/images/home/hero.webp and public/images/home/hero-storefront.webp (cropped WebP, 1076x768)",
+      "usage": "Homepage hero; embedded storefront URL corrected to cloverloop.in in the optimized copies; cropped copy removes the redundant left-side wordmark and empty space"
+    },
+    {
+      "source": "storefront mockup.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1666854,
+      "projectAsset": "public/images/home/storefront-mockup.webp",
+      "usage": "Homepage storefront concept, Store Builder and conceptual payment page illustration"
+    },
+    {
+      "source": "digital product collection.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1811794,
+      "projectAsset": "public/images/home/digital-product-collection.webp",
+      "usage": "Homepage digital product categories and Sell Online / Downloads feature pages"
+    },
+    {
+      "source": "creator community.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 2263874,
+      "projectAsset": "public/images/home/creator-community.webp",
+      "usage": "Homepage creator audience section and authentication page illustration"
+    },
+    {
+      "source": "creator onboarding dashboard.png",
+      "format": "PNG",
+      "dimensions": "1200x896",
+      "alphaChannel": true,
+      "sourceBytes": 1267728,
+      "projectAsset": "public/images/home/creator-onboarding-dashboard.webp",
+      "usage": "Authenticated onboarding dashboard"
+    },
+    {
+      "source": "feature illustration set.png",
+      "format": "PNG",
+      "dimensions": "1408x768",
+      "alphaChannel": true,
+      "sourceBytes": 1396187,
+      "projectAsset": null,
+      "usage": "Inspected but intentionally excluded: the image contains a legacy project URL, unsupported payment-provider UI and operational dashboard elements."
+    },
+    {
+      "source": "Marketing Ideas Tool.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1142375,
+      "projectAsset": "public/images/resources/marketing-ideas-tool.webp",
+      "usage": "Marketing Ideas Tool page"
+    },
+    {
+      "source": "How to Write an Ebook.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1710439,
+      "projectAsset": "public/images/resources/how-to-write-an-ebook.webp",
+      "usage": "How to Write an Ebook article"
+    },
+    {
+      "source": "How to Sell Presets.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1588320,
+      "projectAsset": "public/images/resources/how-to-sell-presets.webp",
+      "usage": "How to Sell Presets article"
+    },
+    {
+      "source": "How to Sell Printables.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1914032,
+      "projectAsset": "public/images/resources/how-to-sell-printables.webp",
+      "usage": "How to Sell Printables article"
+    },
+    {
+      "source": "How to Sell Ebooks.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1796275,
+      "projectAsset": "public/images/resources/how-to-sell-ebooks.webp",
+      "usage": "How to Sell Ebooks article"
+    },
+    {
+      "source": "How to Sell Canva Templates.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1591258,
+      "projectAsset": "public/images/resources/how-to-sell-canva-templates.webp",
+      "usage": "How to Sell Canva Templates article"
+    },
+    {
+      "source": "Online Course Ideas.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1908628,
+      "projectAsset": "public/images/resources/online-course-ideas.webp",
+      "usage": "Online Course Ideas article"
+    },
+    {
+      "source": "Content Creator.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1989414,
+      "projectAsset": "public/images/resources/content-creator.webp",
+      "usage": "Content Creator article"
+    },
+    {
+      "source": "Digital Products.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1886021,
+      "projectAsset": "public/images/resources/digital-products.webp",
+      "usage": "Digital Products pillar article"
+    },
+    {
+      "source": "Resource Hub.png",
+      "format": "PNG",
+      "dimensions": "1376x768",
+      "alphaChannel": true,
+      "sourceBytes": 1868083,
+      "projectAsset": "public/images/resources/resource-hub.webp",
+      "usage": "Resource Hub index page"
+    }
+  ],
+  "documents": [
+    {
+      "source": "CloverLoop_Content_and_SEO_Master_Document.docx",
+      "format": "DOCX",
+      "sourceBytes": 84762,
+      "usage": "Imported complete educational article copy; page copy and FAQs are maintained in src/lib/site.ts."
+    }
+  ]
+}
