@@ -41,22 +41,22 @@ export function loadAnalytics() {
   }
   window.__cloverloopAnalyticsLoaded = true;
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  const gtmId = "GTM-T22DLGW9";
+  const dataLayer = window.dataLayer || (window.dataLayer = []);
+  const gtag = (...args: unknown[]) => dataLayer.push(args);
+  window.gtag = gtag;
+  gtag("js", new Date());
 
   if (gaId) {
     const script = document.createElement("script");
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
     document.head.appendChild(script);
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = (...args: unknown[]) => window.dataLayer?.push(args);
-    window.gtag("js", new Date());
-    window.gtag("config", gaId, { send_page_view: false });
+    gtag("config", gaId, { send_page_view: false });
   }
 
   if (gtmId) {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
+    dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
     const script = document.createElement("script");
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(gtmId)}`;

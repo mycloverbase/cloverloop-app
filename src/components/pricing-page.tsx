@@ -10,6 +10,7 @@ const plans = [
     cadence: "/month",
     fee: "0%",
     description: "Start with a simple storefront plan.",
+    ctaLabel: "Start Free Plan",
     features: ["1 paid product", "5 free product listings"],
   },
   {
@@ -18,6 +19,7 @@ const plans = [
     cadence: "/month",
     fee: "3%",
     description: "Offer more of what you create.",
+    ctaLabel: "Start Creator Plan",
     features: ["Unlimited paid products", "Unlimited free products", "Unlimited free product downloads"],
   },
   {
@@ -26,6 +28,7 @@ const plans = [
     cadence: "/month",
     fee: "2%",
     description: "A lower platform transaction fee.",
+    ctaLabel: "Start Pro Creator Plan",
     features: ["Unlimited paid products", "Unlimited free products", "Unlimited free product downloads"],
   },
 ];
@@ -66,7 +69,7 @@ export function PricingPage() {
                 eventValue={plan.name}
                 className={`button ${plan.name === "Creator" ? "" : "button-secondary"}`}
               >
-                Get Started for Free <ArrowRight size={17} />
+                {plan.ctaLabel} <ArrowRight size={17} />
               </TrackLink>
               <div className="plan-includes">
                 <h3>Plan includes</h3>
