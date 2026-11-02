@@ -25,6 +25,15 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const callbackError = searchParams.get("error");
+  const requestedUsername = searchParams.get("username")?.trim() ?? "";
+  const storefrontUsername =
+    requestedUsername.length <= 30 &&
+    /^[a-zA-Z0-9](?:[a-zA-Z0-9_-]{0,28}[a-zA-Z0-9])?$/.test(requestedUsername)
+      ? requestedUsername
+      : "";
+  const onboardingPath = storefrontUsername
+    ? `/dashboard?username=${encodeURIComponent(storefrontUsername)}`
+    : "/dashboard";
 
   useEffect(() => {
     if (callbackError === "callback" || callbackError === "configuration") {
@@ -46,11 +55,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         const { data, error: authError } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: authCallbackUrl("/dashboard") },
+          options: {
+            ...(storefrontUsername ? { data: { storefront_username: storefrontUsername } } : {}),
+            emailRedirectTo: authCallbackUrl(onboardingPath),
+          },
         });
         if (authError) throw authError;
         if (data.session) {
-          router.replace("/dashboard");
+          router.replace(onboardingPath);
           router.refresh();
           return;
         }
@@ -77,7 +89,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     setError("");
     try {
       const supabase = createSupabaseBrowserClient();
-      const next = mode === "signup" ? "/dashboard" : searchParams.get("next") || "/dashboard";
+      const next = mode === "signup" ? onboardingPath : searchParams.get("next") || "/dashboard";
       const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
       track("google_oauth_initiation", { mode });
       window.localStorage.setItem(AUTH_FLOW_KEY, mode);
@@ -107,6 +119,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   return (
     <div className="auth-form-wrap">
+      {mode === "signup" && storefrontUsername && (
+        <p className="storefront-username-note" role="note">
+          Your selected store address: <strong>cloverloop.in/{storefrontUsername}</strong>
+        </p>
+      )}
       <button type="button" className="google-button" disabled={pending} onClick={signInWithGoogle}>
         <GoogleMark /> Continue with Google
       </button>

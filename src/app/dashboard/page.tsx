@@ -32,12 +32,25 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ username?: string }>;
+}) {
+  const { username: requestedUsername } = await searchParams;
   const supabase = await createSupabaseServerClient();
   if (!supabase) redirect("/login?error=configuration");
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) redirect("/login?next=/dashboard");
 
+  const storedUsername = user.user_metadata?.storefront_username;
+  const username =
+    requestedUsername ?? (typeof storedUsername === "string" ? storedUsername : "");
+  const storefrontUsername =
+    username.length <= 30 &&
+    /^[a-zA-Z0-9](?:[a-zA-Z0-9_-]{0,28}[a-zA-Z0-9])?$/.test(username)
+      ? username
+      : "";
   const formUrl = getFoundingFormUrl();
   return (
     <main className="dashboard-page">
@@ -56,10 +69,14 @@ export default async function DashboardPage() {
           <span className="eyebrow">Your CloverLoop onboarding</span>
           <h1>Welcome to CloverLoop!</h1>
           <p>We&apos;re happy to have you onboard and are all set to begin the journey with you.</p>
+          {storefrontUsername && (
+            <p className="storefront-username-note">
+              Your selected store address: <strong>cloverloop.in/{storefrontUsername}</strong>
+            </p>
+          )}
           <div className="onboarding-message">
             <p>Before you start selling your digital products, we&apos;d like to invite you to become a part of our Founding Creator Programme.</p>
-            <p>CloverLoop is currently in its beta phase. We&apos;re working closely with our founding creators to refine the experience and build a platform that genuinely supports independent creators.</p>
-            <p>As a founding creator, you&apos;ll have the opportunity to be part of the platform&apos;s early community and share feedback that helps shape its development.</p>
+            <p>As a founding creator, you can share your perspective and help shape tools for independent creators.</p>
           </div>
           {formUrl ? (
             <TrackLink

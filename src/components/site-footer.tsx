@@ -6,6 +6,8 @@ const groups = [
   { title: "Features", links: publicLinks.features },
   { title: "Company", links: publicLinks.company },
   { title: "Resources", links: publicLinks.resources },
+  { title: "Compare Platforms", links: publicLinks.comparisons },
+  { title: "Legal", links: publicLinks.legal },
 ];
 
 export function SiteFooter() {

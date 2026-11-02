@@ -13,7 +13,7 @@ Your CloverLoop storefront is a dedicated page where your audience can view the 
 
 ## Your storefront address
 
-The intended address format is cloverloop.in/creatorname. The creatorname portion identifies your storefront. Availability and naming rules should be checked in the live setup flow.
+Your storefront address uses the format cloverloop.in/creatorname. Choose a unique, easy-to-remember creatorname that represents your work.
 
 ## What visitors see
 

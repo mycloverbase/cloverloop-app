@@ -3,13 +3,13 @@ title: "How to Add a Digital Product"
 slug: "how-to-add-a-digital-product"
 category: "managing-products"
 order: 8
-description: "Prepare the product information and final file before starting the product creation process. Field names and publishing controls must match the current CloverLoop interface."
+description: "Prepare clear product information and the final file before publishing a digital product."
 status: "published"
 lastUpdated: "2026-11-01"
 related: []
 ---
 
-Prepare the product information and final file before starting the product creation process. Field names and publishing controls must match the current CloverLoop interface.
+Prepare the product information and final file before publishing your product.
 
 ## Prepare the product
 
@@ -21,7 +21,7 @@ Choose the price shown to customers, or select the free option if the product is
 
 ## Upload the file
 
-Upload the final digital file. The maximum file size is 100 MB per file. Confirm supported formats in the live upload interface.
+Upload the final digital file in a supported format.
 
 ## Configure access
 

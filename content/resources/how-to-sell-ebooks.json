@@ -76,7 +76,7 @@
                        "type":  "paragraph"
                    },
                    {
-                       "text":  "If you use a third-party selling or payment service, understand its fees, settlement arrangements, refund processes and customer support responsibilities. Keep payment processing fees distinct from any platform fee. Never imply that a platform\u0027s payment integration is active unless it has actually been configured and tested. For CloverLoop, the planned model uses the creator\u0027s own Razorpay account, with the payment proceeds settled by Razorpay to the creator and CloverLoop\u0027s platform commission invoiced separately.",
+                       "text":  "If you use a third-party selling or payment service, understand its fees, settlement arrangements, refund processes and customer support responsibilities. Keep payment processing fees distinct from any platform fee. For CloverLoop, each creator uses their own Razorpay account, with payment proceeds settled by Razorpay to the creator and CloverLoop\u0027s platform commission invoiced separately.",
                        "type":  "paragraph"
                    },
                    {

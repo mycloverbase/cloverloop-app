@@ -21,11 +21,16 @@ export const publicLinks = {
     { label: "Help Center", href: "/help-center" },
     { label: "Email Us", href: "/contact" },
     { label: "FAQ", href: "/faq" },
-    { label: "Terms", href: "/terms" },
-    { label: "Privacy", href: "/privacy" },
     { label: "Reviews", href: "/reviews" },
     { label: "Sitemap", href: "/sitemap" },
     { label: "Partner Program", href: "/partner-program" },
+  ],
+  legal: [
+    { label: "Terms of Use", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Refund & Cancellation Policy", href: "/refunds" },
+    { label: "Cookie Policy", href: "/cookies" },
+    { label: "Disclaimer", href: "/disclaimer" },
   ],
   resources: [
     { label: "Marketing ideas tool", href: "/resources/marketing-ideas-tool" },
@@ -39,6 +44,13 @@ export const publicLinks = {
     { label: "Digital Products", href: "/resources/digital-products" },
     { label: "Resource Hub", href: "/resources" },
   ],
+  comparisons: [
+    { label: "All platform comparisons", href: "/compare" },
+    { label: "CloverLoop vs SuperProfile", href: "/compare/cloverloop-vs-superprofile" },
+    { label: "CloverLoop vs Gumroad", href: "/compare/cloverloop-vs-gumroad" },
+    { label: "CloverLoop vs Payhip", href: "/compare/cloverloop-vs-payhip" },
+    { label: "CloverLoop vs Instamojo", href: "/compare/cloverloop-vs-instamojo" },
+  ],
 };
 
 export const featurePages = [
@@ -49,7 +61,7 @@ export const featurePages = [
       "Sell digital products directly to the people who follow your work with a dedicated creator storefront.",
     heading: "Sell digital products directly to your audience",
     intro:
-      "Sell digital products directly to the people who follow your work. CloverLoop is designed to give independent creators a dedicated storefront, a clear way to present downloadable products and a planned payment model built around each creator's own payment gateway account.",
+      "Sell digital products directly to the people who follow your work with a dedicated storefront, clear product pages and payments through your own gateway account.",
     image: "/images/home/digital-product-collection.webp",
     imageAlt: "A collection of digital products for independent creators",
     sections: [
@@ -59,11 +71,11 @@ export const featurePages = [
       },
       {
         heading: "Built around creator ownership",
-        body: "The planned payment model connects each creator's own Razorpay account. Customer payments are processed through that account and settled by Razorpay directly to the creator.",
+        body: "Connect your own Razorpay account. Customer payments are processed through that account and settled by Razorpay directly to you.",
       },
       {
         heading: "A clear buying journey",
-        body: "Present what each product includes, who it is for and how customers can access it. The planned experience includes secure digital delivery and configurable download limits.",
+        body: "Present what each product includes, who it is for and how customers can access it, with secure digital delivery after successful payment verification.",
       },
     ],
   },
@@ -74,7 +86,7 @@ export const featurePages = [
       "Plan a clear digital download experience for ebooks, templates, presets and other creator products.",
     heading: "A simpler way to sell digital downloads",
     intro:
-      "Turn your knowledge and creative work into downloadable products. The planned product supports files up to 100 MB each, secure download links and configurable download limits. Supported file types and final delivery settings should be confirmed in the product interface when implemented.",
+      "Turn your knowledge and creative work into downloadable products with clear product pages and a smooth customer delivery experience.",
     image: "/images/home/digital-product-collection.webp",
     imageAlt: "Digital product formats including guides, templates and creative downloads",
     sections: [
@@ -84,11 +96,11 @@ export const featurePages = [
       },
       {
         heading: "Designed for controlled access",
-        body: "The intended delivery model includes configurable download limits and secure links with a reasonable expiry. Checkout, payment verification and file delivery are not implemented in this sprint.",
+        body: "Customers receive secure download links after successful payment verification.",
       },
       {
-        heading: "Files sized for digital products",
-        body: "The planned maximum file size is 100 MB per file. Confirm supported formats and final limits in the product interface when the selling platform is implemented.",
+        heading: "Make downloads easy to use",
+        body: "Choose clear file names and formats, and include simple instructions so customers can use what they purchased.",
       },
     ],
   },
@@ -99,7 +111,7 @@ export const featurePages = [
       "Give your audience one dedicated place to explore your digital products with an independent storefront.",
     heading: "Your own storefront, made for your work",
     intro:
-      "Give your audience a dedicated place to explore what you create. The planned storefront URL format is CloverLoop.in/creatorname, allowing creators to share one destination across social profiles, video descriptions, websites and other channels.",
+      "Give your audience a dedicated place to explore what you create at a shareable CloverLoop.in/creatorname address.",
     image: "/images/home/storefront-mockup.webp",
     imageAlt: "CloverLoop storefront concept displaying creator digital products",
     sections: [
@@ -109,7 +121,7 @@ export const featurePages = [
       },
       {
         heading: "An independent creator destination",
-        body: "The planned storefront keeps a creator's work together under a shareable address such as cloverloop.in/creatorname.",
+        body: "Bring your work together under a shareable address such as cloverloop.in/creatorname.",
       },
       {
         heading: "Designed for a direct relationship",
@@ -121,24 +133,20 @@ export const featurePages = [
     slug: "payment-gateways",
     title: "Creator-owned Payments | CloverLoop",
     description:
-      "Understand CloverLoop's planned creator-owned Razorpay payment architecture and separate monthly platform commission.",
+      "Learn how creator-owned Razorpay payments and CloverLoop's separate monthly platform commission work.",
     heading: "Payments designed around your own account",
     intro:
-      "CloverLoop's planned payment architecture lets each creator connect their own Razorpay account. Customer payments are processed through the creator's account and settled directly to the creator's bank account by Razorpay under its settlement rules. CloverLoop calculates its platform commission separately and invoices it monthly. Razorpay processing charges are additional.",
+      "Connect your own Razorpay account so customer payments are processed through your account and settled directly to your bank by Razorpay. CloverLoop calculates its platform commission separately and invoices it monthly. Razorpay processing charges are additional.",
     image: "/images/home/storefront-mockup.webp",
-    imageAlt: "Illustration representing the planned creator-owned payment flow",
+    imageAlt: "Illustration representing creator-owned payment flow",
     sections: [
       {
-        heading: "How the planned payment flow works",
+        heading: "How the payment flow works",
         body: "A customer pays through the creator's connected Razorpay account. Razorpay processes the payment and settles proceeds directly to the creator's bank account according to the creator's Razorpay arrangement. CloverLoop does not centrally collect or hold creator sales proceeds.",
       },
       {
         heading: "Platform commission is separate",
         body: "CloverLoop calculates commission on successful paid transactions according to the creator's plan and invoices it monthly. This fee is not automatically deducted from a customer's payment. Razorpay processing fees are additional.",
-      },
-      {
-        heading: "Planned architecture, not a live integration",
-        body: "The Razorpay integration, checkout, payment verification and digital delivery are not implemented in this marketing website sprint. This page describes the intended architecture, not a currently available payment service.",
       },
     ],
   },
@@ -163,7 +171,7 @@ export const companyPages: Record<
   about: {
     title: "About CloverLoop | A Platform Built for Independent Creators",
     description:
-      "Discover CloverLoop, a platform being built to help independent creators sell digital products through their own storefronts with transparent pricing and creator-owned payment arrangements.",
+      "Discover how CloverLoop helps independent creators sell digital products through their own storefronts with transparent pricing and creator-owned payment arrangements.",
     keywords: [
       "Platform for independent creators",
       "Sell digital products online",
@@ -178,33 +186,33 @@ export const companyPages: Record<
       { type: "p", text: "The internet has made it easier than ever to create, share and build an audience. Independent creators are publishing valuable work across social media, YouTube, blogs, online communities and other digital platforms. From educational resources and ebooks to design templates, presets and creative tools, there is no shortage of knowledge and creativity worth sharing." },
       { type: "p", text: "But turning that work into a sustainable source of income is not always straightforward." },
       { type: "p", text: "Creators often have to navigate multiple platforms, complicated monetisation models, payment arrangements and fragmented ways of delivering digital products. Their audience may belong to them, but the tools they rely on to monetise their work are often spread across different services." },
-      { type: "strong", text: "CloverLoop is being built to make that process simpler." },
-      { type: "p", text: "We are creating a platform that gives independent creators a more direct way to present, distribute and sell their digital products through their own storefronts. Our aim is to bring the essential parts of digital product selling together in one straightforward experience, while keeping creators in control of their audience relationships and payment arrangements." },
+      { type: "strong", text: "CloverLoop makes that process simpler." },
+      { type: "p", text: "CloverLoop gives independent creators a more direct way to present, distribute and sell digital products through their own storefronts. It brings the essential parts of digital product selling together in one straightforward experience, while keeping creators in control of their audience relationships and payment arrangements." },
       { type: "h2", text: "Why we are building CloverLoop" },
       { type: "p", text: "We believe that valuable creative work should have a clear path to monetisation." },
       { type: "p", text: "A musician should be able to sell guitar tabs, backing tracks or learning resources. A designer should be able to distribute templates and creative assets. An educator should be able to offer ebooks, guides and downloadable learning material. A content creator should be able to turn their knowledge and expertise into products their audience can access." },
       { type: "p", text: "These creators should not need to build an entire ecommerce operation just to sell a digital file." },
       { type: "p", text: "We see an opportunity to make the process more accessible by providing the infrastructure required to present digital products, manage a creator-owned storefront and facilitate online sales." },
-      { type: "p", text: "CloverLoop is being developed around this idea: simplify the infrastructure so creators can focus on what they do best — creating useful work and building meaningful relationships with their audiences." },
+      { type: "p", text: "CloverLoop follows this principle: simplify the infrastructure so creators can focus on what they do best — creating useful work and building meaningful relationships with their audiences." },
       { type: "h2", text: "Built around creator independence" },
       { type: "p", text: "We believe creators should have greater control over how they present and monetise their work." },
       { type: "p", text: "That belief informs three principles behind CloverLoop." },
       { type: "h3", text: "1. Your own storefront, your identity" },
       { type: "p", text: "Your products deserve a dedicated space that represents your work." },
       { type: "p", text: "CloverLoop is designed to give each creator their own storefront, with a shareable address and a place to present digital products directly to their audience. Instead of relying entirely on marketplace listings or scattered payment links, creators can build a consistent destination for their digital offerings." },
-      { type: "p", text: "The intention is simple: your storefront should be an extension of your creator identity, not just another product listing." },
+      { type: "p", text: "Your storefront should be an extension of your creator identity, not just another product listing." },
       { type: "h3", text: "2. Transparent payment arrangements" },
       { type: "p", text: "We believe payment arrangements should be straightforward and easy to understand." },
       { type: "p", text: "CloverLoop is designed around a creator-owned payment account model. Creators connect their own payment gateway account, such as Razorpay, to process customer transactions. Eligible sales proceeds are settled by the payment provider directly to the creator's registered bank account." },
       { type: "p", text: "CloverLoop's platform commission is handled separately through monthly invoicing. Payment gateway processing charges are additional and governed by the provider's terms." },
-      { type: "p", text: "This approach is intended to provide greater clarity about how customer payments, payment gateway charges and platform fees are handled." },
+      { type: "p", text: "This approach makes it clear how customer payments, payment gateway charges and platform fees are handled." },
       { type: "h3", text: "3. Straightforward and transparent pricing" },
       { type: "p", text: "Creators should be able to understand what a platform costs before committing to it." },
       { type: "p", text: "Our pricing model is designed to offer an accessible starting point, with options for creators at different stages of their digital product business." },
       { type: "p", text: "Whether you are experimenting with your first digital product or already have an established audience, CloverLoop aims to provide a clear pricing structure without making the economics difficult to understand." },
       { type: "p", text: "We want creators to know what they pay, why they pay it and how platform charges relate to their sales." },
       { type: "h2", text: "Designed for creators with something to share" },
-      { type: "p", text: "CloverLoop is being built for a broad range of independent creators, including:" },
+      { type: "p", text: "CloverLoop is made for a broad range of independent creators, including:" },
       {
         type: "ul",
         items: [
@@ -223,18 +231,16 @@ export const companyPages: Record<
       { type: "p", text: "CloverLoop aims to make it easier to turn these ideas into products and present them through a dedicated storefront." },
       { type: "p", text: "Our broader vision is to support the independent creator economy with practical, accessible infrastructure — without making creators navigate unnecessary complexity just to monetise their work." },
       { type: "h2", text: "Building with creators, not just for creators" },
-      { type: "p", text: "CloverLoop is currently in its early development and validation phase." },
       { type: "p", text: "We believe the best way to build a useful platform is to understand the people who will use it. That means listening to creators, learning how they currently sell their work, identifying the difficulties they encounter and prioritising the features that genuinely make a difference." },
       { type: "p", text: "We are inviting independent creators to participate in this early journey through our Founding Creator Programme." },
-      { type: "p", text: "Their feedback will help us refine the platform's experience, evaluate our assumptions and make informed decisions about what we build next." },
-      { type: "p", text: "We do not want to build another platform filled with features that creators do not need. We want to solve real problems, make the experience practical and develop CloverLoop around actual creator requirements." },
+      { type: "p", text: "Creator feedback helps us keep CloverLoop focused on practical tools and real creator requirements." },
       { type: "h2", text: "Our vision" },
       { type: "p", text: "We envision a creator economy where independent individuals have accessible tools to distribute their work, build direct relationships with their audiences and create sustainable income from what they know and make." },
       { type: "p", text: "CloverLoop is one step towards that vision." },
-      { type: "p", text: "We are starting with digital products and creator-owned storefronts, with a focus on simplicity, transparency and independence. As we learn from creators and validate the platform, we intend to keep improving the experience around their needs." },
+      { type: "p", text: "CloverLoop focuses on digital products and creator-owned storefronts, with simplicity, transparency and independence at its core." },
       { type: "strong", text: "Because what you create should have a place of its own." },
       { type: "h2", text: "Be part of the journey" },
-      { type: "p", text: "Whether you are a musician, designer, educator, photographer or content creator, if you have something valuable to share, CloverLoop is being built with you in mind." },
+      { type: "p", text: "Whether you are a musician, designer, educator, photographer or content creator, if you have something valuable to share, CloverLoop is made with you in mind." },
       { type: "p", text: "Explore the platform, discover our approach to creator monetisation and join us as a Founding Creator." },
       { type: "strong", text: "Your work. Your audience. Your own storefront." },
       { type: "cta", text: "Get Started for Free", href: "/signup" },
@@ -246,17 +252,17 @@ export const companyPages: Record<
       "Share your perspective on the tools independent creators need.",
     heading: "Share your creator perspective",
     paragraphs: [
-      "CloverLoop is being built around the needs of independent creators. We value practical feedback about the tools, workflows and experiences that help creators present digital products to their audiences.",
+      "CloverLoop is focused on the needs of independent creators. We value practical feedback about the tools, workflows and experiences that help creators present digital products to their audiences.",
       "Create an account to continue to the next step in the CloverLoop experience.",
     ],
   },
   "help-center": {
     title: "Help Center | CloverLoop",
     description:
-      "Find answers about CloverLoop, creator storefronts, pricing and the planned payment model.",
+      "Find answers about CloverLoop, creator storefronts, pricing and payments.",
     heading: "How can we help?",
     paragraphs: [
-      "Find answers to common questions about CloverLoop, creator storefronts, pricing and the planned payment model. Visit the FAQ page for answers or contact our support team using the email address listed on the Contact page.",
+      "Find answers to common questions about CloverLoop, creator storefronts, pricing and payments. Visit the FAQ page for answers or contact our support team using the email address listed on the Contact page.",
     ],
   },
   contact: {
@@ -264,7 +270,7 @@ export const companyPages: Record<
     description: "Contact the CloverLoop support team.",
     heading: "Contact CloverLoop",
     paragraphs: [
-      "Have a question about CloverLoop? Contact our support team using the confirmed support email listed below.",
+      "Have a question about CloverLoop? Contact our support team.",
     ],
   },
   reviews: {
@@ -282,29 +288,6 @@ export const companyPages: Record<
     heading: "Partner with CloverLoop",
     paragraphs: [
       "We are interested in exploring collaborations with communities, educators and organisations that support independent creators. Contact CloverLoop to discuss a potential partnership.",
-      "Referral tracking, commissions and rewards are not described as available programme features.",
-    ],
-  },
-  terms: {
-    title: "Terms of Service | CloverLoop",
-    description: "Draft terms of service for CloverLoop, pending legal review.",
-    heading: "Terms of Service",
-    paragraphs: [
-      "Draft for legal review. These terms are an initial outline and are not ready for publication as a binding agreement. Qualified counsel must review and approve the terms before launch.",
-      "CloverLoop is intended to provide independent creators with storefront and digital product infrastructure. Creators are responsible for the content they provide and must have the rights and permissions required to distribute it.",
-      "Descriptions of payment connectivity and digital delivery on this site refer to planned capabilities. The Razorpay integration, payment processing, product management and digital delivery are not implemented in this sprint.",
-      "The intended pricing model applies platform commission to successful paid transactions and invoices it monthly. Razorpay processing fees are separate and governed by the creator's own Razorpay arrangement. Final terms, consumer policies, refunds, liability and governing-law provisions require legal review.",
-    ],
-  },
-  privacy: {
-    title: "Privacy Policy | CloverLoop",
-    description: "Draft privacy notice for CloverLoop, pending legal review.",
-    heading: "Privacy Policy",
-    paragraphs: [
-      "Draft for legal review. This initial privacy notice must be reviewed by qualified counsel and updated with confirmed operational details before publication.",
-      "CloverLoop uses Supabase authentication for account registration and sign-in. Registration may involve an email address and authentication credentials managed through Supabase. Do not send passwords or authentication tokens to analytics.",
-      "Google Tag Manager loads with analytics storage denied by default, and Google Analytics 4 measurement is only permitted after the visitor gives the required consent. Cookie preferences are stored so the site can respect the visitor's choice.",
-      "The final notice must explain the personal data collected, purposes and legal basis, service providers, retention periods, user rights, international transfers where applicable, contact details and how users can make a privacy request. These details require confirmation before launch.",
     ],
   },
 };
@@ -318,7 +301,7 @@ export const pageTitles: Record<string, { title: string; description: string }> 
   faq: {
     title: "Frequently Asked Questions | CloverLoop",
     description:
-      "Answers about CloverLoop, creator storefronts, digital products, pricing and the planned payment architecture.",
+      "Answers about CloverLoop, creator storefronts, digital products, pricing and payments.",
   },
   sitemap: {
     title: "Sitemap | CloverLoop",
@@ -405,27 +388,27 @@ export const faqItems = [
   {
     question: "What is CloverLoop?",
     answer:
-      "CloverLoop is a creator-focused platform designed to help independent creators establish their own digital storefronts and sell downloadable products directly to their audiences. The planned platform combines storefront presentation, payment connectivity and digital product delivery in one creator-oriented experience.",
+      "CloverLoop helps independent creators establish their own digital storefronts and sell downloadable products directly to their audiences, with creator-owned payments and secure digital delivery.",
   },
   {
     question: "Who can use CloverLoop?",
     answer:
-      "CloverLoop is intended for independent creators, educators, musicians, designers, professionals and other people who create digital products. The product should be suitable for creators who want to sell resources such as ebooks, PDFs, templates, presets, printables and other downloadable files.",
+      "CloverLoop is for independent creators, educators, musicians, designers, professionals and others who create digital products such as ebooks, PDFs, templates, presets, printables and downloadable files.",
   },
   {
     question: "What kinds of digital products can creators sell?",
     answer:
-      "The intended product categories include ebooks, PDF guides, music tabs, backing tracks, audio resources, presets, templates, printables, educational materials and other downloadable digital files. Creators are responsible for ensuring that they own or have permission to distribute the content they sell.",
+      "Creators can offer ebooks, PDF guides, music tabs, backing tracks, audio resources, presets, templates, printables, educational materials and other downloadable files. Creators are responsible for ensuring that they own or have permission to distribute the content they sell.",
   },
   {
     question: "Will I get my own storefront?",
     answer:
-      "The planned model gives each creator an independent storefront with a shareable URL in the format cloverloop.in/creatorname. The storefront is intended to provide a central destination where an audience can explore a creator's digital products.",
+      "Yes. Each creator gets an independent storefront with a shareable URL in the format cloverloop.in/creatorname, where an audience can explore their digital products.",
   },
   {
     question: "Do I need my own Razorpay account?",
     answer:
-      "Yes. Under CloverLoop's planned payment architecture, each creator connects their own Razorpay account. Customer payments are processed through that creator's account rather than being collected into a central CloverLoop merchant account.",
+      "Yes. Each creator connects their own Razorpay account. Customer payments are processed through that creator's account rather than being collected into a central CloverLoop merchant account.",
   },
   {
     question: "Who receives the customer's payment?",
@@ -445,17 +428,17 @@ export const faqItems = [
   {
     question: "What are the available plans?",
     answer:
-      "The intended plans are Free, Creator and Pro Creator. Free costs ₹0 per month with 0% platform transaction fee, one paid product and five free product listings. Creator costs ₹0 per month with a 3% platform transaction fee and unlimited paid and free products and free downloads. Pro Creator costs ₹10,000 per month with a 2% platform transaction fee and unlimited paid and free products and free downloads.",
+      "The plans are Free, Creator and Pro Creator. Free costs ₹0 per month with a 0% platform transaction fee, one paid product and five free product listings. Creator costs ₹0 per month with a 4% platform transaction fee (excluding GST) and unlimited paid and free products. Pro Creator costs ₹5,000 per month (excluding GST) with a 3% platform transaction fee (excluding GST) and unlimited paid and free products. GST at 18% applies to CloverLoop's platform commission, so the effective rates including GST are 0%, 4.72% and 3.54%. The commission is invoiced separately each month; Razorpay processing charges are additional.",
   },
   {
     question: "How is the platform transaction fee calculated?",
     answer:
-      "The platform transaction fee is calculated on successful paid transactions according to the creator's plan. Free products do not attract platform transaction commission. The applicable commission is invoiced monthly.",
+      "The platform transaction fee is calculated on successful paid transactions according to the creator's plan. Free products do not attract platform transaction commission. GST at 18% applies to CloverLoop commission, which is invoiced monthly with applicable GST and is not deducted from customer payments.",
   },
   {
     question: "Does the Free plan have a limit on free products?",
     answer:
-      "The Free plan allows one paid product and five free product listings. The Creator and Pro Creator plans are intended to include unlimited paid and free products and unlimited free product downloads.",
+      "The Free plan allows one paid product and five free product listings. Creator and Pro Creator include unlimited paid and free products.",
   },
   {
     question: "Are free products charged a transaction fee?",
@@ -463,24 +446,14 @@ export const faqItems = [
       "No. Free products do not incur CloverLoop's platform transaction commission. Usage limits apply according to the selected plan.",
   },
   {
-    question: "What is the maximum file size?",
-    answer:
-      "The intended maximum file size is 100 MB per file. The final supported file types and any additional limits should be stated in the product interface when the selling platform is implemented.",
-  },
-  {
-    question: "Can creators set download limits?",
-    answer:
-      "The planned product includes configurable download limits and secure download links that expire after a reasonable period. These are intended product capabilities and should not be presented as operational during the marketing-site-only implementation sprint.",
-  },
-  {
     question: "How does digital product delivery work?",
     answer:
-      "The intended experience is that customers receive access to the digital files after a successful purchase is verified. Secure links and configurable download limits are part of the planned delivery approach. The actual checkout, verification and delivery workflow are not implemented in the current website sprint.",
+      "Customers receive access to digital files only after successful payment verification. Files are delivered through secure, private download links.",
   },
   {
     question: "Is CloverLoop a marketplace?",
     answer:
-      "CloverLoop is positioned around independent creator storefronts rather than a central marketplace catalogue. Each creator is intended to share their own storefront directly with their audience.",
+      "No. CloverLoop is built around independent creator storefronts rather than a central marketplace catalogue. Each creator shares their storefront directly with their audience.",
   },
   {
     question: "Can I create an account now?",
@@ -493,14 +466,9 @@ export const faqItems = [
       "Your account provides an onboarding step where you can share your perspective and help CloverLoop understand the needs of independent creators.",
   },
   {
-    question: "Does CloverLoop currently process payments?",
-    answer:
-      "The public website explains the planned payment architecture. The Razorpay integration and live payment processing are not part of the current marketing website implementation. Do not treat a public product description as confirmation that the integration is active.",
-  },
-  {
     question: "How can I contact CloverLoop?",
     answer:
-      "Use the support email address configured for CloverLoop on the Contact page. The production email address must be confirmed before launch; do not substitute an address belonging to another business.",
+      "Use the contact details listed on the Contact page to reach CloverLoop support.",
   },
   {
     question: "Can I sell copyrighted or third-party material?",
@@ -510,6 +478,6 @@ export const faqItems = [
   {
     question: "Does CloverLoop guarantee sales or income?",
     answer:
-      "No. CloverLoop provides planned storefront and digital product infrastructure. Sales depend on factors such as product quality, audience fit, pricing, promotion and market demand. The platform must not promise a particular sales volume, income or business result.",
+      "No. Sales depend on factors such as product quality, audience fit, pricing, promotion and market demand. CloverLoop does not promise a particular sales volume, income or business result.",
   },
 ];

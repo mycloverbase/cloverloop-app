@@ -9,10 +9,13 @@ import { Breadcrumbs } from "@/components/site-header";
 import { TrackLink } from "@/components/track-link";
 import { companyPages, faqItems, featurePages, pageTitles, publicLinks, PRODUCTION_URL } from "@/lib/site";
 import { PricingPage } from "@/components/pricing-page";
+import { LegalPolicyPage } from "@/components/legal-policy-page";
+import { legalPolicyPages } from "@/lib/legal-policies";
 
 const slugs = [
   ...featurePages.map((item) => item.slug),
   ...Object.keys(companyPages),
+  ...legalPolicyPages.map((item) => item.slug),
   "pricing",
   "faq",
   "sitemap",
@@ -26,6 +29,28 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  const legalPolicy = legalPolicyPages.find((item) => item.slug === slug);
+  if (legalPolicy) {
+    const url = `${PRODUCTION_URL}/${slug}`;
+    return {
+      title: legalPolicy.seoTitle,
+      description: legalPolicy.description,
+      alternates: { canonical: url },
+      robots: { index: true, follow: true },
+      openGraph: {
+        type: "article",
+        title: legalPolicy.seoTitle,
+        description: legalPolicy.description,
+        url,
+        siteName: "CloverLoop",
+      },
+      twitter: {
+        card: "summary",
+        title: legalPolicy.seoTitle,
+        description: legalPolicy.description,
+      },
+    };
+  }
   const feature = featurePages.find((item) => item.slug === slug);
   const company = companyPages[slug];
   const meta = feature
@@ -39,7 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: meta.description,
     ...(company?.keywords ? { keywords: company.keywords } : {}),
     alternates: { canonical: `${PRODUCTION_URL}/${slug}` },
-    ...(slug === "terms" || slug === "privacy" || slug === "founding-creators" || slug === "contact"
+    ...(slug === "founding-creators" || slug === "contact"
       ? { robots: { index: false, follow: false } }
       : {}),
     openGraph: {
@@ -77,7 +102,6 @@ function FeaturePage({ slug }: { slug: string }) {
           <Image src={page.image} alt={page.imageAlt} width={1376} height={768} priority sizes="(max-width: 760px) 100vw, 54vw" />
         </div>
       </section>
-      {slug === "payment-gateways" && <PaymentFlow />}
       <section className="section-space detail-section">
         <div className="reading-width">
           {page.sections.map((section) => (
@@ -88,41 +112,13 @@ function FeaturePage({ slug }: { slug: string }) {
           ))}
           {slug === "sell-digital-downloads" && (
             <ul className="check-list">
-              <li><Check size={18} /> Maximum intended file size of 100 MB per file</li>
-              <li><Check size={18} /> Configurable download limits</li>
-              <li><Check size={18} /> Secure download links with reasonable expiry</li>
+              <li><Check size={18} /> Secure download links after successful payment verification</li>
             </ul>
           )}
         </div>
       </section>
       <PublicCta />
     </>
-  );
-}
-
-function PaymentFlow() {
-  return (
-    <section className="payment-explainer section-space">
-      <div className="page-width">
-        <div className="section-heading">
-          <span className="eyebrow">Planned payment flow</span>
-          <h2>Customer payment goes through your own Razorpay account</h2>
-          <p>The intended architecture keeps the creator&apos;s payment settlement separate from CloverLoop&apos;s monthly commission invoice.</p>
-        </div>
-        <div className="payment-flow large">
-          <div><span>Customer</span><small>Completes payment</small></div>
-          <ArrowRight aria-hidden="true" />
-          <div><span>Creator&apos;s Razorpay account</span><small>Processes payment</small></div>
-          <ArrowRight aria-hidden="true" />
-          <div><span>Creator&apos;s bank account</span><small>Razorpay settles directly</small></div>
-        </div>
-        <div className="commission-note">
-          <strong>CloverLoop calculates platform commission separately.</strong>
-          <p>Commission applies to successful paid transactions according to the plan and is invoiced monthly. It is not automatically deducted from customer payments. Razorpay processing fees are additional.</p>
-        </div>
-        <p className="scope-note">This is the intended architecture. The Razorpay integration, checkout, payment verification and digital delivery are not implemented in the current website sprint.</p>
-      </div>
-    </section>
   );
 }
 
@@ -187,12 +183,8 @@ function CompanyPage({ slug }: { slug: string }) {
         <h1>{page.heading}</h1>
         <div className="simple-page-body">
           {page.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-          {slug === "contact" && (
-            supportEmail ? (
-              <p><a className="subtle-link" href={`mailto:${supportEmail}`}>{supportEmail}</a></p>
-            ) : (
-              <p className="notice-box">CloverLoop support email to be confirmed before launch. Set NEXT_PUBLIC_SUPPORT_EMAIL in the deployment environment.</p>
-            )
+          {slug === "contact" && supportEmail && (
+            <p><a className="subtle-link" href={`mailto:${supportEmail}`}>{supportEmail}</a></p>
           )}
           {slug === "help-center" && <Link href="/faq" className="button">Visit the FAQ <ArrowRight size={16} /></Link>}
           {slug === "founding-creators" && (
@@ -215,7 +207,7 @@ function FaqPage() {
         <header className="section-heading">
           <span className="eyebrow">Answers and details</span>
           <h1>Frequently asked questions</h1>
-          <p>Learn about CloverLoop, creator storefronts, pricing and the planned payment model.</p>
+          <p>Learn about CloverLoop, creator storefronts, pricing and payments.</p>
         </header>
         <div className="faq-list">
           {faqItems.map((item) => (
@@ -238,7 +230,7 @@ function SitemapPage() {
         <span className="eyebrow">Browse CloverLoop</span>
         <h1>Website sitemap</h1>
         <div className="sitemap-columns">
-          {[{ title: "Features", links: publicLinks.features }, { title: "Company", links: publicLinks.company }, { title: "Resources", links: publicLinks.resources }].map((group) => (
+          {[{ title: "Features", links: publicLinks.features }, { title: "Company", links: publicLinks.company }, { title: "Resources", links: publicLinks.resources }, { title: "Compare Platforms", links: publicLinks.comparisons }, { title: "Legal", links: publicLinks.legal }].map((group) => (
             <section key={group.title}>
               <h2>{group.title}</h2>
               <ul>{group.links.map((link) => <li key={link.href}><Link href={link.href}>{link.label}</Link></li>)}</ul>
@@ -255,7 +247,8 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   if (!slugs.includes(slug)) notFound();
   let content = null;
-  if (featurePages.some((item) => item.slug === slug)) content = <FeaturePage slug={slug} />;
+  if (legalPolicyPages.some((item) => item.slug === slug)) content = <LegalPolicyPage slug={slug} />;
+  else if (featurePages.some((item) => item.slug === slug)) content = <FeaturePage slug={slug} />;
   else if (slug === "pricing") content = <PricingPage />;
   else if (slug === "faq") content = <FaqPage />;
   else if (slug === "sitemap") content = <SitemapPage />;

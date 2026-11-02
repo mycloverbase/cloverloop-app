@@ -3,13 +3,13 @@ title: "Requesting Account Deletion"
 slug: "requesting-account-deletion"
 category: "account-and-security"
 order: 25
-description: "If you no longer want to use CloverLoop, follow the account deletion process available in your account settings or contact CloverLoop support if the option is not available."
+description: "Contact CloverLoop support to request account deletion."
 status: "published"
 lastUpdated: "2026-11-01"
 related: []
 ---
 
-If you no longer want to use CloverLoop, follow the account deletion process available in your account settings or contact CloverLoop support if the option is not available.
+If you no longer want to use CloverLoop, contact CloverLoop support to request account deletion.
 
 ## Before requesting deletion
 

@@ -101,7 +101,7 @@
                        "type":  "paragraph"
                    },
                    {
-                       "text":  "Under CloverLoop\u0027s planned architecture, each creator has an independent storefront and connects their own Razorpay account. Customer payments are processed through the creator\u0027s account and settled by Razorpay directly to the creator. CloverLoop\u0027s platform commission is calculated separately and invoiced monthly. This describes the intended model; the integration is not part of the current marketing-site implementation.",
+                       "text":  "Each creator has an independent storefront and connects their own Razorpay account. Customer payments are processed through the creator\u0027s account and settled by Razorpay directly to the creator. CloverLoop\u0027s platform commission is calculated separately and invoiced monthly.",
                        "type":  "paragraph"
                    },
                    {

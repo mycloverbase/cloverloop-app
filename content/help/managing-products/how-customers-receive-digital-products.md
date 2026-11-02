@@ -3,13 +3,13 @@ title: "How Customers Receive Digital Products"
 slug: "how-customers-receive-digital-products"
 category: "managing-products"
 order: 10
-description: "The intended CloverLoop experience is designed to let customers access digital products after completing the required purchase or free-download process."
+description: "Learn how customers access digital products after completing a purchase or free-download process."
 status: "published"
 lastUpdated: "2026-11-01"
 related: []
 ---
 
-The intended CloverLoop experience is designed to let customers access digital products after completing the required purchase or free-download process.
+Customers access digital products after completing the required purchase or free-download process.
 
 ## Paid products
 
@@ -21,7 +21,7 @@ A customer follows the available free-product access flow. Free products do not 
 
 ## Secure download access
 
-CloverLoop is intended to use secure download links with expiry and configurable download limits. The exact validity period and permitted download count should be taken from the live product settings.
+Customers receive secure download links after payment verification. Keep delivery instructions clear and contact support if a link does not work.
 
 ## If a link does not work
 

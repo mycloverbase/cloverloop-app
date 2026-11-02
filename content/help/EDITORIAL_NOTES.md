@@ -13,7 +13,7 @@ Publish operational how-to instructions only after the relevant feature exists a
 
 CloverLoop uses a creator-owned payment account model. Creators connect their own Razorpay accounts. Razorpay processes customer payments and settles eligible funds directly to the creator's registered bank account. CloverLoop does not centrally collect or hold creator sales proceeds. CloverLoop calculates platform commission separately and invoices creators monthly.
 
-Authoritative pricing: Free — ₹0/month, 0% platform transaction fee, 1 paid product listing and 5 free product listings per account; Creator — ₹0/month, 3% platform transaction fee, unlimited paid and free product listings; Pro Creator — ₹10,000/month, 2% platform transaction fee, unlimited paid and free product listings. Free products do not incur platform transaction commission. Razorpay processing fees are additional.
+Authoritative pricing: Free — ₹0/month, 0% platform transaction fee, 1 paid product listing and 5 free product listings per account; Creator — ₹0/month, 4% platform transaction fee excluding GST, unlimited paid and free product listings; Pro Creator — ₹5,000/month excluding GST, 3% platform transaction fee excluding GST, unlimited paid and free product listings. GST at 18% applies to platform commission, making effective rates 0%, 4.72% and 3.54%. Free products do not incur platform transaction commission. CloverLoop commission is invoiced monthly, not deducted from customer payments; Razorpay processing fees are additional.
 
 The Free plan's five free product listings are an account-level listing cap. They are not five downloads, not a monthly quota and do not reset monthly.
 

@@ -20,12 +20,12 @@ const benefits = [
   {
     icon: CreditCard,
     title: "Your payment account",
-    body: "The planned payment model connects your own Razorpay account, with customer payments settled to you by Razorpay.",
+    body: "Keep control of the payment account connected to your storefront.",
   },
   {
     icon: Check,
     title: "A clearer delivery experience",
-    body: "The planned platform includes secure digital delivery with configurable download limits.",
+    body: "Files are delivered after payment verification through secure download links.",
   },
 ];
 
@@ -43,7 +43,7 @@ export default function HomePage() {
             </p>
             <div className="hero-actions">
               <TrackLink href="/signup" event="signup_click" className="button">
-                Get Started for Free <ArrowRight size={17} />
+                Start Selling <ArrowRight size={17} />
               </TrackLink>
               <Link href="/pricing" className="button button-secondary">
                 Explore Pricing
@@ -85,31 +85,40 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section-space storefront-section">
-        <div className="page-width split-grid">
-          <div className="split-image">
-            <Image
-              src="/images/home/storefront-mockup.webp"
-              alt="Illustrative creator storefront concept for digital products"
-              width={1376}
-              height={768}
-              sizes="(max-width: 760px) 100vw, 50vw"
-            />
-          </div>
-          <div className="split-copy">
+      <section className="section-space storefront-cta-section">
+        <div className="page-width storefront-cta-card">
+          <div className="storefront-cta-copy">
             <span className="eyebrow">Your work, in one place</span>
-            <h2>A storefront that feels like yours</h2>
-            <p>
-              Give your audience one dedicated place to explore your work. The
-              planned storefront address follows a simple format:
-            </p>
-            <div className="url-example"><span>cloverloop.in/</span>creatorname</div>
-            <p>
-              Share one destination across social profiles, video descriptions,
-              websites and other channels.
-            </p>
-            <Link href="/store-builder" className="subtle-link">
-              Explore the Store Builder <ArrowRight size={16} />
+            <h2>Your store is five minutes away</h2>
+            <p>Choose the address your audience will use to find your digital products.</p>
+          </div>
+          <div className="storefront-cta-action">
+            <form action="/signup" method="get" className="storefront-username-form">
+              <label htmlFor="storefront-username">Choose your storefront address</label>
+              <div className="storefront-username-row">
+                <div className="storefront-url-input">
+                  <span aria-hidden="true">cloverloop.in/</span>
+                  <input
+                    id="storefront-username"
+                    name="username"
+                    type="text"
+                    placeholder="yourname"
+                    autoComplete="username"
+                    required
+                    minLength={1}
+                    maxLength={30}
+                    pattern="[A-Za-z0-9]([A-Za-z0-9_\x2d]{0,28}[A-Za-z0-9])?"
+                    title="Use 1–30 letters, numbers, underscores or hyphens. Start and end with a letter or number."
+                  />
+                </div>
+                <button type="submit" className="button">
+                  Start my store <ArrowRight size={17} />
+                </button>
+              </div>
+              <p className="storefront-username-hint">Use letters, numbers, underscores or hyphens.</p>
+            </form>
+            <Link href="/faq" className="subtle-link">
+              Read the FAQ <ArrowRight size={16} />
             </Link>
           </div>
         </div>
@@ -148,53 +157,94 @@ export default function HomePage() {
       <section className="section-space how-section">
         <div className="page-width">
           <div className="section-heading">
-            <span className="eyebrow">A direct path</span>
-            <h2>How it works</h2>
-            <p>The intended product workflow is designed to feel clear from the first step.</p>
+            <span className="eyebrow">Creator-owned payments</span>
+            <h2>Your money never passes through us</h2>
+            <p>
+              Payments go directly from your buyer to your own Razorpay account. We handle
+              payment verification and secure digital delivery.
+            </p>
           </div>
-          <div className="steps-grid">
+          <div className="payment-steps">
             {[
-              ["01", "Create your creator storefront."],
-              ["02", "Connect your payment gateway and add your digital products."],
-              ["03", "Share your storefront with your audience."],
-            ].map(([number, text]) => (
-              <article className="step-card" key={number}>
-                <span>{number}</span>
-                <p>{text}</p>
-              </article>
+              ["Buyer pays", "Customers pay using UPI, cards and other supported payment methods."],
+              ["Your account", "Payment is received directly in your own Razorpay account."],
+              ["Your bank", "Razorpay settles the money directly into your bank account."],
+            ].map(([title, description], index) => (
+              <div className="payment-step-group" key={title}>
+                <article className={`payment-step-card payment-step-card-${index + 1}`}>
+                  <span className="payment-step-number">0{index + 1}</span>
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                </article>
+                {index < 2 && <ArrowRight className="payment-step-arrow" size={22} aria-hidden="true" />}
+              </div>
             ))}
           </div>
-          <p className="scope-note">
-            This describes the intended product workflow. Payment connection,
-            product management and digital delivery are not implemented in the
-            current marketing website sprint.
-          </p>
+          <ul className="payment-trust-list">
+            {[
+              "Payments are processed through your own payment gateway.",
+              "Files are delivered only after successful payment verification.",
+              "Secure, private download links.",
+              "Transparent refund and anti-fraud policies.",
+            ].map((point) => (
+              <li key={point}><Check size={18} aria-hidden="true" />{point}</li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="section-space payment-section">
-        <div className="page-width split-grid">
-          <div className="split-copy">
-            <span className="eyebrow">Creator-owned payment architecture</span>
-            <h2>Your payment account. Your settlement.</h2>
+      <section className="section-space earnings-section">
+        <div className="page-width">
+          <div className="section-heading">
+            <span className="eyebrow">Clear from the start</span>
+            <h2>Understand exactly what you earn from every sale.</h2>
             <p>
-              The planned model uses each creator&apos;s own Razorpay account.
-              Razorpay processes customer payments and settles proceeds directly
-              to the creator. CloverLoop&apos;s platform commission is calculated
-              separately and invoiced monthly.
+              Your payment gateway charges its processing fee, CloverLoop charges its platform
+              commission separately, and you keep the remaining revenue.
             </p>
-            <Link href="/payment-gateways" className="subtle-link">
-              Understand the planned payment flow <ArrowRight size={16} />
-            </Link>
           </div>
-          <div className="payment-flow" aria-label="Planned payment flow">
-            <div><span>Customer</span><small>Makes a purchase</small></div>
-            <ArrowRight aria-hidden="true" />
-            <div><span>Creator&apos;s Razorpay</span><small>Processes payment</small></div>
-            <ArrowRight aria-hidden="true" />
-            <div><span>Creator&apos;s bank</span><small>Direct settlement</small></div>
-            <p>CloverLoop invoices its platform commission separately each month.</p>
+          <div className="earnings-grid" aria-label="Breakdown of a ₹100 sale by plan">
+            {[
+              { name: "Free", fee: "₹0.00", gst: "₹0.00", invoice: "₹0.00", net: "₹97.64" },
+              { name: "Creator", fee: "₹4.00", gst: "₹0.72", invoice: "₹4.72", net: "₹92.92" },
+              { name: "Pro Creator", fee: "₹3.00", gst: "₹0.54", invoice: "₹3.54", net: "₹94.10" },
+            ].map((plan) => (
+              <article className="earnings-card" key={plan.name}>
+                <h3>{plan.name}</h3>
+                <p className="earnings-card-caption">On a ₹100 product sale</p>
+                <dl>
+                  <div className="earnings-line">
+                    <dt>Product selling price</dt><dd>₹100.00</dd>
+                  </div>
+                  <div className="earnings-line">
+                    <dt>Razorpay processing fee (2.36%)</dt><dd>₹2.36</dd>
+                  </div>
+                  <div className="earnings-line">
+                    <dt>CloverLoop commission (excl. GST)</dt><dd>{plan.fee}</dd>
+                  </div>
+                  <div className="earnings-line">
+                    <dt>GST on commission (18%)</dt><dd>{plan.gst}</dd>
+                  </div>
+                  <div className="earnings-line">
+                    <dt>Monthly commission invoice allocation (incl. GST)</dt><dd>{plan.invoice}</dd>
+                  </div>
+                  <div className="earnings-line">
+                    <dt>Amount settled by Razorpay</dt><dd>₹97.64</dd>
+                  </div>
+                  <div className="earnings-receives">
+                    <dt>Net earnings after all fees (including GST)</dt><dd>{plan.net}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
           </div>
+          <ul className="earnings-notes">
+            <li>Razorpay charges 2.36% for payment processing and settles ₹97.64 from this ₹100 sale on every plan.</li>
+            <li>CloverLoop charges 0%, 4% or 3% depending on the selected plan; 18% GST applies to the commission.</li>
+            <li>CloverLoop&apos;s platform commission, including applicable GST, is invoiced separately each month and is not deducted from customer payments.</li>
+            <li>Razorpay processing fees are separate from CloverLoop&apos;s commission.</li>
+            <li>Pro Creator&apos;s ₹5,000 monthly subscription (excluding GST) is separate from this per-sale example.</li>
+          </ul>
         </div>
       </section>
 
@@ -212,28 +262,6 @@ export default function HomePage() {
                 <p>{feature.intro}</p>
               </Link>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section-space pricing-preview">
-        <div className="page-width split-grid">
-          <div className="split-copy">
-            <span className="eyebrow">Transparent pricing</span>
-            <h2>Choose a plan that fits the way you create</h2>
-            <p>
-              Compare the intended Free, Creator and Pro Creator plan fees. Platform
-              commission applies to successful paid transactions and is invoiced
-              monthly. Razorpay processing charges are additional.
-            </p>
-            <Link href="/pricing" className="subtle-link">
-              View all plan details <ArrowRight size={16} />
-            </Link>
-          </div>
-          <div className="price-preview-list">
-            <div><span>Free</span><strong>₹0/month</strong><small>0% platform transaction fee</small></div>
-            <div><span>Creator</span><strong>₹0/month</strong><small>3% platform transaction fee</small></div>
-            <div><span>Pro Creator</span><strong>₹10,000/month</strong><small>2% platform transaction fee</small></div>
           </div>
         </div>
       </section>
