@@ -148,7 +148,7 @@ All article reading-time estimates are calculated from the actual words rendered
 
 ## Analytics and cookie consent
 
-Google Tag Manager container `GTM-K4BMMLN3` loads once from the root layout on every route with Google Consent Mode defaults denied; GA4 (`G-PJV7T22086`) is managed inside the GTM container and is not loaded separately by the app. Selecting **Allow analytics** grants `analytics_storage` and starts custom `dataLayer` events. Rejecting stores that choice locally, keeps consent denied and pushes no custom events. Tracked events include page views, navigation, pricing visits and CTAs, signup/login outcomes, Google OAuth initiation, resource views and the authenticated programme CTA. Authentication credentials and tokens are never included in analytics payloads.
+Google Tag Manager container `GTM-K4BMMLN3` loads once from the root layout on every route with Google Consent Mode defaults denied. GA4 is not installed separately by the app; configure it in GTM with a Google Tag ID of `G-PS230HQXZY` and require `analytics_storage` consent. Disable the Google Tag's automatic `page_view` (`send_page_view: false`), then send one GA4 `page_view` event from the app's custom `page_view` data-layer event, mapping `page_path` as an event parameter. Do not also use a History Change trigger for page views. The app emits one custom page-view event per route after consent is granted, including the current page when consent is first accepted. Rejecting stores that choice locally, keeps consent denied and pushes no custom events. Other tracked events include navigation, pricing visits and CTAs, signup/login outcomes, Google OAuth initiation, resource views and the authenticated programme CTA. Authentication credentials and tokens are never included in analytics payloads.
 
 ## Production and Vercel deployment
 
@@ -159,7 +159,7 @@ Google Tag Manager container `GTM-K4BMMLN3` loads once from the root layout on e
 5. Add `https://cloverloop.in/auth/callback` to the Supabase redirect allow list and set the Supabase production Site URL to `https://cloverloop.in`.
 6. Configure Google OAuth's authorized origin and Supabase callback as described above.
 7. Set the confirmed support email and external Founding Creator form URL before launch.
-8. Verify the GTM container publishes a GA4 tag for `G-PJV7T22086` and test the cookie-consent experience.
+8. Configure and publish the GTM Google Tag and `page_view` event tag for `G-PS230HQXZY`; test consent and page views with Tag Assistant before validating GA4 Realtime.
 9. Run `npm run typecheck`, `npm run lint` and `npm run build`, then deploy.
 10. After launch, submit `https://cloverloop.in/sitemap.xml` to Google Search Console.
 
