@@ -55,8 +55,6 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for authentication | Supabase public anon/publishable key. |
 | `NEXT_PUBLIC_FOUNDING_CREATOR_FORM_URL` | For the dashboard programme CTA | External Google Form URL. It is intentionally not hardcoded. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Before launch | Confirmed CloverLoop support address. The Contact page shows a setup notice until provided. |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Optional | GA4 measurement ID. Analytics loads only after analytics consent. |
-| `NEXT_PUBLIC_GTM_ID` | Optional | Google Tag Manager container ID. GTM loads only after analytics consent. |
 
 Set the same environment variables in the Vercel project. Keep `.env.local` private; it is ignored by Git.
 
@@ -150,7 +148,7 @@ All article reading-time estimates are calculated from the actual words rendered
 
 ## Analytics and cookie consent
 
-GA4 and GTM are optional. If either ID is configured, its script is loaded only after the visitor selects **Allow analytics**. Rejecting optional analytics stores that choice locally and prevents those scripts from loading. Tracked events include page views, navigation, pricing visits and CTAs, signup/login outcomes, Google OAuth initiation, resource views and the authenticated programme CTA. Authentication credentials and tokens are never included in analytics payloads.
+Google Tag Manager container `GTM-K4BMMLN3` loads once from the root layout on every route with Google Consent Mode defaults denied; GA4 (`G-PJV7T22086`) is managed inside the GTM container and is not loaded separately by the app. Selecting **Allow analytics** grants `analytics_storage` and starts custom `dataLayer` events. Rejecting stores that choice locally, keeps consent denied and pushes no custom events. Tracked events include page views, navigation, pricing visits and CTAs, signup/login outcomes, Google OAuth initiation, resource views and the authenticated programme CTA. Authentication credentials and tokens are never included in analytics payloads.
 
 ## Production and Vercel deployment
 
@@ -161,7 +159,7 @@ GA4 and GTM are optional. If either ID is configured, its script is loaded only 
 5. Add `https://cloverloop.in/auth/callback` to the Supabase redirect allow list and set the Supabase production Site URL to `https://cloverloop.in`.
 6. Configure Google OAuth's authorized origin and Supabase callback as described above.
 7. Set the confirmed support email and external Founding Creator form URL before launch.
-8. Add GA4/GTM IDs only if they are needed; verify the cookie-consent experience before enabling tags.
+8. Verify the GTM container publishes a GA4 tag for `G-PJV7T22086` and test the cookie-consent experience.
 9. Run `npm run typecheck`, `npm run lint` and `npm run build`, then deploy.
 10. After launch, submit `https://cloverloop.in/sitemap.xml` to Google Search Console.
 

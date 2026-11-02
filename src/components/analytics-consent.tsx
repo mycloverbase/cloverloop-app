@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
-import { loadAnalytics, track } from "@/lib/analytics";
+import { track, updateConsent } from "@/lib/analytics";
 
 const CONSENT_KEY = "cloverloop-analytics-consent";
 const CONSENT_CHANGE_EVENT = "cloverloop-consent-change";
@@ -23,10 +23,6 @@ function subscribeToConsent(onChange: () => void) {
 export function AnalyticsConsent() {
   const consent = useSyncExternalStore(subscribeToConsent, readConsent, () => "");
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (consent === "accepted") loadAnalytics();
-  }, [consent]);
 
   useEffect(() => {
     track("page_view", { page_path: pathname });
@@ -51,8 +47,8 @@ export function AnalyticsConsent() {
   function choose(choice: "accepted" | "rejected") {
     window.localStorage.setItem(CONSENT_KEY, choice);
     window.dispatchEvent(new Event(CONSENT_CHANGE_EVENT));
+    updateConsent(choice);
     if (choice === "accepted") {
-      loadAnalytics();
       track("page_view", { page_path: window.location.pathname });
     }
   }
@@ -62,7 +58,7 @@ export function AnalyticsConsent() {
     <aside className="consent-banner" aria-label="Cookie preferences">
       <div>
         <strong>Cookie preferences</strong>
-        <p>Optional analytics help us understand site usage. They load only if you allow them.</p>
+        <p>Optional analytics help us understand site usage. Measurement starts only if you allow it.</p>
       </div>
       <div className="consent-actions">
         <button className="button button-secondary" onClick={() => choose("rejected")}>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { SITE_NAME, PRODUCTION_URL } from "@/lib/site";
+import Script from "next/script";
+import { SITE_NAME, PRODUCTION_URL, GTM_ID } from "@/lib/site";
 import { AnalyticsConsent } from "@/components/analytics-consent";
 import { AuthFlowTracker } from "@/components/auth-flow-tracker";
 import "./globals.css";
@@ -54,6 +55,21 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   };
   return (
     <html lang="en-IN">
+      <head>
+        <Script id="google-tag-manager-setup" strategy="beforeInteractive">
+          {`window.dataLayer=window.dataLayer||[];
+function gtag(){window.dataLayer.push(arguments);}
+window.gtag=gtag;
+gtag('js', new Date());
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
+try{if(localStorage.getItem('cloverloop-analytics-consent')==='accepted'){gtag('consent','update',{analytics_storage:'granted'});}}catch(error){console.warn('Unable to read analytics consent preference.',error);}`}
+        </Script>
+        <Script
+          id="google-tag-manager"
+          src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`}
+          strategy="beforeInteractive"
+        />
+      </head>
       <body>
         <AuthFlowTracker />
         <AnalyticsConsent />

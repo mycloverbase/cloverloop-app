@@ -2,6 +2,7 @@ export const SITE_NAME = "CloverLoop";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://cloverloop.in";
 export const PRODUCTION_URL = "https://cloverloop.in";
+export const GTM_ID = "GTM-K4BMMLN3";
 
 export function canonical(path: string) {
   return `${PRODUCTION_URL}${path === "/" ? "" : path}`;
@@ -302,7 +303,7 @@ export const companyPages: Record<
     paragraphs: [
       "Draft for legal review. This initial privacy notice must be reviewed by qualified counsel and updated with confirmed operational details before publication.",
       "CloverLoop uses Supabase authentication for account registration and sign-in. Registration may involve an email address and authentication credentials managed through Supabase. Do not send passwords or authentication tokens to analytics.",
-      "Analytics services such as Google Analytics 4 or Google Tag Manager are optional and should only load after the visitor gives the required consent. Cookie preferences are stored so the site can respect the visitor's choice.",
+      "Google Tag Manager loads with analytics storage denied by default, and Google Analytics 4 measurement is only permitted after the visitor gives the required consent. Cookie preferences are stored so the site can respect the visitor's choice.",
       "The final notice must explain the personal data collected, purposes and legal basis, service providers, retention periods, user rights, international transfers where applicable, contact details and how users can make a privacy request. These details require confirmation before launch.",
     ],
   },

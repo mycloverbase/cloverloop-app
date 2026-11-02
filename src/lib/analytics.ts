@@ -18,7 +18,6 @@ declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
-    __cloverloopAnalyticsLoaded?: boolean;
   }
 }
 
@@ -30,36 +29,12 @@ export function analyticsAllowed() {
 
 export function track(event: AnalyticsEvent, values: Record<string, string> = {}) {
   if (!analyticsAllowed()) return;
-  const payload = { event, ...values };
-  window.dataLayer?.push(payload);
-  window.gtag?.("event", event, values);
+  const dataLayer = (window.dataLayer = window.dataLayer || []);
+  dataLayer.push({ event, ...values });
 }
 
-export function loadAnalytics() {
-  if (typeof window === "undefined" || !analyticsAllowed() || window.__cloverloopAnalyticsLoaded) {
-    return;
-  }
-  window.__cloverloopAnalyticsLoaded = true;
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  const gtmId = "GTM-T22DLGW9";
-  const dataLayer = window.dataLayer || (window.dataLayer = []);
-  const gtag = (...args: unknown[]) => dataLayer.push(args);
-  window.gtag = gtag;
-  gtag("js", new Date());
-
-  if (gaId) {
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
-    document.head.appendChild(script);
-    gtag("config", gaId, { send_page_view: false });
-  }
-
-  if (gtmId) {
-    dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(gtmId)}`;
-    document.head.appendChild(script);
-  }
+export function updateConsent(choice: "accepted" | "rejected") {
+  window.gtag?.("consent", "update", {
+    analytics_storage: choice === "accepted" ? "granted" : "denied",
+  });
 }
