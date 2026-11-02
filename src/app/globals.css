@@ -1078,6 +1078,56 @@ a {
   line-height: 1.8;
 }
 
+.simple-page-body h1 {
+  margin: 0 0 28px;
+  color: var(--forest);
+  font-size: clamp(2.35rem, 4vw, 3.5rem);
+  font-weight: 670;
+  letter-spacing: -0.05em;
+  line-height: 1.08;
+}
+
+.simple-page-body h2 {
+  margin: 56px 0 18px;
+  color: var(--forest);
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.simple-page-body h3 {
+  margin: 36px 0 12px;
+  color: var(--forest);
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.simple-page-body p {
+  margin: 0 0 1.25rem;
+}
+
+.simple-page-body strong {
+  color: var(--forest);
+  font-weight: 700;
+}
+
+.simple-page-body ul {
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+}
+
+.simple-page-body li {
+  margin-bottom: 0.7rem;
+  padding-left: 0.25rem;
+}
+
+.simple-page-body li::marker {
+  color: #78a98b;
+}
+
 .simple-page-body .button {
   margin-top: 10px;
 }

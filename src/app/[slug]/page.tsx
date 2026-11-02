@@ -132,7 +132,7 @@ function AboutBlocks({ blocks }: { blocks: NonNullable<(typeof companyPages)[str
       {blocks.map((block, index) => {
         switch (block.type) {
           case "h2":
-            return <h2 key={index}>{block.text}</h2>;
+            return index === 0 ? <h1 key={index}>{block.text}</h1> : <h2 key={index}>{block.text}</h2>;
           case "h3":
             return <h3 key={index}>{block.text}</h3>;
           case "strong":

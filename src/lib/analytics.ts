@@ -33,6 +33,21 @@ export function track(event: AnalyticsEvent, values: Record<string, string> = {}
   dataLayer.push({ event, ...values });
 }
 
+let lastPageViewUrl = "";
+
+// Sends at most one page_view per distinct URL, only after analytics consent.
+export function trackPageView() {
+  if (!analyticsAllowed()) return;
+  const pageLocation = window.location.href;
+  if (pageLocation === lastPageViewUrl) return;
+  lastPageViewUrl = pageLocation;
+  track("page_view", {
+    page_path: window.location.pathname,
+    page_location: pageLocation,
+    page_title: document.title,
+  });
+}
+
 export function updateConsent(choice: "accepted" | "rejected") {
   window.gtag?.("consent", "update", {
     analytics_storage: choice === "accepted" ? "granted" : "denied",

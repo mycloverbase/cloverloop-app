@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
-import { track, updateConsent } from "@/lib/analytics";
+import { track, trackPageView, updateConsent } from "@/lib/analytics";
 
 const CONSENT_KEY = "cloverloop-analytics-consent";
 const CONSENT_CHANGE_EVENT = "cloverloop-consent-change";
@@ -23,10 +23,33 @@ function subscribeToConsent(onChange: () => void) {
 export function AnalyticsConsent() {
   const consent = useSyncExternalStore(subscribeToConsent, readConsent, () => "");
   const pathname = usePathname();
+  const lastTitle = useRef("");
 
   useEffect(() => {
-    track("page_view", { page_path: pathname });
-    if (pathname === "/pricing") track("pricing_page_visit");
+    // Next.js applies the new route's <title> after the route commits, so wait for it to change.
+    let done = false;
+    const previousTitle = lastTitle.current;
+    const titleReady = () => Boolean(document.title) && document.title !== previousTitle;
+    function fire() {
+      if (done) return;
+      done = true;
+      observer.disconnect();
+      window.clearTimeout(fallback);
+      lastTitle.current = document.title;
+      trackPageView();
+      if (pathname === "/pricing") track("pricing_page_visit");
+    }
+    const observer = new MutationObserver(() => {
+      if (titleReady()) fire();
+    });
+    const fallback = window.setTimeout(fire, 1000);
+    observer.observe(document.head, { childList: true, subtree: true, characterData: true });
+    if (titleReady()) fire();
+    return () => {
+      done = true;
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, [pathname]);
 
   useEffect(() => {
@@ -48,9 +71,7 @@ export function AnalyticsConsent() {
     window.localStorage.setItem(CONSENT_KEY, choice);
     window.dispatchEvent(new Event(CONSENT_CHANGE_EVENT));
     updateConsent(choice);
-    if (choice === "accepted") {
-      track("page_view", { page_path: window.location.pathname });
-    }
+    if (choice === "accepted") trackPageView();
   }
 
   if (consent) return null;
