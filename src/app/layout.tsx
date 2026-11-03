@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script";
-import { SITE_NAME, PRODUCTION_URL, GTM_ID } from "@/lib/site";
+import { ANALYTICS_CONSENT_KEY, SITE_NAME, PRODUCTION_URL, GTM_ID } from "@/lib/site";
 import { AnalyticsConsent } from "@/components/analytics-consent";
 import { AuthFlowTracker } from "@/components/auth-flow-tracker";
 import "./globals.css";
@@ -53,21 +52,38 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     description:
       "Create your own digital storefront, sell directly to your audience and simplify digital product delivery.",
   };
+  const googleTagManagerBootstrap = `
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){window.dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('consent', 'default', {
+      analytics_storage: 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      wait_for_update: 500
+    });
+    try {
+      if (window.localStorage.getItem('${ANALYTICS_CONSENT_KEY}') === 'accepted') {
+        gtag('consent', 'update', { analytics_storage: 'granted' });
+      }
+    } catch (error) {
+      console.warn('Unable to read analytics consent preference.', error);
+    }
+    window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+    (function() {
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://www.googletagmanager.com/gtm.js?id=${GTM_ID}';
+      document.head.appendChild(script);
+    })();
+  `;
   return (
     <html lang="en-IN">
       <head>
-        <Script id="google-tag-manager-setup" strategy="beforeInteractive">
-          {`window.dataLayer=window.dataLayer||[];
-function gtag(){window.dataLayer.push(arguments);}
-window.gtag=gtag;
-gtag('js', new Date());
-gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
-try{if(localStorage.getItem('cloverloop-analytics-consent')==='accepted'){gtag('consent','update',{analytics_storage:'granted'});}}catch(error){console.warn('Unable to read analytics consent preference.',error);}`}
-        </Script>
-        <Script
-          id="google-tag-manager"
-          src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`}
-          strategy="beforeInteractive"
+        <script
+          id="google-tag-manager-bootstrap"
+          dangerouslySetInnerHTML={{ __html: googleTagManagerBootstrap }}
         />
       </head>
       <body>

@@ -1,5 +1,7 @@
 "use client";
 
+import { ANALYTICS_CONSENT_KEY } from "@/lib/site";
+
 export type AnalyticsEvent =
   | "navigation_click"
   | "pricing_page_visit"
@@ -21,10 +23,24 @@ declare global {
   }
 }
 
-const CONSENT_KEY = "cloverloop-analytics-consent";
+export type AnalyticsConsentChoice = "accepted" | "rejected";
+
+export function readAnalyticsConsent(): AnalyticsConsentChoice | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const choice = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
+    return choice === "accepted" || choice === "rejected" ? choice : null;
+  } catch {
+    return null;
+  }
+}
+
+export function persistAnalyticsConsent(choice: AnalyticsConsentChoice) {
+  window.localStorage.setItem(ANALYTICS_CONSENT_KEY, choice);
+}
 
 export function analyticsAllowed() {
-  return typeof window !== "undefined" && window.localStorage.getItem(CONSENT_KEY) === "accepted";
+  return readAnalyticsConsent() === "accepted";
 }
 
 export function track(event: AnalyticsEvent, values: Record<string, string> = {}) {
@@ -48,7 +64,7 @@ export function trackPageView() {
   });
 }
 
-export function updateConsent(choice: "accepted" | "rejected") {
+export function updateConsent(choice: AnalyticsConsentChoice | null) {
   window.gtag?.("consent", "update", {
     analytics_storage: choice === "accepted" ? "granted" : "denied",
   });

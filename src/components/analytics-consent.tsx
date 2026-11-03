@@ -1,22 +1,32 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
-import { track, trackPageView, updateConsent } from "@/lib/analytics";
+import {
+  persistAnalyticsConsent,
+  readAnalyticsConsent,
+  track,
+  trackPageView,
+  updateConsent,
+  type AnalyticsConsentChoice,
+} from "@/lib/analytics";
 
-const CONSENT_KEY = "cloverloop-analytics-consent";
 const CONSENT_CHANGE_EVENT = "cloverloop-consent-change";
 
 function readConsent() {
-  return typeof window === "undefined" ? "" : window.localStorage.getItem(CONSENT_KEY) ?? "";
+  return readAnalyticsConsent() ?? "";
 }
 
 function subscribeToConsent(onChange: () => void) {
-  window.addEventListener("storage", onChange);
-  window.addEventListener(CONSENT_CHANGE_EVENT, onChange);
+  function syncConsent() {
+    updateConsent(readAnalyticsConsent());
+    onChange();
+  }
+  window.addEventListener("storage", syncConsent);
+  window.addEventListener(CONSENT_CHANGE_EVENT, syncConsent);
   return () => {
-    window.removeEventListener("storage", onChange);
-    window.removeEventListener(CONSENT_CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", syncConsent);
+    window.removeEventListener(CONSENT_CHANGE_EVENT, syncConsent);
   };
 }
 
@@ -24,6 +34,7 @@ export function AnalyticsConsent() {
   const consent = useSyncExternalStore(subscribeToConsent, readConsent, () => "");
   const pathname = usePathname();
   const lastTitle = useRef("");
+  const [storageError, setStorageError] = useState("");
 
   useEffect(() => {
     // Next.js applies the new route's <title> after the route commits, so wait for it to change.
@@ -67,10 +78,17 @@ export function AnalyticsConsent() {
     return () => document.removeEventListener("click", onDocumentClick);
   }, []);
 
-  function choose(choice: "accepted" | "rejected") {
-    window.localStorage.setItem(CONSENT_KEY, choice);
+  function choose(choice: AnalyticsConsentChoice) {
+    try {
+      persistAnalyticsConsent(choice);
+      setStorageError("");
+    } catch (error) {
+      console.error("Could not persist the analytics consent choice.", error);
+      updateConsent("rejected");
+      setStorageError("Your choice could not be saved. Check your browser storage settings and try again.");
+      return;
+    }
     window.dispatchEvent(new Event(CONSENT_CHANGE_EVENT));
-    updateConsent(choice);
     if (choice === "accepted") trackPageView();
   }
 
@@ -80,13 +98,14 @@ export function AnalyticsConsent() {
       <div>
         <strong>Cookie preferences</strong>
         <p>Optional analytics help us understand site usage. Measurement starts only if you allow it.</p>
+        {storageError && <p role="alert">{storageError}</p>}
       </div>
       <div className="consent-actions">
         <button className="button button-secondary" onClick={() => choose("rejected")}>
-          Reject optional
+          Reject Analytics
         </button>
         <button className="button" onClick={() => choose("accepted")}>
-          Allow analytics
+          Accept Analytics
         </button>
       </div>
     </aside>

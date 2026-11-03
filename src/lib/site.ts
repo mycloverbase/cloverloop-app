@@ -3,6 +3,7 @@ export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://cloverloop.in";
 export const PRODUCTION_URL = "https://cloverloop.in";
 export const GTM_ID = "GTM-K4BMMLN3";
+export const ANALYTICS_CONSENT_KEY = "cloverloop-analytics-consent";
 
 export function canonical(path: string) {
   return `${PRODUCTION_URL}${path === "/" ? "" : path}`;
