@@ -1,8 +1,8 @@
 ## 1. CloverLoop's role
 
-CloverLoop provides software and related infrastructure that allows independent creators to publish and sell digital products through their own storefronts. Creators are responsible for the products, descriptions, claims, licences, delivery obligations, customer support and buyer-facing policies they publish. CloverLoop does not create, independently verify, certify or endorse every creator product and does not guarantee its quality, accuracy, legality, safety or suitability.
+CloverLoop provides software and related infrastructure for independent creators to present digital products through their own storefronts. Creators are responsible for the products, descriptions, claims, licences, delivery obligations, customer support and buyer-facing policies they publish. CloverLoop does not create, independently verify, certify or endorse every creator product and does not guarantee its quality, accuracy, legality, safety or suitability.
 
-CloverLoop may facilitate parts of the transaction workflow, including payment-status verification, order records and digital delivery. The legal responsibilities of CloverLoop, creators and payment providers depend on the actual transaction structure and applicable law. Nothing in this Disclaimer excludes a duty that cannot legally be excluded.
+The legal responsibilities of CloverLoop, creators and payment providers depend on the actual transaction structure and applicable law. Nothing in this Disclaimer excludes a duty that cannot legally be excluded.
 
 ## 2. No professional advice
 
@@ -14,7 +14,7 @@ Examples of sales, revenue, fees, conversion rates, audience growth or creator e
 
 ## 4. Third-party platforms and services
 
-CloverLoop may integrate with or link to Razorpay, Supabase, Vercel, Resend, Google services and external websites. Those services are governed by their own terms, privacy policies, availability and decisions. CloverLoop does not control third-party systems and is not responsible for their independent acts, outages, payment holds, delays, policy changes or security incidents, except to the extent responsibility is imposed on CloverLoop by law.
+Third-party services, including Razorpay, Supabase, Vercel, Resend, Google services and external websites, may be subject to their own terms, privacy policies, availability and decisions. CloverLoop does not control third-party systems and is not responsible for their independent acts, outages, payment holds, delays, policy changes or security incidents, except to the extent responsibility is imposed on CloverLoop by law.
 
 ## 5. External links and creator content
 
@@ -22,7 +22,7 @@ External links are provided for convenience. We do not control or endorse all ex
 
 ## 6. Availability and technical issues
 
-We make reasonable efforts to keep the Platform available and secure, but do not guarantee uninterrupted, error-free or continuous availability. Maintenance, updates, network issues, hosting incidents or payment-provider downtime may affect access. We will take reasonable steps to address material issues.
+We make reasonable efforts to keep the Platform available and secure, but do not guarantee uninterrupted, error-free or continuous availability. Maintenance, updates, network issues or third-party service interruptions may affect access. We will take reasonable steps to address material issues.
 
 ## 7. Limitation of liability
 

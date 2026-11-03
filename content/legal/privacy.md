@@ -1,4 +1,4 @@
-This Privacy Policy explains how CloverLoop, operated by ARM Gear Co., collects, uses, stores, shares and protects personal data when you visit the website, create an account, operate a storefront, browse a store, purchase a product or contact us.
+This Privacy Policy explains how CloverLoop, operated by ARM Gear Co., collects, uses, stores, shares and protects personal data when you visit the website, create an account, use the Platform or contact us.
 
 ## 1. Who is responsible for your data
 
@@ -10,29 +10,30 @@ For account, platform, website, support, security and business-administration in
 
 - Identity and contact details such as name, email, mobile number and account identifiers.
 - Authentication and security information. Passwords should be stored by the authentication provider in protected form; CloverLoop does not need plaintext passwords.
-- Storefront information such as username, profile, product titles, descriptions, prices, files, images and settings.
-- Plan selection, subscription status, invoices, platform commission calculations and payment references.
-- Razorpay account connection / integration information needed to associate a storefront with the creator's own payment account.
+- Creator profile information such as display name, username, bio, location, contact number, profile image, social links and communication preferences.
+- Storefront information such as product titles, descriptions, prices, files, images and settings.
+- Plan selection and related account information, where applicable.
+- Payment-provider connection information, where applicable.
 - Support requests, feedback, complaints and communications.
 
 ### Buyers and storefront visitors
 
-- Information entered at checkout, which may include name, email and other details requested by the creator or needed to fulfil an order.
-- Order details, product purchased, order status, download or access events, and payment references / transaction identifiers.
+- Information entered in a purchase flow, where applicable, which may include name, email and other details requested by the creator or needed to fulfil an order.
+- Order details, product purchased, order status, download or access events, and payment references or transaction identifiers, where applicable.
 - Information submitted in forms or communications with the creator or CloverLoop.
 - Technical information such as browser, device, approximate location derived from network information, referring page, pages viewed, timestamps and diagnostic logs, subject to applicable consent and configuration.
 
 ### Information from payment providers
 
-Razorpay processes payment credentials such as card, UPI, bank and other payment information under its own systems and terms. CloverLoop should receive only transaction information and status needed to confirm an order, reconcile activity and support refunds or disputes. We do not intend to collect or store full card numbers, UPI PINs, banking passwords or payment authentication credentials.
+Payment providers process payment credentials under their own systems and terms. CloverLoop does not intend to collect or store full card numbers, UPI PINs, banking passwords or payment authentication credentials.
 
 ## 3. Why we use information
 
 - Create and administer accounts, authenticate users and operate creator storefronts.
-- Display products, process order workflows, verify payment status and provide digital-product access or delivery.
-- Calculate platform commissions, administer Pro Creator subscriptions, issue invoices and maintain business records.
+- Operate the website and account features and provide related services.
+- Explain published plan pricing and administer plan-related information, where applicable.
 - Send service notices, order confirmations, support responses and security alerts.
-- Detect fraud, abuse, unauthorised access, policy violations and payment disputes.
+- Detect fraud, abuse, unauthorised access and policy violations, and address payment disputes where applicable.
 - Maintain, troubleshoot, secure and improve the Platform and understand aggregate usage.
 - Comply with legal obligations, respond to lawful requests and establish, exercise or defend legal claims.
 - Send marketing communications only where we have an appropriate lawful basis or consent and provide an opt-out where required.
@@ -47,11 +48,11 @@ Google Analytics 4 and Google Tag Manager may be used to measure website usage i
 
 ## 5. Who we share information with
 
-- Creators: a creator may receive buyer details and order information needed to fulfil a purchase, provide support and manage the creator's customer relationship.
+- Creators: a creator may receive buyer details and order information needed to fulfil a purchase, provide support and manage the creator's customer relationship, where applicable.
 - Supabase: may provide authentication, database and file-storage infrastructure, depending on deployed configuration.
 - Vercel: may provide website hosting, content delivery, security and technical diagnostics.
-- Resend: may provide transactional email delivery, such as account, order and product-delivery communications, if configured.
-- Razorpay: processes buyer payments and provides payment status / transaction references under the creator's payment account and Razorpay's terms.
+- Resend: may provide transactional email delivery, such as account, order and product-delivery communications, where configured.
+- Payment providers: may process buyer payments and provide transaction information, where applicable.
 - Professional advisers and service providers: may receive limited information to provide accounting, legal, security or operational services under appropriate confidentiality obligations.
 - Authorities and other parties: where disclosure is required by law, court order or regulation, or necessary to protect rights, safety, users or the Platform.
 

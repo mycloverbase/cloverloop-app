@@ -1,33 +1,33 @@
 ---
-title: "What Is Razorpay and Why Does CloverLoop Use It?"
+title: "What Is Razorpay?"
 slug: "what-is-razorpay-and-why-does-cloverloop-use-it"
 category: "razorpay-setup"
 order: 12
-description: "Razorpay is a payment services provider that enables businesses to accept online payments. CloverLoop is designed to let each creator connect their own Razorpay account rather than routing all creator sales through a central CloverLoop merchant account."
+description: "A general overview of Razorpay payment services, merchant accounts and provider terms."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-03"
 related: []
 editorialLabel: "GENERAL GUIDANCE"
 ---
 
-Razorpay is a payment services provider that enables businesses to accept online payments. CloverLoop is designed to let each creator connect their own Razorpay account rather than routing all creator sales through a central CloverLoop merchant account.
+Razorpay is a payment services provider that enables businesses to accept online payments. Its merchant services, account requirements and fees are governed by Razorpay's terms.
 
 ## The payment gateway's role
 
-When a customer pays for a creator's product, Razorpay processes the payment using the creator's connected account and the payment methods available to that customer.
+When used independently, Razorpay processes payments under the merchant account and payment methods available to that merchant.
 
 ## Creator-owned account model
 
-The creator is responsible for creating and maintaining their Razorpay merchant account and completing any verification required by Razorpay.
+Merchants are responsible for creating and maintaining their Razorpay accounts and completing any verification required by Razorpay.
 
 ## Where the money goes
 
-Razorpay settles eligible funds to the creator's registered bank account according to Razorpay's settlement process and applicable terms. CloverLoop does not centrally collect or hold creator sales proceeds.
+Razorpay settles eligible funds according to its settlement process and applicable terms. Review the current details in the relevant Razorpay account.
 
 ## Separate platform charges
 
-CloverLoop calculates its platform commission separately and invoices creators monthly. Razorpay processing fees are additional and governed by the creator's Razorpay arrangement.
+Razorpay or another payment provider may charge processing fees under its own terms. Those charges are payable separately by the creator and are not included in CloverLoop's platform commission.
 
-## Illustrative flow
+## Review current provider terms
 
-Customer → Creator storefront on CloverLoop → Razorpay payment processing through the creator's account → settlement by Razorpay to the creator's registered bank account.
+Fees, supported payment methods, eligibility and settlement terms may vary. Check the current details with the provider before choosing a service.

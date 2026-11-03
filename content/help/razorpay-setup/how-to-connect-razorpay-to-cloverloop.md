@@ -1,24 +1,20 @@
 ---
-title: "Creator-Owned Razorpay Payments"
+title: "Razorpay Fees and CloverLoop Platform Commission"
 slug: "how-to-connect-razorpay-to-cloverloop"
 category: "razorpay-setup"
 order: 14
-description: "Learn how creator-owned Razorpay accounts keep payment processing and settlement connected directly to the creator."
+description: "Understand how Razorpay processing charges are separate from CloverLoop platform commission."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-03"
 related: []
 ---
 
-Customer payments are processed through the creator's own Razorpay account and settled by Razorpay to the creator's registered bank account. Razorpay's account terms and activation requirements apply.
+Razorpay or another payment provider may charge processing fees under its own terms. Those charges are payable separately by the creator and are not included in CloverLoop's platform commission.
 
-## Account ownership
+## Review the provider's terms
 
-Use a Razorpay account that belongs to you or the business operating your creator storefront. Razorpay determines the account's activation and eligibility for payment services.
+Check the current provider fee schedule, supported payment methods, eligibility requirements, settlement terms and refund rules directly with the provider.
 
-## Security
+## Protect your account
 
-Never share your Razorpay password, one-time password or secret credentials with another person. Do not send secret API keys through email or chat. Authorize account access only through a trusted, official payment-provider flow.
-
-## Fees and settlement
-
-Razorpay processing fees are separate from CloverLoop's platform commission. Razorpay settles eligible funds according to its settlement terms and the creator's account configuration.
+Follow the provider's official security guidance. Never share passwords, one-time passwords or secret credentials, and authorize access only through a trusted provider flow.

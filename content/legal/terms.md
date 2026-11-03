@@ -1,4 +1,4 @@
-These Terms of Use (“Terms”) govern access to and use of CloverLoop, including its website, creator dashboards, storefronts, checkout and digital-product delivery features (the “Platform”). The Platform is operated under the trade name ARM Gear Co., a sole proprietorship, at Plot 477, Nuasahi, Bhubaneswar, Khordha, Odisha – 751012 (“CloverLoop”, “we”, “us” or “our”).
+These Terms of Use (“Terms”) govern access to and use of CloverLoop, including its website, creator dashboards, storefronts and related features (the “Platform”). The Platform is operated under the trade name ARM Gear Co., a sole proprietorship, at Plot 477, Nuasahi, Bhubaneswar, Khordha, Odisha – 751012 (“CloverLoop”, “we”, “us” or “our”).
 
 By creating an account, opening a storefront, browsing a storefront, purchasing a product or otherwise using the Platform, you agree to these Terms and the [Privacy Policy](/privacy), [Refund & Cancellation Policy](/refunds), [Cookie Policy](/cookies) and [Disclaimer](/disclaimer). If you do not agree, do not use the Platform.
 
@@ -11,9 +11,9 @@ By creating an account, opening a storefront, browsing a storefront, purchasing 
 
 ## 2. What CloverLoop provides
 
-CloverLoop provides software and infrastructure that enables independent creators to publish digital products, present them through a storefront, receive order information and deliver digital content to buyers. Features may include product listings, checkout integration, payment-status verification, order management and download access.
+CloverLoop provides software and infrastructure for independent creators to present digital products through storefronts. Product, plan and platform terms are described in the applicable offer and these Terms.
 
-Creators are responsible for the products they offer, descriptions, pricing, licences, customer support, tax obligations and legal compliance. CloverLoop provides technology and may facilitate payment verification and delivery workflows. The precise legal relationship among CloverLoop, a creator, a buyer and a payment provider depends on the transaction and applicable law; nothing in these Terms removes statutory obligations that apply to CloverLoop.
+Creators are responsible for the products they offer, descriptions, pricing, licences, customer support, tax obligations and legal compliance. The precise legal relationship among CloverLoop, a creator, a buyer and a payment provider depends on the transaction and applicable law; nothing in these Terms removes statutory obligations that apply to CloverLoop.
 
 ## 3. Creator responsibilities
 
@@ -39,35 +39,29 @@ We may review reports, request information, restrict access to content or take o
 
 ## 5. Plans, fees and taxes
 
-The current plan structure, subject to the pricing page at the time of purchase, is:
+The published plan structure is:
 
 | Plan | Subscription | Platform fee | Product allowance |
 | --- | --- | --- | --- |
-| Free | ₹0/month | 0% | 1 paid product; up to 5 free product listings |
-| Creator | ₹0/month | 4% | Unlimited paid and free products |
-| Pro Creator | ₹5,000/month | 3% | Unlimited paid and free products |
+| Free | ₹0/month | 0% on the first ₹10,000 Gross Sales per calendar month; 4% only on incremental Gross Sales above ₹10,000 | 1 paid product and 5 free product listings per account lifetime |
+| Creator | ₹0/month | 4%; no monthly Gross Sales limit | Unlimited paid and free products |
+| Pro Creator | ₹1,499/month | 2.5%; no monthly Gross Sales limit | Unlimited paid and free products |
 
-Platform rates are exclusive of applicable GST. CloverLoop currently applies 18% GST to its platform commission where applicable. At the stated rates, commission plus GST is 4.72% for Creator and 3.54% for Pro Creator. The Pro Creator subscription is ₹5,000 per month exclusive of applicable GST. The pricing page and invoice govern if rates or taxes change.
+The Free-plan ₹10,000 allowance resets on the first day of each calendar month (IST). Sales are not stopped after the allowance is used. Platform rates and monthly subscription prices are exclusive of applicable GST where required.
 
-Razorpay processing fees are separate from CloverLoop's platform commission and are governed by the creator's agreement with Razorpay. Such fees may include applicable taxes and may vary by payment method, account or settlement terms.
+Razorpay or other payment-provider processing charges, if applicable, are separate from CloverLoop's platform commission and payable by the creator to the provider under its terms. These charges are not included in CloverLoop's platform commission.
 
-Creators connect their own Razorpay account. Buyer payments are processed and settled by Razorpay under the creator's own account and terms. CloverLoop does not represent that it holds or safeguards creator funds. CloverLoop may verify payment status and use transaction references to enable delivery.
+Free products do not attract platform transaction commission. Usage, storage, bandwidth or download limits may apply where disclosed.
 
-CloverLoop platform commission is invoiced separately to the creator monthly; it is not automatically deducted from the buyer's payment settlement. Creators must pay invoices by the due date shown. Free products do not attract platform transaction commission. Usage, storage, bandwidth or download limits may apply where disclosed.
+Creators are responsible for taxes arising from their sales and business. Obtain independent tax advice for your circumstances.
 
-Creators are responsible for taxes arising from their sales and business. CloverLoop invoices may include GST on CloverLoop's services as legally required. Obtain independent tax advice for your circumstances.
+## 6. Plan availability
 
-## 6. Pro Creator subscription, renewal and cancellation
-
-Pro Creator is billed monthly at the price displayed at subscription. Unless checkout states otherwise, it renews automatically until cancelled. You may cancel using account billing controls or by emailing mycloverbase@gmail.com. Cancellation stops the next renewal; paid features ordinarily continue until the end of the period already paid for, unless restriction is necessary for legal, security or payment reasons.
-
-A full refund may be requested within 14 days of the first paid Pro Creator subscription charge or any subsequent renewal charge. Send the request to mycloverbase@gmail.com with the account email and invoice / transaction reference. Approved refunds will be returned to the original payment method where supported. This commitment does not limit non-waivable rights under applicable law.
-
-If a subscription payment fails, we may ask you to update the payment method. If it remains unpaid, Pro Creator features may be restricted or the account moved to a lower plan. Products will not be intentionally deleted solely because a renewal failed, subject to legal, security and retention requirements.
+Any plan changes, renewals, cancellations or refunds are governed by the applicable plan terms and any non-waivable rights under applicable law.
 
 ## 7. Buyer purchases and delivery
 
-The creator sets product price, description and buyer-facing terms. Buyers should review the product page before ordering. Payment is processed by the provider enabled for the transaction. Access is provided after CloverLoop receives or verifies payment confirmation and may be delivered by download link, account access, email or another checkout-described method.
+The creator sets product price, description and buyer-facing terms. The applicable payment provider and delivery conditions should be clearly identified to buyers before purchase.
 
 Buyers may use purchased content only within the licence stated by the creator. Unless permitted by the creator or law, buyers must not resell, redistribute, publicly share or make unauthorised copies.
 
@@ -81,7 +75,7 @@ To report suspected infringement, email mycloverbase@gmail.com with the relevant
 
 ## 9. Third-party services
 
-CloverLoop may integrate with third-party services to provide and operate certain Platform features, including payment processing, hosting, authentication, database management and email delivery.
+CloverLoop may use third-party services to provide and operate Platform features, including hosting, authentication, database management and email delivery.
 
 Your use of services provided by these third parties may be subject to their respective terms, conditions and privacy policies. CloverLoop does not control the independent operations of these providers and is not responsible for service interruptions, changes or actions beyond its reasonable control, except where liability cannot be excluded under applicable law.
 
@@ -89,7 +83,7 @@ For information about how third-party providers may process your personal data, 
 
 ## 10. Suspension and termination
 
-You may stop using the Platform and request account closure through available account controls or by contacting mycloverbase@gmail.com. Before closure, download records you need and resolve pending customer obligations, invoices, refunds and disputes.
+You may stop using the Platform and request account closure through available account controls or by contacting mycloverbase@gmail.com. Before closure, download records you need and resolve pending customer obligations, refunds and disputes.
 
 We may restrict, suspend or terminate an account, storefront, listing or feature where we reasonably believe there is fraud, unlawful activity, infringement, material breach, payment-provider risk, security risk, harm to users, repeated serious disputes or a legal requirement. Where practicable, we will provide the reason and an opportunity to respond. Immediate action may be taken to prevent harm, preserve evidence or comply with law.
 

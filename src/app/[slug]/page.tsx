@@ -112,7 +112,7 @@ function FeaturePage({ slug }: { slug: string }) {
           ))}
           {slug === "sell-digital-downloads" && (
             <ul className="check-list">
-              <li><Check size={18} /> Secure download links after successful payment verification</li>
+              <li><Check size={18} /> Clear product details and access instructions help buyers understand what a digital download includes.</li>
             </ul>
           )}
         </div>

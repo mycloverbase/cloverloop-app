@@ -9,13 +9,13 @@ Sprint 2 • Editorial copy and article structure
 
 This document contains the proposed creator-facing copy for the CloverLoop Help Centre. It is the content source of truth for implementation. The website implementation should place this content into documentation templates; the coding agent must not independently author, rewrite or expand articles.
 
-Publish operational how-to instructions only after the relevant feature exists and the steps have been checked against the live interface. Articles marked REVIEW BEFORE PUBLICATION must remain drafts until the product flow is confirmed.
+Publish operational how-to instructions only after the steps have been checked against the relevant interface. Articles marked REVIEW BEFORE PUBLICATION must remain drafts until the content is verified.
 
-CloverLoop uses a creator-owned payment account model. Creators connect their own Razorpay accounts. Razorpay processes customer payments and settles eligible funds directly to the creator's registered bank account. CloverLoop does not centrally collect or hold creator sales proceeds. CloverLoop calculates platform commission separately and invoices creators monthly.
+Use neutral descriptions for payment and plan-related topics. Do not describe a provider connection, transaction, billing or fee-collection flow as available unless the relevant user-facing experience has been verified.
 
-Authoritative pricing: Free — ₹0/month, 0% platform transaction fee, 1 paid product listing and 5 free product listings per account; Creator — ₹0/month, 4% platform transaction fee excluding GST, unlimited paid and free product listings; Pro Creator — ₹5,000/month excluding GST, 3% platform transaction fee excluding GST, unlimited paid and free product listings. GST at 18% applies to platform commission, making effective rates 0%, 4.72% and 3.54%. Free products do not incur platform transaction commission. CloverLoop commission is invoiced monthly, not deducted from customer payments; Razorpay processing fees are additional.
+Authoritative published pricing: Free — ₹0/month, 0% on the first ₹10,000 in Gross Sales per calendar month and 4% only on incremental Gross Sales above the allowance; one paid and five free product listings per account lifetime. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator — ₹0/month, 4% platform commission, unlimited paid and free product listings, no monthly Gross Sales limit. Pro Creator — ₹1,499/month, 2.5% platform commission, unlimited paid and free product listings, no monthly Gross Sales limit. Razorpay or other payment-provider processing charges, if applicable, are separate, payable by creators to the provider, and not included in platform commission.
 
-The Free plan's five free product listings are an account-level listing cap. They are not five downloads, not a monthly quota and do not reset monthly.
+The Free plan's one paid and five free product listings are lifetime account-level limits. They are not download quotas and do not reset monthly. Only the ₹10,000 Gross Sales allowance resets each calendar month (IST).
 
 ## Note on external references
 
@@ -23,13 +23,11 @@ Razorpay onboarding requirements, fees, supported payment methods and settlement
 
 ## Editorial QA checklist
 
-- All pricing and plan limits match the approved CloverLoop pricing model.
-- The Free plan is described as allowing five free product listings per account.
-- No article describes five free downloads per month or a monthly reset.
-- Creator-owned Razorpay account architecture is described correctly.
-- No article says CloverLoop holds creator sales proceeds.
-- Commission is described as a separate monthly invoice, not a checkout deduction.
-- Razorpay fees are clearly described as additional.
+- All published pricing, the Free-plan Gross Sales threshold, monthly reset and lifetime listing limits match the approved model.
+- The Free plan's 4% commission is described as applying only to incremental Gross Sales above ₹10,000, not to all monthly Gross Sales.
+- No article says sales stop when the Free-plan allowance is used.
+- Payment and plan-related copy does not imply an unverified transaction, billing or fee-collection flow is available.
+- Payment-provider fees are described as separate from platform commission and payable by the creator.
 - UI instructions are checked against the current product.
 - Implementation-dependent articles remain unpublished until verified.
 - No screenshots or mockups are represented as actual product UI.

@@ -10,9 +10,9 @@ export const comparisonArticles = [
     title: "CloverLoop vs SuperProfile: Selling Digital Products in India",
     seoTitle: "CloverLoop vs SuperProfile: Pricing and Features for India",
     description:
-      "Compare CloverLoop and SuperProfile pricing, platform fees, creator tools and payment terms using current official pricing information.",
+      "Compare CloverLoop's published plans and Free-plan Gross Sales allowance with SuperProfile pricing, creator tools and payment terms using current official pricing.",
     summary:
-      "A practical comparison of CloverLoop's INR digital-product plans and SuperProfile's currently published USD pricing and creator toolkit.",
+      "A practical comparison of CloverLoop's INR plan rates and Free-plan Gross Sales allowance with SuperProfile's currently published USD pricing and creator toolkit.",
     reviewedOn: "2 November 2026",
     reviewedOnISO: "2026-11-02",
   },
@@ -21,9 +21,9 @@ export const comparisonArticles = [
     title: "CloverLoop vs Gumroad: Fees, Tax Handling and Digital Products",
     seoTitle: "CloverLoop vs Gumroad: Compare Fees and Features",
     description:
-      "Compare CloverLoop and Gumroad direct-sale fees, Discover charges, payment processing, tax handling and digital-product tools.",
+      "Compare CloverLoop's published plans and Free-plan Gross Sales allowance with Gumroad direct-sale fees, Discover charges, payment processing, tax handling and digital-product tools.",
     summary:
-      "Compare CloverLoop's GST-inclusive commission with Gumroad's fixed USD direct-sale fee, Discover marketplace fee and Merchant of Record service.",
+      "Compare CloverLoop's INR plan rates and Free-plan Gross Sales allowance with Gumroad's fixed USD direct-sale fee, Discover marketplace fee and Merchant of Record service.",
     reviewedOn: "2 November 2026",
     reviewedOnISO: "2026-11-02",
   },
@@ -32,7 +32,7 @@ export const comparisonArticles = [
     title: "CloverLoop vs Payhip: Plans and Fees for Digital Products",
     seoTitle: "CloverLoop vs Payhip: Pricing, Plans and Features",
     description:
-      "Compare CloverLoop and Payhip plans, platform transaction fees, USD subscriptions, payment processing and digital-product features.",
+      "Compare CloverLoop's published plans and Free-plan Gross Sales allowance with Payhip fees, USD subscriptions, payment processing and digital-product features.",
     summary:
       "Compare CloverLoop's INR plans with Payhip's USD Free, Plus and Pro tiers, including processor fees and tax-basis considerations.",
     reviewedOn: "2 November 2026",
@@ -43,7 +43,7 @@ export const comparisonArticles = [
     title: "CloverLoop vs Instamojo: Digital Products and Online Store Fees",
     seoTitle: "CloverLoop vs Instamojo: Current Pricing and Fees",
     description:
-      "Compare CloverLoop and Instamojo plan fees, GST, subscriptions and ecommerce trade-offs using Instamojo's current official pricing.",
+      "Compare CloverLoop's published plans with Instamojo plan fees, subscriptions and ecommerce trade-offs using its current official pricing.",
     summary:
       "Compare CloverLoop's digital-product plan fees with Instamojo's current Online Store rates, including percentage-plus-fixed charges and GST.",
     reviewedOn: "2 November 2026",

@@ -1,28 +1,16 @@
-CloverLoop involves two distinct kinds of payments: creators pay CloverLoop for platform subscriptions and services; buyers purchase digital products from creators. The responsible party and refund process differ.
+This policy explains the published plan fees and general refund responsibilities for creators and buyers. Payment-provider processing charges are separate from CloverLoop's platform commission.
 
 ## 1. CloverLoop plans and platform fees (creators)
 
-The Free plan has no subscription fee and currently permits one paid product and up to five free product listings. The Creator plan has no monthly subscription fee and a 4% platform transaction fee. Pro Creator costs ₹5,000 per month, exclusive of applicable GST, and has a 3% platform transaction fee. Applicable GST is charged in addition.
+Free is ₹0/month and allows one paid and five free product listings per account lifetime. Its platform fee is 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that amount. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator is ₹1,499/month with a 2.5% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit.
 
-### Pro Creator subscription refunds
+Razorpay or other payment-provider processing charges, if applicable, are separate, payable by creators to the provider, and not included in CloverLoop's platform commission.
 
-If you are not satisfied with Pro Creator, you may request a full refund within 14 days of the first paid subscription charge or within 14 days of any subsequent renewal charge. Email mycloverbase@gmail.com with your account email and invoice / transaction reference. Approved refunds will be returned to the original payment method where supported. Processing time depends on the payment provider and banking system.
-
-### Cancelling and renewal
-
-You may cancel at any time using account billing controls or by contacting mycloverbase@gmail.com. Cancellation prevents the next renewal. Unless a refund is approved, paid features ordinarily remain available until the end of the period already paid for. Outside the 14-day refund window, a partial-period refund is not ordinarily provided, except where required by law.
-
-### Platform transaction commissions
-
-CloverLoop invoices platform commission separately each month. If a creator refunds a buyer, the creator should retain refund evidence and notify CloverLoop. Any related commission adjustment, reversal or credit will be handled under the applicable invoice process and verified transaction records. Razorpay processing fees and any reversal are governed by Razorpay's terms and may not be refundable by CloverLoop.
-
-### Failed subscription payments
-
-If a Pro Creator renewal fails, we may ask you to update the payment method. If it remains unpaid, Pro Creator features may be restricted or the account moved to a lower plan. Products will not be intentionally deleted solely because a renewal failed, subject to legal, security and retention requirements.
+Any plan-fee refund, renewal or cancellation is governed by the terms presented for the plan and applicable law.
 
 ## 2. Purchases from creators (buyers)
 
-Digital products are offered by independent creators. The creator sets the product price, description and refund terms and is responsible for fulfilment and buyer refunds. Payments are processed through the creator's own Razorpay account. CloverLoop may verify payment status, provide delivery infrastructure and route support requests, but does not promise a refund on the creator's behalf.
+The creator sets the product price, description and refund terms and is responsible for fulfilment and buyer refunds. The creator's payment provider governs payment processing and any provider fees.
 
 Creators should clearly display product-specific refund terms before purchase. Unless the product page states otherwise, the following are recommended principles and do not limit rights under applicable law:
 
@@ -34,22 +22,20 @@ Creators should clearly display product-specific refund terms before purchase. U
 
 ### How buyers can request a refund
 
-1. Reply to the order confirmation or delivery email, or contact the creator using details shown on the storefront.
+1. Contact the creator using the contact details provided for the purchase.
 2. Provide the order reference, product name, purchase date and a clear description of the issue.
-3. The creator should review the request and, if approving it, initiate the refund through the creator's Razorpay account or payment-provider process.
-4. If the creator does not respond within 7 calendar days, or the issue involves suspected fraud or misuse of CloverLoop, email mycloverbase@gmail.com with the order reference. CloverLoop may follow up with the creator and review relevant platform records.
+3. The creator should review the request and, if approving it, follow the payment provider's refund process.
+4. Follow the payment provider's process for any approved refund and contact CloverLoop support if the issue concerns the platform.
 
-Refund settlement time depends on Razorpay, payment method and the buyer's bank. Any processing estimate is not a guarantee; the payment provider's actual timeline applies.
+For independent sales, refund settlement time depends on the creator's payment provider, payment method and the buyer's bank. The payment provider's actual timeline applies.
 
 ## 3. Recurring purchases
 
-If a creator offers a recurring product or membership, the creator must clearly disclose renewal frequency, price and cancellation method before purchase. Buyers should contact the creator or use the cancellation method stated at checkout to stop future renewals. Refunds for the current period follow the creator's disclosed terms and applicable law.
+If a creator offers a recurring product or membership independently, the creator must clearly disclose renewal frequency, price and cancellation method before purchase. Buyers should contact the creator or follow the cancellation instructions they provide. Refunds follow the creator's disclosed terms and applicable law.
 
 ## 4. Chargebacks and payment disputes
 
-Before raising a dispute with a bank or payment provider, buyers and creators are encouraged to contact the other party. This does not restrict a buyer's right to dispute a charge. Disputes relating to creator sales are handled under the creator's Razorpay account and provider procedures. Disputes relating to CloverLoop subscription charges should be sent to mycloverbase@gmail.com.
-
-CloverLoop may share relevant order, payment-status and delivery records with a payment provider or competent authority to investigate a dispute. Repeated fraud indicators or unresolved serious complaints may result in a store review or suspension.
+Before raising a dispute with a bank or payment provider, buyers and creators are encouraged to contact the other party. This does not restrict a buyer's right to dispute a charge. Disputes relating to creator sales are handled under the creator's payment-provider terms. Any dispute about a CloverLoop plan fee should follow the plan terms and contact CloverLoop support.
 
 ## Contact
 

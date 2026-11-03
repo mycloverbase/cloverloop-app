@@ -1,112 +1,206 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, LogOut } from "lucide-react";
-import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { logoutAction } from "./actions";
-import { TrackLink } from "@/components/track-link";
-
-function getFoundingFormUrl() {
-  const configuredUrl = process.env.NEXT_PUBLIC_FOUNDING_CREATOR_FORM_URL?.trim();
-  if (!configuredUrl) return null;
-  try {
-    const url = new URL(configuredUrl);
-    if (
-      url.protocol === "https:" &&
-      (url.hostname === "docs.google.com" || url.hostname === "forms.gle")
-    ) {
-      return url.toString();
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
+import { ArrowRight, Bell, CircleCheck, CircleHelp, UserRound } from "lucide-react";
+import { getCreatorPlan, creatorPlans } from "@/lib/account/plans";
+import { requireCreatorContext } from "@/lib/account/server";
 
 export const metadata: Metadata = {
-  title: "Your CloverLoop onboarding",
-  description: "Welcome to CloverLoop.",
+  title: "Dashboard | CloverLoop",
+  description: "Your CloverLoop creator account overview.",
   robots: { index: false, follow: false },
 };
 
-export const dynamic = "force-dynamic";
+function completionItems(profile: Awaited<ReturnType<typeof requireCreatorContext>>["profile"]) {
+  return [
+    { label: "Add your display name", complete: Boolean(profile.display_name.trim()) },
+    { label: "Choose a unique username", complete: Boolean(profile.username) },
+    { label: "Write a short bio", complete: Boolean(profile.bio.trim()) },
+    { label: "Upload a profile picture", complete: Boolean(profile.avatar_path) },
+    {
+      label: "Add a website or social link",
+      complete: Boolean(
+        profile.website_url ||
+          profile.instagram_url ||
+          profile.youtube_url ||
+          profile.social_links.length,
+      ),
+    },
+  ];
+}
 
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ username?: string }>;
+  searchParams: Promise<{ username?: string | string[] }>;
 }) {
-  const { username: requestedUsername } = await searchParams;
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) redirect("/login?error=configuration");
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) redirect("/login?next=/dashboard");
+  const { username: requestedValue } = await searchParams;
+  const requestedUsername = Array.isArray(requestedValue) ? requestedValue[0] : requestedValue;
+  const { supabase, user, profile } = await requireCreatorContext();
+  let profileUsername = profile.username;
+  let usernameMessage = "";
+  if (!profileUsername && requestedUsername) {
+    const candidate = requestedUsername.trim().toLowerCase();
+    if (!/^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/.test(candidate)) {
+      usernameMessage = "Choose a username with 3–30 letters, numbers, underscores or hyphens.";
+    } else {
+      const { data, error } = await supabase
+        .from("creator_profiles")
+        .update({ username: candidate })
+        .eq("user_id", user.id)
+        .is("username", null)
+        .select("username")
+        .maybeSingle();
+      if (error?.code === "23505") {
+        usernameMessage = "That selected username is already taken. Choose another in My Profile.";
+      } else if (error) {
+        console.error("Could not save the selected signup username.", error);
+        throw new Error("Your selected username could not be saved. Please update it in My Profile.");
+      } else if (data?.username) {
+        profileUsername = data.username;
+      }
+    }
+  }
+  const emailName = user.email?.split("@")[0] ?? "";
+  const name = profile.display_name || emailName || "Creator";
+  const plan = creatorPlans[getCreatorPlan(user.app_metadata?.plan)];
+  const checklist = completionItems(profile);
+  const completed = checklist.filter((item) => item.complete).length;
 
-  const storedUsername = user.user_metadata?.storefront_username;
-  const username =
-    requestedUsername ?? (typeof storedUsername === "string" ? storedUsername : "");
-  const storefrontUsername =
-    username.length <= 30 &&
-    /^[a-zA-Z0-9](?:[a-zA-Z0-9_-]{0,28}[a-zA-Z0-9])?$/.test(username)
-      ? username
-      : "";
-  const formUrl = getFoundingFormUrl();
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-header">
-        <div className="page-width dashboard-header-inner">
-          <Link href="/" aria-label="CloverLoop home">
-            <Image src="/images/brand/logo.png" alt="CloverLoop" width={148} height={55} priority />
-          </Link>
-          <form action={logoutAction}>
-            <button type="submit" className="logout-button"><LogOut size={17} /> Log out</button>
-          </form>
+    <div className="dashboard-page-content">
+      <header className="dashboard-page-heading">
+        <div>
+          <span className="eyebrow">Creator dashboard</span>
+          <h1>Welcome back, {name}</h1>
+          <p>Manage your creator profile, account preferences and support requests.</p>
         </div>
       </header>
-      <section className="dashboard-content page-width">
-        <div className="dashboard-welcome">
-          <span className="eyebrow">Your CloverLoop onboarding</span>
-          <h1>Welcome to CloverLoop!</h1>
-          <p>We&apos;re happy to have you onboard and are all set to begin the journey with you.</p>
-          {storefrontUsername && (
-            <p className="storefront-username-note">
-              Your selected store address: <strong>cloverloop.in/{storefrontUsername}</strong>
-            </p>
-          )}
-          <div className="onboarding-message">
-            <p>Before you start selling your digital products, we&apos;d like to invite you to become a part of our Founding Creator Programme.</p>
-            <p>As a founding creator, you can share your perspective and help shape tools for independent creators.</p>
-          </div>
-          {formUrl ? (
-            <TrackLink
-              href={formUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              event="founding_creator_click"
-              className="button dashboard-cta"
-            >
-              Join the Founding Creator Programme <ArrowUpRight size={17} />
-            </TrackLink>
-          ) : (
-            <div className="dashboard-form-missing">
-              <span className="button disabled-button" aria-disabled="true">Join the Founding Creator Programme <ArrowUpRight size={17} /></span>
-              <p>Programme form is not configured. Set NEXT_PUBLIC_FOUNDING_CREATOR_FORM_URL to enable this link.</p>
-            </div>
-          )}
-          <Link href="/" className="dashboard-home-link">Return to the public website</Link>
+
+      <section className="dashboard-founder-banner" aria-labelledby="founder-banner-title">
+        <span className="dashboard-card-label">CloverLoop Founding Creator Programme</span>
+        <h2 id="founder-banner-title">Welcome to the CloverLoop Founding Creator Programme!</h2>
+        <p>
+          You&apos;re among the early creators joining CloverLoop. We&apos;re currently in the pilot
+          testing phase, refining the platform based on creator feedback. Our creator storefront
+          feature, enabling you to showcase and sell digital products, will be introduced soon.
+        </p>
+        <p>
+          <strong>Your next step:</strong> Complete your creator profile and share your feedback to
+          help us shape CloverLoop.
+        </p>
+        <div className="dashboard-founder-banner-actions">
+          <Link className="button" href="/dashboard/profile">
+            Complete Your Profile <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+          <Link className="dashboard-founder-feedback-link" href="/dashboard/help#feedback">
+            Share Feedback <ArrowRight size={16} aria-hidden="true" />
+          </Link>
         </div>
-        <div className="dashboard-illustration">
-          <Image
-            src="/images/home/creator-onboarding-dashboard.webp"
-            alt="Creators collaborating on digital products"
-            width={1200}
-            height={896}
-            priority
-            sizes="(max-width: 760px) 100vw, 46vw"
-          />
-        </div>
+        <p className="dashboard-founder-thanks">Thank you for being part of our journey!</p>
       </section>
-    </main>
+
+      <section className="dashboard-overview-grid" aria-label="Account overview">
+        <article className="dashboard-card dashboard-plan-card">
+          <div className="dashboard-card-heading">
+            <div>
+              <span className="dashboard-card-label">Current plan</span>
+              <h2>{plan.name}</h2>
+            </div>
+            <span className="dashboard-plan-price">{plan.monthlyPrice}</span>
+          </div>
+          <p>{plan.commission}</p>
+          <ul className="dashboard-feature-list">
+            {plan.features.map((feature) => <li key={feature}>{feature}</li>)}
+          </ul>
+          <Link className="dashboard-text-link" href="/pricing">
+            View all plans <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </article>
+
+        <article className="dashboard-card dashboard-profile-summary">
+          <div className="dashboard-card-heading">
+            <div>
+              <span className="dashboard-card-label">Creator account</span>
+              <h2>{profileUsername ? `@${profileUsername}` : "Complete your profile"}</h2>
+            </div>
+            <UserRound size={22} aria-hidden="true" />
+          </div>
+          <p>{profile.bio || "Add a short bio and links to complete your creator profile."}</p>
+          <Link className="dashboard-text-link" href="/dashboard/profile">
+            Manage profile <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+          <Link className="dashboard-secondary-link" href="/dashboard/settings">
+            Account settings
+          </Link>
+        </article>
+      </section>
+
+      {usernameMessage && (
+        <p className="dashboard-message dashboard-message-error" role="alert">
+          {usernameMessage} <Link href="/dashboard/profile">Edit your profile</Link>
+        </p>
+      )}
+
+      <section className="dashboard-card dashboard-checklist" aria-labelledby="profile-checklist-title">
+        <div className="dashboard-card-heading">
+          <div>
+            <span className="dashboard-card-label">Account setup</span>
+            <h2 id="profile-checklist-title">Profile completion</h2>
+          </div>
+          <span className="dashboard-completion-count">{completed} of {checklist.length}</span>
+        </div>
+        <div
+          className="dashboard-progress-track"
+          role="progressbar"
+          aria-label="Profile completion"
+          aria-valuemin={0}
+          aria-valuemax={checklist.length}
+          aria-valuenow={completed}
+        >
+          <span style={{ width: `${(completed / checklist.length) * 100}%` }} />
+        </div>
+        <ul className="dashboard-checklist-items">
+          {checklist.map((item) => (
+            <li key={item.label} className={item.complete ? "complete" : ""}>
+              <CircleCheck size={18} aria-hidden="true" />
+              <span>{item.label}</span>
+            </li>
+          ))}
+        </ul>
+        <Link className="dashboard-text-link" href="/dashboard/profile">
+          Update your profile <ArrowRight size={16} aria-hidden="true" />
+        </Link>
+      </section>
+
+      <section className="dashboard-lower-grid">
+        <article className="dashboard-card dashboard-announcement-card">
+          <div className="dashboard-card-heading">
+            <div>
+              <span className="dashboard-card-label">Platform announcements</span>
+              <h2>Plan details at a glance</h2>
+            </div>
+            <Bell size={21} aria-hidden="true" />
+          </div>
+          <p>Review the published plan prices, listing allowances and how the Free plan&apos;s monthly Gross Sales allowance works.</p>
+          <Link className="dashboard-text-link" href="/pricing">
+            Read pricing details <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </article>
+
+        <article className="dashboard-card dashboard-support-card">
+          <div className="dashboard-card-heading">
+            <div>
+              <span className="dashboard-card-label">Need a hand?</span>
+              <h2>Help &amp; support</h2>
+            </div>
+            <CircleHelp size={21} aria-hidden="true" />
+          </div>
+          <p>Browse common questions, creator resources or contact the CloverLoop team.</p>
+          <Link className="dashboard-text-link" href="/dashboard/help">
+            Visit help &amp; support <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </article>
+      </section>
+    </div>
   );
 }

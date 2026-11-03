@@ -5,7 +5,7 @@ category: "troubleshooting"
 order: 26
 description: "Use these checks to identify common problems. If the issue remains unresolved, contact CloverLoop support with a clear description and relevant non-sensitive references."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-03"
 related: []
 editorialLabel: "GENERAL TROUBLESHOOTING — VERIFY FEATURE-SPECIFIC STEPS"
 ---
@@ -26,7 +26,9 @@ Check that the file is no larger than 100 MB, that its format is supported and t
 
 ## I have reached the Free plan listing limit
 
-The Free plan allows one paid product listing and five free product listings per account. The five-free-product limit is not a monthly download quota. Review the plan options and current listing-management controls.
+The Free plan allows one paid product listing and five free product listings per account lifetime. The five-free-product limit is not a monthly download quota. Creator and Pro Creator have unlimited listings under the published plan terms.
+
+The Free plan also has a ₹10,000 Gross Sales allowance per calendar month. It resets on the first day of the month (IST); a 4% platform commission applies only to incremental Gross Sales above ₹10,000. Sales are not stopped when the allowance is used.
 
 ## A download link does not work
 
@@ -34,11 +36,11 @@ Check whether the link has expired or reached its configured download limit. Con
 
 ## A payment is not confirmed
 
-Check the order in CloverLoop and the corresponding payment in Razorpay. Do not request another payment until the existing transaction has been investigated.
+Check the payment status with the provider that processed it before requesting another payment.
 
 ## I cannot find a settlement
 
-Check Razorpay settlement records and bank details. Contact Razorpay for settlement status or bank-credit issues.
+Check the relevant provider's settlement records and bank details. Contact that provider for settlement status or bank-credit issues.
 
 ## What should I send to support?
 

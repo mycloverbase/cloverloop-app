@@ -1,6 +1,6 @@
 ## The short answer
 
-CloverLoop is a platform for creators to sell digital products through a creator storefront. Its platform commission is separate from payment processing: Free is 0%, Creator is 4% before GST and Pro Creator is 3% before GST. With 18% GST on commission, the effective CloverLoop rates are 0%, 4.72% and 3.54%.
+CloverLoop is a platform for creators to sell digital products through a creator storefront. Free is ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission.
 
 Payhip's [official pricing page](https://payhip.com/pricing) lists three plans in US dollars: Free at 5%, Plus at US$29/month plus 2%, and Pro at US$99/month plus 0% Payhip transaction fee. Stripe or PayPal processing fees remain additional. Payhip's percentage fees are shown as provider-listed rates; its pricing materials do not establish an India-specific GST-inclusive rate.
 
@@ -10,10 +10,10 @@ Compare the monthly subscription, currency conversion and applicable taxes along
 
 | Pricing item | CloverLoop | Payhip |
 | --- | --- | --- |
-| Free plan | ₹0/month + 0%; 1 paid product and 5 free product listings | US$0/month + 5%; unlimited products |
-| Middle plan | Creator: ₹0/month + 4% before GST (4.72% including GST) | Plus: US$29/month + 2% listed fee |
+| Free plan | ₹0/month; 0% on first ₹10,000 monthly Gross Sales, then 4% only on excess; 1 paid and 5 free product listings per account lifetime | US$0/month + 5%; unlimited products |
+| Middle plan | Creator: ₹0/month + 4%; unlimited listings and no monthly Gross Sales limit | Plus: US$29/month + 2% listed fee |
 | Zero-platform-fee tier | None with unlimited products in the current plan set | Pro: US$99/month + 0% Payhip transaction fee |
-| Payment processing | Razorpay charges are additional | Stripe/PayPal processing fees are additional |
+| Payment processing | Provider charges are additional and payable separately by the creator | Stripe/PayPal processing fees are additional |
 | Tax and currency | INR plan pricing; applicable GST on CloverLoop commission | USD plan pricing; confirm processor availability and any applicable tax for your country |
 | Product allowance | Free is limited; Creator and Pro Creator allow unlimited paid and free products | Unlimited products on all plans |
 
@@ -21,23 +21,23 @@ Payhip's listed percentages are not treated here as GST-inclusive or GST-exclusi
 
 ## Pricing and platform fees
 
-| Plan | CloverLoop monthly fee | CloverLoop commission before GST | CloverLoop commission including 18% GST | Payhip monthly fee | Payhip listed transaction fee |
+| Plan | CloverLoop monthly fee | CloverLoop platform commission | CloverLoop tax treatment | Payhip monthly fee | Payhip listed transaction fee |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Free | ₹0 | 0% | 0% | US$0 | 5% |
-| Creator / Plus | ₹0 | 4% | 4.72% | US$29 | 2% |
-| Pro Creator / Pro | ₹5,000 before GST | 3% | 3.54% | US$99 | 0% |
+| Free | ₹0 | 0% on first ₹10,000 monthly Gross Sales; 4% only on excess | Applicable GST may apply | US$0 | 5% |
+| Creator / Plus | ₹0 | 4% | Applicable GST may apply | US$29 | 2% |
+| Pro Creator / Pro | ₹1,499 | 2.5% | Applicable GST may apply | US$99 | 0% |
 
-Payhip's monthly prices and rates are USD-denominated. CloverLoop Pro Creator's monthly subscription is ₹5,000 before GST. CloverLoop commission and applicable GST are invoiced monthly; Razorpay processing charges are additional.
+Payhip's monthly prices and rates are USD-denominated. CloverLoop's ₹10,000 Free-plan allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Pro Creator is ₹1,499/month. Payment-provider processing charges are separate from CloverLoop's platform commission.
 
 ### Platform-fee example on a ₹1,000 sale
 
-The CloverLoop totals include 18% GST on commission and exclude Razorpay processing and monthly plan charges. Payhip values below show the provider-listed percentage only; the illustrative 18% column is conditional and is not a confirmed Payhip charge.
+The ₹1,000 CloverLoop example assumes the Free-plan allowance has not already been used. It illustrates the platform fee only; payment-provider charges are separate. Payhip values below show the provider-listed percentage only; the illustrative 18% column is conditional and is not a confirmed Payhip charge.
 
 | Platform / plan | Provider-listed percentage | Platform fee on ₹1,000 before any fee tax | Example if 18% tax applies to that fee |
 | --- | ---: | ---: | ---: |
-| CloverLoop Free | 0% | ₹0.00 | ₹0.00 |
+| CloverLoop Free (within monthly allowance) | 0% | ₹0.00 | ₹0.00 |
 | CloverLoop Creator | 4% before GST | ₹40.00 | ₹47.20; 4.72% effective |
-| CloverLoop Pro Creator | 3% before GST | ₹30.00 | ₹35.40; 3.54% effective, plus ₹5,000/month before GST |
+| CloverLoop Pro Creator | 2.5% | ₹25.00 | ₹29.50, if 18% GST applies; plus ₹1,499/month |
 | Payhip Free | 5% listed | ₹50.00 equivalent | ₹59.00 equivalent at 18%, if applicable |
 | Payhip Plus | 2% listed | ₹20.00 equivalent | ₹23.60 equivalent at 18%, if applicable |
 | Payhip Pro | 0% listed | ₹0.00 equivalent | ₹0.00 platform percentage, plus US$99/month |
@@ -48,7 +48,7 @@ The Payhip fee examples exclude its USD subscription and Stripe/PayPal processin
 
 Payhip lets sellers exchange a higher monthly subscription for a lower listed percentage: Free is 5%, Plus is 2% for US$29/month, and Pro is 0% for US$99/month. Stripe or PayPal processing remains separate on each plan.
 
-CloverLoop uses a different structure. Free has no platform commission but limits the catalogue to one paid product and five free product listings. Creator supports unlimited products at 4% before GST, with no monthly subscription. Pro Creator lowers the rate to 3% before GST and adds a ₹5,000 monthly subscription before GST. Compare expected successful paid sales, subscription cost, tax and currency conversion.
+CloverLoop uses a different structure. Free has a ₹10,000 monthly Gross Sales allowance at 0%, then a 4% fee only on incremental Gross Sales above it, and limits the catalogue to one paid product and five free product listings per account lifetime. Creator supports unlimited products at 4%, with no monthly subscription or monthly Gross Sales limit. Pro Creator is ₹1,499/month at 2.5%. Compare expected monthly Gross Sales, subscription cost, tax and currency conversion.
 
 ## Feature and service comparison
 
@@ -57,7 +57,7 @@ CloverLoop uses a different structure. Free has no platform commission but limit
 | Digital products | Creator storefront focus | Digital products and other supported product formats |
 | Product allowance | Free: 1 paid + 5 free listings; Creator and Pro Creator: unlimited paid and free products | Unlimited products on all plans |
 | Memberships and courses | Pricing is centred on digital-product storefront plans | Memberships and courses are among Payhip's supported formats |
-| Payment providers | Razorpay processing charges are additional | Stripe/PayPal and other supported gateways; availability varies by country |
+| Payment providers | Provider charges are separate from CloverLoop's platform commission | Stripe/PayPal and other supported gateways; availability varies by country |
 | Payout and tax | Check current gateway terms and creator tax obligations | Payhip says sellers are paid through their connected processor and describes EU/UK VAT handling |
 | Plan differences | Product limits and commission vary by plan | Main listed differences are subscription and transaction-fee rate |
 
@@ -65,7 +65,7 @@ Payhip says it automatically collects and remits EU and UK VAT. That statement i
 
 ## Who should choose which platform?
 
-Choose CloverLoop if you are an India-focused creator who prefers INR plan pricing, wants a 0% limited Free plan, or wants unlimited products without a monthly subscription on Creator. Compare the 4.72% Creator or 3.54% Pro Creator effective commission, Razorpay processing and any subscription GST.
+Choose CloverLoop if you are an India-focused creator who prefers INR plan pricing, wants a Free plan with a ₹10,000 monthly Gross Sales allowance, or wants unlimited products without a monthly subscription on Creator. Compare the 4% Creator or 2.5% Pro Creator rate, payment-provider charges and applicable taxes.
 
 Choose Payhip if unlimited products on its free plan, its Stripe/PayPal ecosystem, memberships or courses, or its stated EU/UK VAT handling better fit your business. Pro may suit sellers whose volume justifies US$99/month in exchange for a 0% Payhip transaction fee.
 

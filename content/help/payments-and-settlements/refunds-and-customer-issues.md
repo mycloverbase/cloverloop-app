@@ -3,13 +3,13 @@ title: "Refunds and Customer Issues"
 slug: "refunds-and-customer-issues"
 category: "payments-and-settlements"
 order: 19
-description: "If a customer requests a refund, first identify the relevant order and payment record. Explain the refund process clearly and avoid promising a result or timeline that has not been confirmed."
+description: "Guidance for creators handling refund requests and customer issues."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-03"
 related: []
 ---
 
-If a customer requests a refund, first identify the relevant order and payment record. Explain the refund process clearly and avoid promising a result or timeline that has not been confirmed.
+The creator's published refund policy and the relevant payment provider's terms apply to a creator sale.
 
 ## Review the request
 
@@ -17,12 +17,12 @@ Confirm the product, order reference, payment reference and reason for the reque
 
 ## Check Razorpay
 
-Use the creator's Razorpay Dashboard and the available refund process for the relevant transaction. Follow Razorpay's current instructions.
+Use the dashboard of the provider that processed the transaction and follow its current refund instructions.
 
 ## Communicate with the customer
 
-Tell the customer the request is being reviewed and provide updates based on verified information. Do not claim a refund has been completed until the payment record confirms it.
+Tell the customer the request is being reviewed and provide updates based on verified information. Do not claim a refund has been completed until the provider confirms it.
 
 ## CloverLoop support
 
-Contact CloverLoop if the issue concerns the storefront, order record or platform display. Contact Razorpay for payment processing or refund ledger issues.
+Contact the creator about the sale and follow the payment provider's process for any approved refund.

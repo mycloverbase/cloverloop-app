@@ -1,19 +1,19 @@
 ---
-title: "Understanding Payment Statuses"
+title: "Understanding Payment Provider Statuses"
 slug: "understanding-payment-statuses"
 category: "payments-and-settlements"
 order: 18
-description: "Payment status tells you what has happened to a transaction. Exact labels and available actions depend on the payment and order records shown in CloverLoop and Razorpay."
+description: "How to interpret payment status information provided by a payment provider."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-03"
 related: []
 ---
 
-Payment status tells you what has happened to a transaction. Exact labels and available actions depend on the payment and order records shown in CloverLoop and Razorpay.
+Payment providers may use different labels and update payment records at different stages. Check the provider's current guidance for the meaning of a status and whether it is final.
 
 ## Check both records
 
-For a customer payment question, compare the order record in CloverLoop with the corresponding transaction in Razorpay.
+Check a transaction's payment status with the provider that handled it.
 
 ## Do not infer success from a screenshot
 
@@ -21,8 +21,8 @@ A customer-provided bank notification or screenshot may not be sufficient to est
 
 ## Avoid duplicate payment requests
 
-If a customer reports a successful payment but the order is not confirmed, investigate the existing transaction before asking them to retry.
+Investigate the provider's transaction record before asking a customer to retry payment.
 
 ## Status labels
 
-Only document labels such as pending, successful, failed, cancelled or refunded if those exact states are supported by the current application.
+Status labels are provider-specific. Confirm the transaction directly with the relevant provider before taking action.

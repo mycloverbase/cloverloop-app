@@ -5,12 +5,12 @@ category: "razorpay-setup"
 order: 13
 description: "Creators who want to accept paid orders need an eligible payment gateway account. Razorpay's onboarding requirements depend on the applicant's legal structure, business activity and verification route. Always follow the requirements displayed by Razorpay."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-03"
 related: []
 editorialLabel: "GENERAL GUIDE"
 ---
 
-Creators who want to accept paid orders need an eligible payment gateway account. Razorpay's onboarding requirements depend on the applicant's legal structure, business activity and verification route. Always follow the requirements displayed by Razorpay.
+Razorpay's onboarding requirements depend on the applicant's legal structure, business activity and verification route. Always follow the requirements displayed by Razorpay.
 
 ## Step 1: Visit Razorpay
 

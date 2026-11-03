@@ -47,8 +47,9 @@ export default function CompareHubPage() {
           <h1>Choose the right platform for your digital products</h1>
           <p>
             Compare plans, platform commissions, payment processing and product features. CloverLoop
-            pricing includes the base rate and its effective commission after 18% GST; competitor
-            prices are linked to official sources and identify their stated fee basis.
+            pricing includes the Free plan&apos;s monthly Gross Sales allowance and the fees on its
+            other plans. Competitor prices are linked to official sources and identify their stated
+            fee basis.
           </p>
         </header>
         <div className="comparison-hub-grid">
@@ -64,7 +65,7 @@ export default function CompareHubPage() {
           ))}
         </div>
         <p className="comparison-hub-pricing">
-          Start with <Link href="/pricing">CloverLoop plans and the ₹100 transaction example</Link>,
+          Start with <Link href="/pricing">CloverLoop plans and the Free-plan Gross Sales allowance example</Link>,
           then check each provider&apos;s linked pricing terms for your region and account.
         </p>
       </section>

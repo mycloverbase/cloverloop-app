@@ -58,10 +58,10 @@ export const featurePages = [
     slug: "sell-online",
     title: "Sell Directly to Your Audience | CloverLoop",
     description:
-      "Sell digital products directly to the people who follow your work with a dedicated creator storefront.",
+      "Learn about CloverLoop storefronts and published plans for digital-product creators.",
     heading: "Sell digital products directly to your audience",
     intro:
-      "Sell digital products directly to the people who follow your work with a dedicated storefront, clear product pages and payments through your own gateway account.",
+      "Explore a dedicated storefront concept for digital products, with clear published plan pricing for creators.",
     image: "/images/home/digital-product-collection.webp",
     imageAlt: "A collection of digital products for independent creators",
     sections: [
@@ -71,11 +71,11 @@ export const featurePages = [
       },
       {
         heading: "Built around creator ownership",
-        body: "Connect your own Razorpay account. Customer payments are processed through that account and settled by Razorpay directly to you.",
+        body: "CloverLoop's published platform commission is separate from processing fees set by Razorpay or another payment provider. Creators pay provider charges separately under the provider's terms.",
       },
       {
         heading: "A clear buying journey",
-        body: "Present what each product includes, who it is for and how customers can access it, with secure digital delivery after successful payment verification.",
+        body: "Clear product descriptions and delivery instructions help creators explain what buyers can expect.",
       },
     ],
   },
@@ -83,10 +83,10 @@ export const featurePages = [
     slug: "sell-digital-downloads",
     title: "Sell Digital Downloads Online | CloverLoop",
     description:
-      "Plan a clear digital download experience for ebooks, templates, presets and other creator products.",
+      "Guidance for preparing a clear digital download experience for ebooks, templates, presets and other creator products.",
     heading: "A simpler way to sell digital downloads",
     intro:
-      "Turn your knowledge and creative work into downloadable products with clear product pages and a smooth customer delivery experience.",
+      "Plan clear product details and access instructions for downloadable products such as ebooks, templates and presets.",
     image: "/images/home/digital-product-collection.webp",
     imageAlt: "Digital product formats including guides, templates and creative downloads",
     sections: [
@@ -96,7 +96,7 @@ export const featurePages = [
       },
       {
         heading: "Designed for controlled access",
-        body: "Customers receive secure download links after successful payment verification.",
+        body: "Explain how customers can access a digital file, including file type, usage instructions and any access limits.",
       },
       {
         heading: "Make downloads easy to use",
@@ -131,22 +131,22 @@ export const featurePages = [
   },
   {
     slug: "payment-gateways",
-    title: "Creator-owned Payments | CloverLoop",
+    title: "Payment Processing and Plan Fees | CloverLoop",
     description:
-      "Learn how creator-owned Razorpay payments and CloverLoop's separate monthly platform commission work.",
-    heading: "Payments designed around your own account",
+      "Learn how payment-provider charges are separate from CloverLoop's published plan fees.",
+    heading: "Payment and fee information",
     intro:
-      "Connect your own Razorpay account so customer payments are processed through your account and settled directly to your bank by Razorpay. CloverLoop calculates its platform commission separately and invoices it monthly. Razorpay processing charges are additional.",
+      "CloverLoop publishes platform plan fees separately from payment-provider processing charges. Razorpay or another provider may charge fees under its own terms; creators pay those charges separately.",
     image: "/images/home/storefront-mockup.webp",
-    imageAlt: "Illustration representing creator-owned payment flow",
+    imageAlt: "Illustration representing a creator storefront",
     sections: [
       {
-        heading: "How the payment flow works",
-        body: "A customer pays through the creator's connected Razorpay account. Razorpay processes the payment and settles proceeds directly to the creator's bank account according to the creator's Razorpay arrangement. CloverLoop does not centrally collect or hold creator sales proceeds.",
+        heading: "Provider processing charges are separate",
+        body: "Razorpay or another payment provider may charge processing fees under its own terms. Those charges are payable separately by the creator and are not included in CloverLoop's platform commission.",
       },
       {
-        heading: "Platform commission is separate",
-        body: "CloverLoop calculates commission on successful paid transactions according to the creator's plan and invoices it monthly. This fee is not automatically deducted from a customer's payment. Razorpay processing fees are additional.",
+        heading: "CloverLoop plan fees",
+        body: "Free is ₹0/month with 0% commission on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that amount. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is ₹0/month with a 4% platform fee; Pro Creator is ₹1,499/month with a 2.5% platform fee.",
       },
     ],
   },
@@ -203,9 +203,8 @@ export const companyPages: Record<
       { type: "p", text: "Your storefront should be an extension of your creator identity, not just another product listing." },
       { type: "h3", text: "2. Transparent payment arrangements" },
       { type: "p", text: "We believe payment arrangements should be straightforward and easy to understand." },
-      { type: "p", text: "CloverLoop is designed around a creator-owned payment account model. Creators connect their own payment gateway account, such as Razorpay, to process customer transactions. Eligible sales proceeds are settled by the payment provider directly to the creator's registered bank account." },
-      { type: "p", text: "CloverLoop's platform commission is handled separately through monthly invoicing. Payment gateway processing charges are additional and governed by the provider's terms." },
-      { type: "p", text: "This approach makes it clear how customer payments, payment gateway charges and platform fees are handled." },
+      { type: "p", text: "Razorpay or other payment-provider processing charges, if applicable, are separate, payable by the creator to the provider, and not included in CloverLoop's platform commission." },
+      { type: "p", text: "Creators can compare CloverLoop's published monthly plan prices and platform rates before choosing a plan." },
       { type: "h3", text: "3. Straightforward and transparent pricing" },
       { type: "p", text: "Creators should be able to understand what a platform costs before committing to it." },
       { type: "p", text: "Our pricing model is designed to offer an accessible starting point, with options for creators at different stages of their digital product business." },
@@ -406,49 +405,44 @@ export const faqItems = [
       "Yes. Each creator gets an independent storefront with a shareable URL in the format cloverloop.in/creatorname, where an audience can explore their digital products.",
   },
   {
-    question: "Do I need my own Razorpay account?",
+    question: "Who sets payment processing charges?",
     answer:
-      "Yes. Each creator connects their own Razorpay account. Customer payments are processed through that creator's account rather than being collected into a central CloverLoop merchant account.",
+      "Razorpay or another payment provider sets its own processing charges. Creators pay those charges separately under the provider's terms; they are not included in CloverLoop's platform commission.",
   },
   {
-    question: "Who receives the customer's payment?",
+    question: "What are CloverLoop's platform transaction fees?",
     answer:
-      "Razorpay processes the payment through the creator's connected account and settles the proceeds directly to the creator's bank account according to Razorpay's settlement rules and the creator's account configuration. CloverLoop does not centrally collect or hold creator sales proceeds.",
+      "Free is 0% on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance. Creator is 4%, and Pro Creator is 2.5%. Payment-provider processing charges are separate.",
   },
   {
-    question: "How does CloverLoop charge its platform fee?",
+    question: "Are payment gateway processing fees included in CloverLoop pricing?",
     answer:
-      "CloverLoop calculates its platform commission on successful paid transactions and invoices the creator monthly. The commission is separate from the customer's payment and is not automatically deducted from the payment by CloverLoop.",
-  },
-  {
-    question: "Are Razorpay processing fees included in CloverLoop pricing?",
-    answer:
-      "No. Razorpay processing charges are additional and are governed by the creator's own Razorpay arrangement. They are separate from CloverLoop's subscription and platform transaction fees.",
+      "No. Razorpay or other payment-provider processing charges, if applicable, are payable separately by creators under the provider's terms. They are not included in CloverLoop's platform commission.",
   },
   {
     question: "What are the available plans?",
     answer:
-      "The plans are Free, Creator and Pro Creator. Free costs ₹0 per month with a 0% platform transaction fee, one paid product and five free product listings. Creator costs ₹0 per month with a 4% platform transaction fee (excluding GST) and unlimited paid and free products. Pro Creator costs ₹5,000 per month (excluding GST) with a 3% platform transaction fee (excluding GST) and unlimited paid and free products. GST at 18% applies to CloverLoop's platform commission, so the effective rates including GST are 0%, 4.72% and 3.54%. The commission is invoiced separately each month; Razorpay processing charges are additional.",
+      "Free is ₹0/month, with 1 paid and 5 free product listings per account lifetime. Its platform fee is 0% on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator is ₹1,499/month with a 2.5% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Provider processing charges are separate.",
   },
   {
     question: "How is the platform transaction fee calculated?",
     answer:
-      "The platform transaction fee is calculated on successful paid transactions according to the creator's plan. Free products do not attract platform transaction commission. GST at 18% applies to CloverLoop commission, which is invoiced monthly with applicable GST and is not deducted from customer payments.",
+      "For the Free plan, 0% applies to the first ₹10,000 of Gross Sales in each calendar month and 4% only to incremental Gross Sales above ₹10,000. The allowance resets on the first day of the month (IST), and sales continue after it is used. Creator is 4% and Pro Creator is 2.5%, with no monthly Gross Sales limits.",
   },
   {
     question: "Does the Free plan have a limit on free products?",
     answer:
-      "The Free plan allows one paid product and five free product listings. Creator and Pro Creator include unlimited paid and free products.",
+      "Yes. Free includes one paid product and five free product listings as a lifetime account-level limit. Creator and Pro Creator include unlimited paid and free product listings.",
   },
   {
     question: "Are free products charged a transaction fee?",
     answer:
-      "No. Free products do not incur CloverLoop's platform transaction commission. Usage limits apply according to the selected plan.",
+      "No platform transaction commission applies to free products. The Free plan has a lifetime account-level limit of one paid and five free product listings.",
   },
   {
-    question: "How does digital product delivery work?",
+    question: "What should I tell buyers about digital product delivery?",
     answer:
-      "Customers receive access to digital files only after successful payment verification. Files are delivered through secure, private download links.",
+      "Clearly describe the product format, how buyers will access it, and any requirements or access limits before purchase.",
   },
   {
     question: "Is CloverLoop a marketplace?",

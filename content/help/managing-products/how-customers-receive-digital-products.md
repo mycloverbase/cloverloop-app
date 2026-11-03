@@ -3,26 +3,26 @@ title: "How Customers Receive Digital Products"
 slug: "how-customers-receive-digital-products"
 category: "managing-products"
 order: 10
-description: "Learn how customers access digital products after completing a purchase or free-download process."
+description: "Guidance for creators sharing access to digital products with customers."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-03"
 related: []
 ---
 
-Customers access digital products after completing the required purchase or free-download process.
+The delivery method for a digital product depends on the creator's product and the terms provided to the customer. Make access instructions clear and share them through a secure method appropriate for the product.
 
 ## Paid products
 
-A customer opens a creator's storefront, selects a product and follows checkout. Payment must be confirmed before paid-product access is granted.
+Tell customers what they will receive, how they will receive it and whom to contact if they need help. Follow the relevant payment provider's records and terms when confirming a paid order.
 
 ## Free products
 
-A customer follows the available free-product access flow. Free products do not incur CloverLoop platform transaction commission. Listing limits depend on the creator's plan.
+Free products do not incur platform transaction commission under the published pricing terms. The Free plan allows five free product listings per account lifetime; Creator and Pro Creator allow unlimited paid and free product listings.
 
-## Secure download access
+## Protecting access
 
-Customers receive secure download links after payment verification. Keep delivery instructions clear and contact support if a link does not work.
+Use access links and file-sharing settings that are appropriate for the product. Avoid sharing passwords, one-time codes or other account credentials.
 
 ## If a link does not work
 
-Check whether the link has expired, whether its permitted download count has been reached and whether the customer is using the original delivery message. Contact CloverLoop support if the issue persists.
+Follow the creator's instructions and contact the creator about access issues. For payment questions, consult the provider that processed the transaction.

@@ -25,6 +25,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const callbackError = searchParams.get("error");
+  const accountDeleted = mode === "login" && searchParams.get("account") === "deleted";
+  const sessionClearFailed = searchParams.get("session") === "clear-failed";
   const requestedUsername = searchParams.get("username")?.trim() ?? "";
   const storefrontUsername =
     requestedUsername.length <= 30 &&
@@ -119,6 +121,12 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   return (
     <div className="auth-form-wrap">
+      {accountDeleted && (
+        <p className="form-message form-success" role="status">
+          Your CloverLoop account has been deleted.
+          {sessionClearFailed ? " This browser session could not be cleared automatically; close this tab before signing in again." : ""}
+        </p>
+      )}
       {mode === "signup" && storefrontUsername && (
         <p className="storefront-username-note" role="note">
           Your selected store address: <strong>cloverloop.in/{storefrontUsername}</strong>

@@ -19,13 +19,13 @@ const benefits = [
   },
   {
     icon: CreditCard,
-    title: "Your payment account",
-    body: "Keep control of the payment account connected to your storefront.",
+    title: "Clear platform fees",
+    body: "Compare plan commission rates, with payment-provider processing charges listed separately.",
   },
   {
     icon: Check,
-    title: "A clearer delivery experience",
-    body: "Files are delivered after payment verification through secure download links.",
+    title: "Plans for every stage",
+    body: "Choose from a zero-cost Free plan, the recommended Creator plan, or Pro Creator for higher-volume sales.",
   },
 ];
 
@@ -38,12 +38,12 @@ export default function HomePage() {
             <span className="eyebrow">A CREATOR STOREFRONT FOR YOUR WORK</span>
             <h1>Your audience. Your products. Your own storefront.</h1>
             <p>
-              Create your own digital storefront, sell directly to your audience and
-              simplify the way customers access your downloadable products.
+              CloverLoop helps creators present digital products through a dedicated storefront,
+              with plans designed for different catalogue sizes and sales volumes.
             </p>
             <div className="hero-actions">
               <TrackLink href="/signup" event="signup_click" className="button">
-                Start Selling <ArrowRight size={17} />
+                Create an account <ArrowRight size={17} />
               </TrackLink>
               <Link href="/pricing" className="button button-secondary">
                 Explore Pricing
@@ -157,93 +157,47 @@ export default function HomePage() {
       <section className="section-space how-section">
         <div className="page-width">
           <div className="section-heading">
-            <span className="eyebrow">Creator-owned payments</span>
-            <h2>Your money never passes through us</h2>
+            <span className="eyebrow">Transparent plan pricing</span>
+            <h2>Payment provider fees are separate</h2>
             <p>
-              Payments go directly from your buyer to your own Razorpay account. We handle
-              payment verification and secure digital delivery.
+              Razorpay or another payment provider may charge processing fees under its own terms.
+              Those charges are payable separately by the creator and are not included in
+              CloverLoop&apos;s platform commission.
             </p>
           </div>
-          <div className="payment-steps">
-            {[
-              ["Buyer pays", "Customers pay using UPI, cards and other supported payment methods."],
-              ["Your account", "Payment is received directly in your own Razorpay account."],
-              ["Your bank", "Razorpay settles the money directly into your bank account."],
-            ].map(([title, description], index) => (
-              <div className="payment-step-group" key={title}>
-                <article className={`payment-step-card payment-step-card-${index + 1}`}>
-                  <span className="payment-step-number">0{index + 1}</span>
-                  <h3>{title}</h3>
-                  <p>{description}</p>
-                </article>
-                {index < 2 && <ArrowRight className="payment-step-arrow" size={22} aria-hidden="true" />}
-              </div>
-            ))}
-          </div>
-          <ul className="payment-trust-list">
-            {[
-              "Payments are processed through your own payment gateway.",
-              "Files are delivered only after successful payment verification.",
-              "Secure, private download links.",
-              "Transparent refund and anti-fraud policies.",
-            ].map((point) => (
-              <li key={point}><Check size={18} aria-hidden="true" />{point}</li>
-            ))}
-          </ul>
         </div>
       </section>
 
       <section className="section-space earnings-section">
         <div className="page-width">
           <div className="section-heading">
-            <span className="eyebrow">Clear from the start</span>
-            <h2>Understand exactly what you earn from every sale.</h2>
+            <span className="eyebrow">Published plan pricing</span>
+            <h2>Choose the plan that fits your catalogue and sales.</h2>
             <p>
-              Your payment gateway charges its processing fee, CloverLoop charges its platform
-              commission separately, and you keep the remaining revenue.
+              Creator is our recommended no-monthly-fee plan. Payment gateway charges are separate
+              from CloverLoop&apos;s platform commission. See the <Link href="/pricing">full pricing details</Link>.
             </p>
           </div>
-          <div className="earnings-grid" aria-label="Breakdown of a ₹100 sale by plan">
-            {[
-              { name: "Free", fee: "₹0.00", gst: "₹0.00", invoice: "₹0.00", net: "₹97.64" },
-              { name: "Creator", fee: "₹4.00", gst: "₹0.72", invoice: "₹4.72", net: "₹92.92" },
-              { name: "Pro Creator", fee: "₹3.00", gst: "₹0.54", invoice: "₹3.54", net: "₹94.10" },
-            ].map((plan) => (
-              <article className="earnings-card" key={plan.name}>
-                <h3>{plan.name}</h3>
-                <p className="earnings-card-caption">On a ₹100 product sale</p>
-                <dl>
-                  <div className="earnings-line">
-                    <dt>Product selling price</dt><dd>₹100.00</dd>
-                  </div>
-                  <div className="earnings-line">
-                    <dt>Razorpay processing fee (2.36%)</dt><dd>₹2.36</dd>
-                  </div>
-                  <div className="earnings-line">
-                    <dt>CloverLoop commission (excl. GST)</dt><dd>{plan.fee}</dd>
-                  </div>
-                  <div className="earnings-line">
-                    <dt>GST on commission (18%)</dt><dd>{plan.gst}</dd>
-                  </div>
-                  <div className="earnings-line">
-                    <dt>Monthly commission invoice allocation (incl. GST)</dt><dd>{plan.invoice}</dd>
-                  </div>
-                  <div className="earnings-line">
-                    <dt>Amount settled by Razorpay</dt><dd>₹97.64</dd>
-                  </div>
-                  <div className="earnings-receives">
-                    <dt>Net earnings after all fees (including GST)</dt><dd>{plan.net}</dd>
-                  </div>
-                </dl>
-              </article>
-            ))}
+          <div className="earnings-grid" aria-label="CloverLoop plan pricing">
+            <article className="earnings-card">
+              <h3>Free</h3>
+              <p className="earnings-card-caption">₹0/month</p>
+              <p>0% on the first ₹10,000 of monthly Gross Sales; 4% only on incremental Gross Sales above the allowance.</p>
+              <p>1 paid and 5 free product listings per account lifetime.</p>
+            </article>
+            <article className="earnings-card">
+              <h3>Creator · Recommended</h3>
+              <p className="earnings-card-caption">₹0/month · 4%</p>
+              <p>Unlimited paid and free product listings, with no monthly Gross Sales limit.</p>
+            </article>
+            <article className="earnings-card">
+              <h3>Pro Creator</h3>
+              <p className="earnings-card-caption">₹1,499/month · 2.5%</p>
+              <p>For established, higher-volume creators. Unlimited listings and no monthly Gross Sales limit.</p>
+            </article>
           </div>
           <ul className="earnings-notes">
-            <li>Razorpay charges 2.36% for payment processing and settles ₹97.64 from this ₹100 sale on every plan.</li>
-            <li>CloverLoop charges 0%, 4% or 3% depending on the selected plan; 18% GST applies to the commission.</li>
-            <li>CloverLoop&apos;s platform commission, including applicable GST, is invoiced separately each month and is not deducted from customer payments.</li>
-            <li>Razorpay processing fees are separate from CloverLoop&apos;s commission.</li>
-            <li>Pro Creator&apos;s ₹5,000 monthly subscription (excluding GST) is separate from this per-sale example.</li>
+            <li>The Free-plan allowance resets on the first day of each calendar month (IST); sales continue after it is used.</li>
           </ul>
         </div>
       </section>
