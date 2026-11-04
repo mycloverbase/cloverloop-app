@@ -35,6 +35,14 @@ export const publicLinks = {
   ],
   resources: [
     { label: "Marketing ideas tool", href: "/resources/marketing-ideas-tool" },
+    { label: "How to sell digital products online", href: "/resources/how-to-sell-digital-products-online" },
+    { label: "How to price digital products", href: "/resources/how-to-price-digital-products" },
+    { label: "How to sell templates online", href: "/resources/how-to-sell-templates-online" },
+    { label: "Accept UPI payments with Razorpay", href: "/resources/accept-upi-payments-digital-products-razorpay" },
+    { label: "GST registration for online sellers", href: "/resources/do-you-need-gst-registration-to-sell-online" },
+    { label: "Sales needed to reach your goal", href: "/resources/how-many-sales-to-hit-your-income-goal" },
+    { label: "Create and sell an online course", href: "/resources/how-to-create-and-sell-online-course-india" },
+    { label: "GST on ebooks and online courses", href: "/resources/gst-on-ebooks-and-online-courses-india" },
     { label: "How to write an ebook", href: "/resources/how-to-write-an-ebook" },
     { label: "How to sell presets", href: "/resources/how-to-sell-presets" },
     { label: "How to sell printables", href: "/resources/how-to-sell-printables" },
@@ -298,6 +306,11 @@ export const pageTitles: Record<string, { title: string; description: string }> 
     description:
       "Compare CloverLoop's Free, Creator and Pro Creator plans, including platform transaction fees and monthly pricing.",
   },
+  courses: {
+    title: "Plan and Sell an Online Course | CloverLoop",
+    description:
+      "Plan a clear online course with structured learning, organised lessons and useful educational resources.",
+  },
   faq: {
     title: "Frequently Asked Questions | CloverLoop",
     description:
@@ -381,6 +394,70 @@ export const resourceCards = [
       "Explore product types and learn how to move from an idea to a clear, useful offer.",
     image: "/images/resources/digital-products.webp",
     category: "Creating",
+  },
+  {
+    slug: "how-to-sell-digital-products-online",
+    title: "How to Sell Digital Products Online: A Beginner's Guide",
+    description:
+      "Learn how to choose, create, price and promote a digital product, from your first idea to your first customers.",
+    image: "/images/resources/digital-products.webp",
+    category: "Guides",
+  },
+  {
+    slug: "how-to-price-digital-products",
+    title: "How to Price Digital Products: A Simple Framework",
+    description:
+      "A practical framework for pricing ebooks, templates and planners using value, costs and customer feedback.",
+    image: "/images/resources/how-to-sell-ebooks.webp",
+    category: "Guides",
+  },
+  {
+    slug: "how-to-sell-templates-online",
+    title: "How to Sell Templates Online (Notion, Canva and Spreadsheets)",
+    description:
+      "Learn how to package, document, price and promote Notion, Canva and spreadsheet templates.",
+    image: "/images/resources/how-to-sell-canva-templates.webp",
+    category: "Guides",
+  },
+  {
+    slug: "accept-upi-payments-digital-products-razorpay",
+    title: "Accept UPI Payments for Digital Products with Razorpay",
+    description:
+      "Understand the steps involved in setting up Razorpay to accept UPI and other online payments in India.",
+    image: "/images/resources/how-to-sell-ebooks.webp",
+    category: "Guides",
+  },
+  {
+    slug: "do-you-need-gst-registration-to-sell-online",
+    title: "Do You Need GST Registration to Sell Online?",
+    description:
+      "A practical introduction to GST registration considerations for creators and small businesses selling online in India.",
+    image: "/images/resources/digital-products.webp",
+    category: "Guides",
+  },
+  {
+    slug: "how-many-sales-to-hit-your-income-goal",
+    title: "How Many Sales Do You Need to Hit Your Goal?",
+    description:
+      "Calculate the sales needed for a monthly revenue target and understand the role of price, fees and conversion rate.",
+    image: "/images/resources/content-creator.webp",
+    category: "Guides",
+  },
+  {
+    slug: "how-to-create-and-sell-online-course-india",
+    title: "How to Create and Sell an Online Course in India (2026)",
+    description:
+      "Plan an online course in India: choose a learning outcome, structure lessons, price the offer and prepare a launch.",
+    image: "/images/resources/online-course-ideas.webp",
+    category: "Courses",
+  },
+  {
+    slug: "gst-on-ebooks-and-online-courses-india",
+    title: "GST on Ebooks and Online Courses in India (2026)",
+    description:
+      "Understand GST questions creators should review before selling ebooks, downloadable resources or online courses in India.",
+    image: "/images/resources/online-course-ideas.webp",
+    category: "Courses",
   },
 ];
 

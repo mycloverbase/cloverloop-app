@@ -9,6 +9,7 @@ import { Breadcrumbs } from "@/components/site-header";
 import { TrackLink } from "@/components/track-link";
 import { companyPages, faqItems, featurePages, pageTitles, publicLinks, PRODUCTION_URL } from "@/lib/site";
 import { PricingPage } from "@/components/pricing-page";
+import { CoursesLandingPage, DigitalProductsLandingPage } from "@/components/marketing-landing-pages";
 import { LegalPolicyPage } from "@/components/legal-policy-page";
 import { legalPolicyPages } from "@/lib/legal-policies";
 
@@ -17,6 +18,7 @@ const slugs = [
   ...Object.keys(companyPages),
   ...legalPolicyPages.map((item) => item.slug),
   "pricing",
+  "courses",
   "faq",
   "sitemap",
 ];
@@ -84,6 +86,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 function FeaturePage({ slug }: { slug: string }) {
+  if (slug === "sell-digital-downloads") return <DigitalProductsLandingPage />;
   const page = featurePages.find((item) => item.slug === slug);
   if (!page) return null;
   return (
@@ -250,6 +253,7 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
   if (legalPolicyPages.some((item) => item.slug === slug)) content = <LegalPolicyPage slug={slug} />;
   else if (featurePages.some((item) => item.slug === slug)) content = <FeaturePage slug={slug} />;
   else if (slug === "pricing") content = <PricingPage />;
+  else if (slug === "courses") content = <CoursesLandingPage />;
   else if (slug === "faq") content = <FaqPage />;
   else if (slug === "sitemap") content = <SitemapPage />;
   else content = <CompanyPage slug={slug} />;

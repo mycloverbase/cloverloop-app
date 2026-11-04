@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/",
     ...featurePages.map((page) => `/${page.slug}`),
     "/pricing",
+    "/courses",
     ...publishedCompanySlugs.map((slug) => `/${slug}`),
     "/resources",
     ...resourceCards.map((resource) => `/resources/${resource.slug}`),

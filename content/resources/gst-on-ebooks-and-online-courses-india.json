@@ -1,0 +1,30 @@
+{
+  "slug": "gst-on-ebooks-and-online-courses-india",
+  "title": "GST on Ebooks and Online Courses in India (2026)",
+  "seoTitle": "GST on Ebooks and Online Courses in India (2026)",
+  "description": "Understand GST questions creators should review before selling ebooks, downloadable resources or online courses in India.",
+  "primaryKeyword": "GST on ebooks and online courses in India",
+  "category": "Courses",
+  "canonicalUrl": "https://cloverloop.in/resources/gst-on-ebooks-and-online-courses-india",
+  "indexable": true,
+  "image": "/images/resources/online-course-ideas.webp",
+  "imageAlt": "Educational resources and online course materials",
+  "related": ["do-you-need-gst-registration-to-sell-online", "how-to-create-and-sell-online-course-india", "accept-upi-payments-digital-products-razorpay"],
+  "blocks": [
+    { "type": "paragraph", "text": "There is no safe one-line GST answer for every ebook, template or course. Treatment can depend on classification, delivery method, customer location, registration status and applicable rate notifications." },
+    { "type": "paragraph", "text": "Do not assume every digital product has the same classification. A downloadable publication, design file, recorded course, live class and bundle may be treated differently. Separate registration from rate: whether a seller must register and what rate applies to a particular supply are different questions." },
+    { "type": "paragraph", "text": "For many service providers, the commonly referenced registration threshold is ₹20 lakh, with a lower threshold in certain states, subject to notifications and exceptions. Aggregate turnover is generally computed across India for the same PAN. Specific inter-state and e-commerce provisions may affect the analysis." },
+    { "type": "paragraph", "text": "A pre-recorded self-paced course may raise different questions from live teaching. Educational exemptions do not automatically apply to every private online course; provider, content and recognition may matter. Cross-border sales can raise place-of-supply, export-of-service, foreign-exchange and documentation questions. A foreign customer alone does not automatically make a transaction an export of services." },
+    { "type": "paragraph", "text": "Keep product descriptions, customer and location records where relevant, invoices, payment statements, refunds, contracts and delivery evidence. Ask a qualified professional to review classification, registration, rate and invoicing." },
+    { "type": "heading", "text": "Frequently asked questions" },
+    { "type": "subheading", "text": "Are ebooks exempt?" },
+    { "type": "paragraph", "text": "Do not assume all ebooks or downloads are exempt; check classification and notifications." },
+    { "type": "subheading", "text": "Are recorded and live courses treated the same?" },
+    { "type": "paragraph", "text": "Not necessarily." },
+    { "type": "subheading", "text": "Does ₹20 lakh apply to everyone?" },
+    { "type": "paragraph", "text": "No; state, supply type and exceptions matter." },
+    { "type": "subheading", "text": "Does a payment gateway calculate GST on my sales?" },
+    { "type": "paragraph", "text": "No. It may charge GST on its own fees but does not determine your sales-tax liability." },
+    { "type": "disclaimer", "text": "Tax disclaimer: General educational information, not tax, legal or accounting advice. Have a qualified professional review your specific product and sales model." }
+  ]
+}

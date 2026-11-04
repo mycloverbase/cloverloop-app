@@ -16,8 +16,14 @@ function ArticleBlocks({ blocks }: { blocks: ResourceBlock[] }) {
         if (block.type === "heading") {
           return <h2 id={`section-${index}`} key={index}>{block.text}</h2>;
         }
+        if (block.type === "subheading") {
+          return <h3 id={`section-${index}`} key={index}>{block.text}</h3>;
+        }
         if (block.type === "takeaway") {
           return <p className="takeaway" key={index}><strong>Key takeaway:</strong> {block.text}</p>;
+        }
+        if (block.type === "disclaimer") {
+          return <p className="article-disclaimer" key={index}>{block.text}</p>;
         }
         return <p key={index}>{block.text}</p>;
       })}
@@ -98,11 +104,21 @@ export function ArticlePage({ slug }: { slug: string }) {
           </nav>
         )}
         <div className="reading-width">
+          {slug === "accept-upi-payments-digital-products-razorpay" && (
+            <p className="article-disclaimer">
+              CloverLoop&apos;s Razorpay integration is not currently live. This guide describes general setup and security considerations; confirm current requirements with Razorpay.
+            </p>
+          )}
           <ArticleBlocks blocks={article.blocks} />
           <div className="article-references">
             <h2>Explore related resources</h2>
             <ul>{related.map((item) => <li key={item.slug}><Link href={`/resources/${item.slug}`}>{item.title} <ArrowRight size={14} /></Link></li>)}</ul>
             {slug === "digital-products" && <Link href="/sell-digital-downloads" className="subtle-link">Explore CloverLoop digital downloads <ArrowRight size={15} /></Link>}
+            <div className="article-platform-links" aria-label="Explore CloverLoop">
+              <Link href="/sell-digital-downloads">Digital Products</Link>
+              <Link href="/courses">Courses</Link>
+              <Link href="/pricing">Pricing</Link>
+            </div>
             <TrackLink href="/signup" event="resource_cta_click" eventValue={slug} className="button">
               Get Started for Free <ArrowRight size={16} />
             </TrackLink>

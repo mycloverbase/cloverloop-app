@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
 export type ResourceBlock = {
-  type: "paragraph" | "heading" | "takeaway";
+  type: "paragraph" | "heading" | "subheading" | "takeaway" | "disclaimer";
   text: string;
 };
 

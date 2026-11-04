@@ -1,0 +1,30 @@
+{
+  "slug": "how-to-sell-digital-products-online",
+  "title": "How to Sell Digital Products Online: A Beginner's Guide",
+  "seoTitle": "How to Sell Digital Products Online: A Beginner's Guide",
+  "description": "Learn how to choose, create, price and promote a digital product, from your first idea to your first customers.",
+  "primaryKeyword": "how to sell digital products online",
+  "category": "Guides",
+  "canonicalUrl": "https://cloverloop.in/resources/how-to-sell-digital-products-online",
+  "indexable": true,
+  "image": "/images/resources/digital-products.webp",
+  "imageAlt": "Ideas and formats for creating digital products",
+  "related": ["how-to-price-digital-products", "how-to-sell-templates-online", "digital-products"],
+  "blocks": [
+    { "type": "paragraph", "text": "Digital products turn knowledge, skills or creative work into an online offer: guides, templates, workbooks, presets or spreadsheets. You do not need a huge audience to begin. You need a clear problem to solve, a useful product and a simple way to explain its value." },
+    { "type": "paragraph", "text": "Start with a specific customer problem. Ask who you want to help and what task you can make easier. A student may need a revision planner; a small business may need an invoice template; a musician may need a practice tracker. Specific problems make useful products easier to design and explain." },
+    { "type": "paragraph", "text": "Choose a format that suits the outcome. Guides explain a process. Templates and spreadsheets help complete repeatable tasks. Planners support organisation. Presets help apply a consistent creative style. Bundles combine related resources." },
+    { "type": "paragraph", "text": "Build for usability. Include a start-here page, clear file names, instructions and compatibility requirements. Test on likely devices and software. Disclose any paid app or subscription required." },
+    { "type": "paragraph", "text": "Price around value, not file size. Consider time saved, problem solved, specificity, quality, support and alternatives. Write a clear product page: lead with the outcome, explain exactly what is included, identify who it is for, list requirements and show previews." },
+    { "type": "paragraph", "text": "Promote with demonstrations, tutorials and practical tips on social profiles, video descriptions, newsletters and relevant communities. Improve the product using repeated customer questions and feedback." },
+    { "type": "heading", "text": "Frequently asked questions" },
+    { "type": "subheading", "text": "Do I need a large following?" },
+    { "type": "paragraph", "text": "No. A small audience with a clear need can be more useful than a large, unrelated audience." },
+    { "type": "subheading", "text": "Which product should I create first?" },
+    { "type": "paragraph", "text": "Start with a focused solution to a problem you understand and can validate." },
+    { "type": "subheading", "text": "How should I deliver it?" },
+    { "type": "paragraph", "text": "Use secure access controls, clear instructions and a support process." },
+    { "type": "subheading", "text": "Do I need GST registration?" },
+    { "type": "paragraph", "text": "It depends on turnover, supply type, location and exceptions; consult a qualified professional." }
+  ]
+}

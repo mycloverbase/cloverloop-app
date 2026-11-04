@@ -23,10 +23,8 @@ export function SiteHeader() {
               Features <ArrowDown size={14} />
             </summary>
             <div className="dropdown-panel">
-              <Link href="/sell-online">Sell Online</Link>
-              <Link href="/sell-digital-downloads">Digital Downloads</Link>
-              <Link href="/store-builder">Store Builder</Link>
-              <Link href="/payment-gateways">Payment Gateways</Link>
+              <Link href="/sell-digital-downloads">Digital Products</Link>
+              <Link href="/courses">Courses</Link>
             </div>
           </details>
           <Link href="/pricing">Pricing</Link>
@@ -50,10 +48,8 @@ export function SiteHeader() {
             <Menu size={23} />
           </summary>
           <nav aria-label="Mobile navigation">
-            <Link href="/sell-online">Sell Online</Link>
-            <Link href="/sell-digital-downloads">Digital Downloads</Link>
-            <Link href="/store-builder">Store Builder</Link>
-            <Link href="/payment-gateways">Payment Gateways</Link>
+            <Link href="/sell-digital-downloads">Digital Products</Link>
+            <Link href="/courses">Courses</Link>
             <Link href="/pricing">Pricing</Link>
             <Link href="/resources">Resources</Link>
             <Link href="/about">About</Link>

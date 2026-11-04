@@ -1,0 +1,30 @@
+{
+  "slug": "how-to-price-digital-products",
+  "title": "How to Price Digital Products: A Simple Framework",
+  "seoTitle": "How to Price Digital Products: A Simple Framework",
+  "description": "A practical framework for pricing ebooks, templates and planners using value, costs and customer feedback.",
+  "primaryKeyword": "how to price digital products",
+  "category": "Guides",
+  "canonicalUrl": "https://cloverloop.in/resources/how-to-price-digital-products",
+  "indexable": true,
+  "image": "/images/resources/how-to-sell-ebooks.webp",
+  "imageAlt": "A guide to setting a price for a digital product",
+  "related": ["how-to-sell-digital-products-online", "how-many-sales-to-hit-your-income-goal", "digital-products"],
+  "blocks": [
+    { "type": "paragraph", "text": "Pricing should communicate value, support sustainable creation and make sense for your audience. Define the outcome: what task does the product help complete, how much time might it save and what uncertainty does it reduce?" },
+    { "type": "paragraph", "text": "Understand customers and alternatives. Compare products with similar audiences, depth, quality and support. Include free alternatives; your paid offer should provide a clearer, more specific or more useful solution." },
+    { "type": "paragraph", "text": "Calculate your cost floor. Include creation time, software, research, contractors, advertising, payment processing, platform fees and customer support. Estimate how many sales recover creation and maintenance costs." },
+    { "type": "paragraph", "text": "Choose a model that fits. One-time pricing suits a standalone resource. Tiers work when versions have meaningful differences. Bundles should solve related problems. Subscriptions require ongoing value or updates." },
+    { "type": "paragraph", "text": "Test a credible starting price. Make discounts intentional and time-limited. If testing prices, change one variable at a time and compare similar audiences." },
+    { "type": "paragraph", "text": "Review what you retain. Gross sales are not take-home earnings. Deduct payment-provider charges, platform fees and fixed plan costs; also consider refunds, discounts, business expenses and taxes on your own sales. CloverLoop's calculator estimates selected costs only." },
+    { "type": "heading", "text": "Frequently asked questions" },
+    { "type": "subheading", "text": "Should I launch cheaply?" },
+    { "type": "paragraph", "text": "Only if it is a deliberate, time-limited validation offer." },
+    { "type": "subheading", "text": "Should a bundle cost more?" },
+    { "type": "paragraph", "text": "It should deliver a coherent additional outcome." },
+    { "type": "subheading", "text": "How often should I change price?" },
+    { "type": "paragraph", "text": "When meaningful evidence from feedback, conversion or costs supports it." },
+    { "type": "subheading", "text": "Does the calculator show profit?" },
+    { "type": "paragraph", "text": "No. It excludes many business expenses and tax liabilities." }
+  ]
+}

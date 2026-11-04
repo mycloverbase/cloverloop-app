@@ -1,0 +1,30 @@
+{
+  "slug": "do-you-need-gst-registration-to-sell-online",
+  "title": "Do You Need GST Registration to Sell Online?",
+  "seoTitle": "Do You Need GST Registration to Sell Online?",
+  "description": "A practical introduction to GST registration considerations for creators and small businesses selling online in India.",
+  "primaryKeyword": "GST registration to sell online",
+  "category": "Guides",
+  "canonicalUrl": "https://cloverloop.in/resources/do-you-need-gst-registration-to-sell-online",
+  "indexable": true,
+  "image": "/images/resources/digital-products.webp",
+  "imageAlt": "A guide to selling digital products online",
+  "related": ["gst-on-ebooks-and-online-courses-india", "how-to-create-and-sell-online-course-india", "how-many-sales-to-hit-your-income-goal"],
+  "blocks": [
+    { "type": "paragraph", "text": "GST registration is not determined by the fact that you sell online alone. It can depend on aggregate turnover, supply type, location, customer and provisions or exemptions that apply." },
+    { "type": "paragraph", "text": "For many service providers, commonly cited thresholds are ₹20 lakh in most states and ₹10 lakh in certain special category states, subject to statutory changes, notifications and exceptions. Aggregate turnover is generally calculated on an all-India basis for a person with the same PAN. Do not treat these figures as a universal answer." },
+    { "type": "paragraph", "text": "Identify what you supply. A downloadable publication, design file, recorded course and live training service may require different classification analysis. GST treatment and rates depend on the precise supply and applicable notifications." },
+    { "type": "paragraph", "text": "GST has provisions for inter-state supplies and e-commerce operators, along with exemptions and exceptions. The result depends on the type of supply and actual transaction structure. Not every online sale automatically triggers compulsory registration." },
+    { "type": "paragraph", "text": "A creator selling their own product and a platform facilitating third-party supplies may have different GST roles. Review contracts, payment flows and who supplies the product to the customer. Maintain records of sales, invoices, refunds, provider statements and expenses. Seek advice if approaching a threshold, selling across states or countries, using a marketplace or unsure about classification." },
+    { "type": "heading", "text": "Frequently asked questions" },
+    { "type": "subheading", "text": "Is ₹20 lakh always the threshold?" },
+    { "type": "paragraph", "text": "No. Thresholds vary by state and supply type, and exceptions may apply." },
+    { "type": "subheading", "text": "Do online sales automatically require registration?" },
+    { "type": "paragraph", "text": "No single rule covers every seller." },
+    { "type": "subheading", "text": "Are ebooks and courses taxed identically?" },
+    { "type": "paragraph", "text": "Do not assume so; classification and notifications matter." },
+    { "type": "subheading", "text": "Does the earnings calculator determine GST registration?" },
+    { "type": "paragraph", "text": "No. It estimates selected selling costs only." },
+    { "type": "disclaimer", "text": "Tax disclaimer: General information, not tax or legal advice. Confirm current law and your facts with a qualified Indian tax professional." }
+  ]
+}

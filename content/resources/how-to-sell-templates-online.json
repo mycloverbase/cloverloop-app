@@ -1,0 +1,29 @@
+{
+  "slug": "how-to-sell-templates-online",
+  "title": "How to Sell Templates Online (Notion, Canva and Spreadsheets)",
+  "seoTitle": "How to Sell Templates Online (Notion, Canva and Spreadsheets)",
+  "description": "Learn how to package, document, price and promote Notion, Canva and spreadsheet templates.",
+  "primaryKeyword": "how to sell templates online",
+  "category": "Guides",
+  "canonicalUrl": "https://cloverloop.in/resources/how-to-sell-templates-online",
+  "indexable": true,
+  "image": "/images/resources/how-to-sell-canva-templates.webp",
+  "imageAlt": "An example of a digital template product",
+  "related": ["how-to-sell-digital-products-online", "how-to-sell-canva-templates", "how-to-price-digital-products"],
+  "blocks": [
+    { "type": "paragraph", "text": "Templates help customers start with a structured system instead of a blank page. They can include a Notion workspace, Canva design, spreadsheet or printable planner. Strong templates are easy to understand, simple to duplicate and designed for a specific use case." },
+    { "type": "paragraph", "text": "Pick a repeatable task: planning content, tracking expenses, managing projects or organising study schedules. Build for the customer's tools. For Notion, explain duplication and plan requirements. For Canva, specify whether designs use free or Pro assets and explain access. For spreadsheets, state whether Excel, Google Sheets or both are supported." },
+    { "type": "paragraph", "text": "Test the buyer experience using a separate account. Check permissions, links, formulas, fonts, images and mobile usability. Remove personal information and ensure buyers cannot edit your master copy." },
+    { "type": "paragraph", "text": "Package professionally: clear file names, a start guide, screenshots, editable/non-editable details and prerequisites. Set a price based on time saved, specificity, quality and support. State whether the licence is personal, single-business or team use. Explain restrictions on redistribution and resale; do not claim rights to assets you do not own." },
+    { "type": "paragraph", "text": "Demonstrate the result with a screen recording. Maintain the template when the underlying platform changes, use version numbers and tell customers about meaningful updates." },
+    { "type": "heading", "text": "Frequently asked questions" },
+    { "type": "subheading", "text": "Can I sell a Notion template?" },
+    { "type": "paragraph", "text": "Yes, subject to Notion's terms and rights in included content." },
+    { "type": "subheading", "text": "Can I sell Canva templates?" },
+    { "type": "paragraph", "text": "Follow Canva's current licensing rules, especially for Pro and stock assets." },
+    { "type": "subheading", "text": "Can I include spreadsheet formulas?" },
+    { "type": "paragraph", "text": "Yes, if you created them or have distribution rights; test supported applications." },
+    { "type": "subheading", "text": "Should I include a tutorial?" },
+    { "type": "paragraph", "text": "A short setup guide can reduce support requests." }
+  ]
+}

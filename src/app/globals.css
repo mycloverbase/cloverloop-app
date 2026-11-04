@@ -4715,3 +4715,434 @@ a {
   .help-prevnext { grid-template-columns: 1fr; }
   .help-hero { padding: 48px 0 44px; }
 }
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.landing-card-grid,
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.landing-card,
+.step-card {
+  min-width: 0;
+  border: 1px solid #e1e8e0;
+  border-radius: 10px;
+  padding: 22px;
+  background: white;
+}
+
+.landing-icon,
+.step-number {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 10px;
+  background: #edf4ed;
+  color: var(--green);
+}
+
+.landing-card h3,
+.step-card h3 {
+  margin: 18px 0 8px;
+  color: var(--forest);
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.landing-card p,
+.step-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.landing-section-muted {
+  background: #f8f9f6;
+}
+
+.step-number {
+  border-radius: 50%;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.keep-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 42px;
+  align-items: center;
+  border: 1px solid #e1e8e0;
+  border-radius: 12px;
+  padding: clamp(24px, 5vw, 48px);
+  background: var(--ivory);
+}
+
+.keep-card h2,
+.landing-resource-heading h2,
+.launch-checklist-copy h2 {
+  margin: 10px 0 0;
+  color: var(--forest);
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+}
+
+.keep-card p {
+  margin: 0 0 14px;
+  color: #56645c;
+  font-size: 0.98rem;
+  line-height: 1.75;
+}
+
+.keep-card .subtle-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.landing-faq {
+  max-width: 900px;
+}
+
+.landing-resource-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.landing-resource-heading h2 {
+  margin-bottom: 0;
+}
+
+.earnings-calculator-section,
+.calculator-how-it-works,
+.pricing-faq-section,
+.launch-checklist-section,
+.pricing-guides-section {
+  padding-top: 76px;
+}
+
+.calculator-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.calculator-inputs,
+.calculator-results,
+.launch-checklist-form {
+  display: grid;
+  gap: 17px;
+  border: 1px solid #e1e8e0;
+  border-radius: 10px;
+  padding: 24px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(30, 48, 36, 0.04);
+}
+
+.calculator-inputs label,
+.launch-checklist-form > label:not(.consent-label) {
+  display: grid;
+  gap: 8px;
+  color: #35463b;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.calculator-inputs input,
+.calculator-inputs select,
+.launch-checklist-form > input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #d7dfd7;
+  border-radius: 6px;
+  padding: 0 12px;
+  background: white;
+  color: var(--ink);
+}
+
+.calculator-inputs input:focus,
+.calculator-inputs select:focus,
+.launch-checklist-form > input:focus {
+  border-color: var(--green);
+  outline: 2px solid rgba(47, 114, 84, 0.14);
+}
+
+.calculator-results h3 {
+  margin: 0;
+  color: var(--forest);
+  font-size: 1.2rem;
+}
+
+.calculator-results dl {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.calculator-results dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  border-bottom: 1px solid #edf0ec;
+  padding: 13px 0;
+  color: #536057;
+  font-size: 0.89rem;
+  line-height: 1.5;
+}
+
+.calculator-results dd {
+  flex: none;
+  margin: 0;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.calculator-results .calculator-total {
+  margin-top: 9px;
+  border: 0;
+  border-radius: 7px;
+  padding: 15px 12px;
+  background: #edf4ed;
+  color: var(--forest);
+  font-weight: 700;
+}
+
+.calculator-results .calculator-total dd {
+  color: var(--forest);
+  font-size: 1.08rem;
+}
+
+.calculator-results > .subtle-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.calculator-disclaimer {
+  max-width: 900px;
+  margin: 20px auto 0;
+  border-left: 3px solid #9db8a2;
+  padding: 4px 0 4px 18px;
+  color: #64716a;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.calculator-disclaimer p {
+  margin: 0 0 10px;
+}
+
+.calculator-disclaimer h3 {
+  margin: 15px 0 5px;
+  color: var(--forest);
+  font-size: 1rem;
+}
+
+.calculator-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.calculator-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  border: 1px solid #e1e8e0;
+  border-radius: 8px;
+  padding: 16px;
+  color: #56645c;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.calculator-steps li span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: #edf4ed;
+  color: var(--green);
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.pricing-earnings {
+  margin-top: 54px;
+}
+
+.pricing-earnings-heading h2 {
+  color: var(--forest);
+}
+
+.pricing-earnings-accounting {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.pricing-faq-section > .section-heading {
+  margin-bottom: 24px;
+}
+
+.launch-checklist-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 36px;
+  align-items: center;
+  border-radius: 12px;
+  padding-inline: clamp(20px, 4vw, 42px);
+  padding-bottom: 38px;
+  background: #f7f8f5;
+}
+
+.launch-checklist-copy p {
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
+
+.launch-checklist-form {
+  gap: 12px;
+}
+
+.launch-checklist-form .consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #59665f;
+  font-size: 0.82rem;
+  font-weight: 450;
+  line-height: 1.55;
+}
+
+.consent-label input {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+  accent-color: var(--green);
+}
+
+.launch-checklist-form button {
+  justify-self: start;
+  cursor: pointer;
+}
+
+.launch-checklist-form button:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.form-message-error {
+  background: #fff1f0;
+  color: #a3332d;
+}
+
+.form-message-success {
+  background: #eff7ee;
+  color: #315f3c;
+}
+
+.pricing-guides-section .resource-card {
+  min-height: 180px;
+}
+
+.article-copy h3 {
+  margin: 1.75rem 0 0.65rem;
+  color: var(--forest);
+  font-size: 1.12rem;
+  line-height: 1.4;
+}
+
+.article-disclaimer {
+  margin-block: 1.6rem !important;
+  border-left: 3px solid #9db8a2;
+  padding: 13px 17px;
+  background: #f4f7f2;
+  color: #52635a;
+}
+
+.article-platform-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 0 0 18px;
+}
+
+.article-platform-links a {
+  border: 1px solid #dfe7df;
+  border-radius: 5px;
+  padding: 7px 10px;
+  color: var(--green);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.article-platform-links a:hover {
+  background: #f3f7f2;
+}
+
+@media (max-width: 900px) {
+  .landing-card-grid,
+  .steps-grid,
+  .calculator-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .calculator-layout,
+  .launch-checklist-section,
+  .keep-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing-card-grid,
+  .steps-grid,
+  .calculator-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-actions {
+    align-items: stretch;
+  }
+
+  .landing-actions .button {
+    flex: 1 1 100%;
+  }
+
+  .calculator-inputs,
+  .calculator-results,
+  .launch-checklist-form {
+    padding: 18px;
+  }
+
+  .calculator-results dl > div {
+    font-size: 0.82rem;
+  }
+
+  .launch-checklist-section {
+    padding-inline: 18px;
+  }
+}

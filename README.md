@@ -55,6 +55,9 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for authentication | Supabase public anon/publishable key. |
 | `NEXT_PUBLIC_FOUNDING_CREATOR_FORM_URL` | For the dashboard programme CTA | External Google Form URL. It is intentionally not hardcoded. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Before launch | Confirmed CloverLoop support address. The Contact page shows a setup notice until provided. |
+| `RESEND_API_KEY` | For the launch checklist | Server-only Resend API key used to email the launch checklist PDF. |
+| `RESEND_FROM_EMAIL` | For the launch checklist | Verified sender address for checklist email. |
+| `RESEND_AUDIENCE_ID` | Optional | Resend audience used only when a visitor separately opts in to marketing emails. |
 
 Set the same environment variables in the Vercel project. Keep `.env.local` private; it is ignored by Git.
 
@@ -75,7 +78,7 @@ The application returns OAuth and email-authentication callbacks to `/auth/callb
 
 ### Email and password
 
-Enable the Email provider in **Authentication → Providers**. Configure email confirmation according to the launch policy. When confirmation is enabled, new users receive a confirmation message and continue to `/dashboard` after completing the callback. Configure the email templates in Supabase; no email-delivery vendor integration is included in this sprint.
+Enable the Email provider in **Authentication → Providers**. Configure email confirmation according to the launch policy. When confirmation is enabled, new users receive a confirmation message and continue to `/dashboard` after completing the callback. Configure the authentication email templates in Supabase. The separate launch-checklist form uses the Resend settings above.
 
 Password reset requests return to `/auth/callback?next=/forgot-password`. Supabase must allow the callback URL above. The reset page accepts a new password only after the recovery callback has established a session.
 
@@ -99,6 +102,7 @@ Google credentials belong in the Supabase provider configuration; do not put a G
 - `/`
 - `/sell-online`
 - `/sell-digital-downloads`
+- `/courses`
 - `/store-builder`
 - `/payment-gateways`
 - `/pricing`
@@ -122,6 +126,14 @@ Google credentials belong in the Supabase provider configuration; do not put a G
 - `/resources/online-course-ideas`
 - `/resources/content-creator`
 - `/resources/digital-products`
+- `/resources/how-to-sell-digital-products-online`
+- `/resources/how-to-price-digital-products`
+- `/resources/how-to-sell-templates-online`
+- `/resources/accept-upi-payments-digital-products-razorpay`
+- `/resources/do-you-need-gst-registration-to-sell-online`
+- `/resources/how-many-sales-to-hit-your-income-goal`
+- `/resources/how-to-create-and-sell-online-course-india`
+- `/resources/gst-on-ebooks-and-online-courses-india`
 
 ### Authentication
 
@@ -135,9 +147,8 @@ Login, signup, password reset, auth callback and dashboard responses are noindex
 
 ## Content and assets
 
-- The complete eight educational article bodies are in `content/resources/` as structured JSON; article metadata is stored alongside, separately from the article blocks.
-- The source Word document is `image assets/CloverLoop_Content_and_SEO_Master_Document.docx`.
-- To refresh article JSON from that Word source, run `powershell -ExecutionPolicy Bypass -File tools/import-content.ps1`.
+- Educational article bodies, metadata and canonical URLs are stored as structured JSON in `content/resources/`. The eight new guide drafts use the supplied CloverLoop Content Guides document; existing articles also draw on `image assets/CloverLoop_Content_and_SEO_Master_Document.docx`.
+- To refresh the existing articles imported from the master document, run `powershell -ExecutionPolicy Bypass -File tools/import-content.ps1`. The eight newer guide drafts are maintained in their JSON files and are not imported by that script.
 - The tool page and Resource Hub are implemented with reusable templates and source copy in `src/app/resources/`.
 - The Marketing Ideas Tool is a local, predefined generator; it does not use an AI API.
 - `content/asset-inventory.json` records dimensions, alpha channel, source file sizes and usage for every supplied asset. Original source files remain in `image assets/`.

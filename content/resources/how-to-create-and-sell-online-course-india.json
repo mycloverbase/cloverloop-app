@@ -1,0 +1,30 @@
+{
+  "slug": "how-to-create-and-sell-online-course-india",
+  "title": "How to Create and Sell an Online Course in India (2026)",
+  "seoTitle": "How to Create and Sell an Online Course in India (2026)",
+  "description": "Plan an online course in India: choose a learning outcome, structure lessons, price the offer and prepare a launch.",
+  "primaryKeyword": "how to create and sell an online course in India",
+  "category": "Courses",
+  "canonicalUrl": "https://cloverloop.in/resources/how-to-create-and-sell-online-course-india",
+  "indexable": true,
+  "image": "/images/resources/online-course-ideas.webp",
+  "imageAlt": "Course creation and online learning ideas",
+  "related": ["gst-on-ebooks-and-online-courses-india", "accept-upi-payments-digital-products-razorpay", "how-to-sell-digital-products-online"],
+  "blocks": [
+    { "type": "paragraph", "text": "An online course is a structured learning experience that helps a specific group move from a starting point to a defined outcome. A clear curriculum and useful learning materials matter more than the number of lessons." },
+    { "type": "paragraph", "text": "Choose a learner and measurable outcome. Describe the learner's starting level and what they should be able to do by the end. Validate demand before recording everything by talking to potential learners, reviewing common questions or testing a short workshop." },
+    { "type": "paragraph", "text": "Structure the curriculum in a logical sequence. Each module should have a purpose and each lesson should cover one manageable concept. Include practice tasks and resources where useful. Produce clear lessons with understandable audio, readable slides and consistent titles. Add captions or transcripts where practical." },
+    { "type": "paragraph", "text": "Choose an access model that matches the course. A live cohort may use scheduled sessions and a community. A self-paced course needs a lesson sequence and a way to grant access to enrolled learners. Test enrolment, permissions, support and refunds before launch." },
+    { "type": "paragraph", "text": "Set a price that matches the transformation. Consider the outcome, depth, instructor expertise, support, feedback and resources. A self-paced course and a cohort with direct feedback are different offers." },
+    { "type": "paragraph", "text": "Launch to a focused audience. State who the course is for, outcomes, contents, prerequisites, schedule and support. Use a sample lesson or syllabus to reduce uncertainty. Improve after each cohort using learner feedback." },
+    { "type": "heading", "text": "Frequently asked questions" },
+    { "type": "subheading", "text": "How long should a course be?" },
+    { "type": "paragraph", "text": "Long enough to deliver the promised outcome, but no longer." },
+    { "type": "subheading", "text": "Must every lesson be recorded first?" },
+    { "type": "paragraph", "text": "Not necessarily; a pilot cohort can validate the curriculum." },
+    { "type": "subheading", "text": "Where should videos be hosted?" },
+    { "type": "paragraph", "text": "Choose a host that meets privacy, access and reliability needs." },
+    { "type": "subheading", "text": "Do I need GST registration?" },
+    { "type": "paragraph", "text": "It depends on turnover, classification, place of supply and exceptions." }
+  ]
+}

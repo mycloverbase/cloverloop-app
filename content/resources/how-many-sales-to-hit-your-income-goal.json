@@ -1,0 +1,28 @@
+{
+  "slug": "how-many-sales-to-hit-your-income-goal",
+  "title": "How Many Sales Do You Need to Hit Your Goal?",
+  "seoTitle": "How Many Sales Do You Need to Hit Your Goal?",
+  "description": "Calculate the sales needed for a monthly revenue target and understand the role of price, fees and conversion rate.",
+  "primaryKeyword": "how many sales to hit income goal",
+  "category": "Guides",
+  "canonicalUrl": "https://cloverloop.in/resources/how-many-sales-to-hit-your-income-goal",
+  "indexable": true,
+  "image": "/images/resources/content-creator.webp",
+  "imageAlt": "Planning sales goals for a creator business",
+  "related": ["how-to-price-digital-products", "accept-upi-payments-digital-products-razorpay", "do-you-need-gst-registration-to-sell-online"],
+  "blocks": [
+    { "type": "paragraph", "text": "A monthly goal becomes easier to plan when translated into sales, visitors and repeatable actions. First distinguish gross revenue from take-home earnings. Payment processing, platform fees, refunds, discounts, taxes and operating expenses affect what remains." },
+    { "type": "paragraph", "text": "For a gross revenue target, divide the target by product price. A ₹30,000 target at ₹500 per sale requires 60 sales. For a target after fees, estimate the amount retained per sale first, then divide the target by that amount and round up." },
+    { "type": "paragraph", "text": "Estimate visitor requirements using a conversion assumption. If 2% of qualified visitors purchase, 60 sales would require about 3,000 qualified visits. This is a planning assumption, not a universal benchmark. Conversion varies with audience fit, trust, offer clarity, price and traffic source." },
+    { "type": "paragraph", "text": "Work backwards into weekly actions: publish useful content, demonstrate the product, build an email list, collaborate with relevant creators or improve search visibility. Improve controllable variables: clarify outcomes, use previews, reduce buying friction and answer delivery questions. Replace assumptions with actual data as soon as tracking is available." },
+    { "type": "heading", "text": "Frequently asked questions" },
+    { "type": "subheading", "text": "Is revenue the same as profit?" },
+    { "type": "paragraph", "text": "No. Profit requires subtracting selling costs and business expenses." },
+    { "type": "subheading", "text": "What conversion rate should I use?" },
+    { "type": "paragraph", "text": "Use your own data; before launch, model conservative, expected and optimistic scenarios." },
+    { "type": "subheading", "text": "Should I lower my price?" },
+    { "type": "paragraph", "text": "Not automatically; compare conversion and retained amount." },
+    { "type": "subheading", "text": "Can one product reach my goal?" },
+    { "type": "paragraph", "text": "Possibly, but validate demand before expanding." }
+  ]
+}
