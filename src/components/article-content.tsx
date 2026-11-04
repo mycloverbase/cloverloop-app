@@ -104,11 +104,6 @@ export function ArticlePage({ slug }: { slug: string }) {
           </nav>
         )}
         <div className="reading-width">
-          {slug === "accept-upi-payments-digital-products-razorpay" && (
-            <p className="article-disclaimer">
-              CloverLoop&apos;s Razorpay integration is not currently live. This guide describes general setup and security considerations; confirm current requirements with Razorpay.
-            </p>
-          )}
           <ArticleBlocks blocks={article.blocks} />
           <div className="article-references">
             <h2>Explore related resources</h2>

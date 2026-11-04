@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { publicLinks } from "@/lib/site";
+import { footerResourceLinks, publicLinks } from "@/lib/site";
 
 const groups = [
   { title: "Features", links: publicLinks.features },
   { title: "Company", links: publicLinks.company },
-  { title: "Resources", links: publicLinks.resources },
+  { title: "Resources", links: footerResourceLinks },
   { title: "Compare Platforms", links: publicLinks.comparisons },
   { title: "Legal", links: publicLinks.legal },
 ];

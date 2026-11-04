@@ -8,7 +8,7 @@ import { canonical } from "@/lib/site";
 
 const TITLE = "Help Centre | CloverLoop";
 const DESCRIPTION =
-  "Find step-by-step guides, practical instructions and answers to common questions about building your storefront and selling digital products with CloverLoop.";
+  "Explore practical guidance on creator businesses, published plans and preparing digital products with CloverLoop.";
 
 export const metadata: Metadata = {
   title: TITLE,

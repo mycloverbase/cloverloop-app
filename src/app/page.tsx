@@ -9,18 +9,18 @@ import { faqItems, featurePages, resourceCards } from "@/lib/site";
 const benefits = [
   {
     icon: Store,
-    title: "Your own storefront",
-    body: "Give your audience one clear destination to explore your digital products.",
+    title: "A creator-focused storefront",
+    body: "Plan one clear destination for your audience to explore your digital products.",
   },
   {
     icon: Download,
-    title: "Sell digital products",
-    body: "Present ebooks, templates, presets, printables and other downloadable resources.",
+    title: "Digital products",
+    body: "Prepare ebooks, templates, presets, printables and other downloadable resources for a creator-led offer.",
   },
   {
     icon: CreditCard,
-    title: "Clear platform fees",
-    body: "Compare plan commission rates, with payment-provider processing charges listed separately.",
+    title: "Transparent plan fees",
+    body: "Understand platform commission alongside separate payment-provider processing charges.",
   },
   {
     icon: Check,
@@ -35,11 +35,11 @@ export default function HomePage() {
       <section className="hero-section">
         <div className="page-width hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow">A CREATOR STOREFRONT FOR YOUR WORK</span>
-            <h1>Your audience. Your products. Your own storefront.</h1>
+            <span className="eyebrow">A CREATOR-FOCUSED PRODUCT EXPERIENCE</span>
+            <h1>Your work deserves a home of its own.</h1>
             <p>
-              CloverLoop helps creators present digital products through a dedicated storefront,
-              with plans designed for different catalogue sizes and sales volumes.
+              CloverLoop is designed around a dedicated storefront concept, clear plan pricing and
+              the direct relationship between creators and their audiences.
             </p>
             <div className="hero-actions">
               <TrackLink href="/signup" event="signup_click" className="button">
@@ -88,16 +88,16 @@ export default function HomePage() {
       <section className="section-space storefront-cta-section">
         <div className="page-width storefront-cta-card">
           <div className="storefront-cta-copy">
-            <span className="eyebrow">Your work, in one place</span>
-            <h2>Your store is five minutes away</h2>
-            <p>Choose the address your audience will use to find your digital products.</p>
+            <span className="eyebrow">Your creator identity</span>
+            <h2>Choose a name for your creator account</h2>
+            <p>Start with a recognisable name for your work and audience.</p>
           </div>
           <div className="storefront-cta-action">
             <form action="/signup" method="get" className="storefront-username-form">
-              <label htmlFor="storefront-username">Choose your storefront address</label>
+              <label htmlFor="storefront-username">Choose a creator username</label>
               <div className="storefront-username-row">
                 <div className="storefront-url-input">
-                  <span aria-hidden="true">cloverloop.in/</span>
+                  <span aria-hidden="true">@</span>
                   <input
                     id="storefront-username"
                     name="username"
@@ -112,7 +112,7 @@ export default function HomePage() {
                   />
                 </div>
                 <button type="submit" className="button">
-                  Start my store <ArrowRight size={17} />
+                  Create my account <ArrowRight size={17} />
                 </button>
               </div>
               <p className="storefront-username-hint">Use letters, numbers, underscores or hyphens.</p>

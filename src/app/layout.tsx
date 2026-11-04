@@ -7,27 +7,27 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(PRODUCTION_URL),
   title: {
-    default: "Sell Digital Products Online | CloverLoop",
+    default: "Digital Products for Creators | CloverLoop",
     template: "%s",
   },
   description:
-    "Create your own digital storefront, sell directly to your audience and simplify digital product delivery.",
+    "Explore CloverLoop's creator storefront concept, transparent plan pricing and practical resources for digital-product creators.",
   applicationName: SITE_NAME,
   alternates: { canonical: PRODUCTION_URL },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
     url: PRODUCTION_URL,
-    title: "Sell Digital Products Online | CloverLoop",
+    title: "Digital Products for Creators | CloverLoop",
     description:
-      "Create your own digital storefront, sell directly to your audience and simplify digital product delivery.",
+      "Explore CloverLoop's creator storefront concept, transparent plan pricing and practical resources for digital-product creators.",
     images: [{ url: "/images/home/hero.webp", width: 1376, height: 768, alt: "Illustrative CloverLoop creator storefront concept" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sell Digital Products Online | CloverLoop",
+    title: "Digital Products for Creators | CloverLoop",
     description:
-      "Create your own digital storefront, sell directly to your audience and simplify digital product delivery.",
+      "Explore CloverLoop's creator storefront concept, transparent plan pricing and practical resources for digital-product creators.",
     images: ["/images/home/hero.webp"],
   },
   icons: {
@@ -50,7 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     name: "CloverLoop",
     url: PRODUCTION_URL,
     description:
-      "Create your own digital storefront, sell directly to your audience and simplify digital product delivery.",
+      "Explore CloverLoop's creator storefront concept, transparent plan pricing and practical resources for digital-product creators.",
   };
   const googleTagManagerBootstrap = `
     window.dataLayer = window.dataLayer || [];

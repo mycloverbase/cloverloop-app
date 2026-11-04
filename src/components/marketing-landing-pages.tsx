@@ -36,19 +36,19 @@ const digitalSteps = [
 const digitalFaqs = [
   {
     question: "What types of digital products can creators sell?",
-    answer: "Creators can plan to offer ebooks, PDF guides, templates, presets, LUTs, printables, bundles and other original downloadable resources. CloverLoop's storefront and product-upload features are not live yet.",
+    answer: "Common formats include ebooks, PDF guides, templates, presets, LUTs, printables, bundles and other original downloadable resources. Choose a format that fits your audience and explain clearly what each offer includes.",
   },
   {
     question: "Which file formats will be supported?",
-    answer: "The planned maximum is 100 MB per file, but supported file types will be confirmed when uploads are available. Product uploads are not currently live, so no format should be represented as supported today.",
+    answer: "Choose formats that suit your product and audience, and include compatibility details and any software requirements in your product information.",
   },
   {
     question: "How will buyers receive digital products?",
-    answer: "Automated checkout and file delivery are planned capabilities, not live functionality. Creators should not promise CloverLoop delivery until those features are available.",
+    answer: "Set clear expectations for how customers will access a product, when access begins and what instructions or support they will receive.",
   },
   {
     question: "How will secure downloads work?",
-    answer: "Configurable download limits and secure links with reasonable expiry are part of the planned product experience. Secure file delivery is not currently operational, so no download-security capability should be represented as live.",
+    answer: "Consider appropriate access controls, usage rights and customer instructions for the type of file you offer.",
   },
   {
     question: "What platform fees apply?",
@@ -56,11 +56,11 @@ const digitalFaqs = [
   },
   {
     question: "Can creators offer free products?",
-    answer: "The Free plan currently includes five free product listings per account for the lifetime of the account. Creator and Pro Creator include unlimited free and paid product listings. Product publishing is not yet live.",
+    answer: "Free products can introduce your work, share a sample or help customers understand what you offer. Review the listing allowances for each plan on the Pricing page.",
   },
   {
     question: "How will refunds and customer support work?",
-    answer: "Creators remain responsible for clear product information, buyer support and their refund obligations under applicable policies and law. CloverLoop's checkout and order-management capabilities are not live; review the published refund policy and terms before making commitments to buyers.",
+    answer: "Creators are responsible for clear product information, buyer support and refund obligations under applicable policies and law. Set expectations before a purchase and review the published refund policy and terms.",
   },
 ];
 
@@ -68,7 +68,7 @@ const courseProducts = [
   { title: "Recorded video courses", body: "Plan a sequence of recorded lessons and supporting materials hosted through your chosen service.", icon: Film },
   { title: "Live workshops & cohorts", body: "Organise a time-bound learning experience with sessions, practice and direct interaction.", icon: UsersRound },
   { title: "Downloadable learning resources", body: "Prepare workbooks, lesson notes, templates and reference PDFs to support learning.", icon: Download },
-  { title: "Course bundles", body: "Pair learning materials with related templates or guides as a coherent offer; course hosting is not provided by CloverLoop.", icon: Boxes },
+  { title: "Course bundles", body: "Pair learning materials with related templates or guides as a coherent offer.", icon: Boxes },
 ];
 
 const courseSteps = [
@@ -86,12 +86,12 @@ const courseBenefits = [
 ];
 
 const courseFaqs = [
-  { question: "What types of courses can creators offer?", answer: "Creators can plan recorded courses, live workshops, cohorts and related learning resources. CloverLoop is not currently a course-hosting or learning-management system." },
-  { question: "Can I sell recorded video courses?", answer: "You can plan a recorded course and explain where lessons are hosted, but CloverLoop does not currently host videos, provide a course player or manage student access." },
-  { question: "Where will course videos be hosted?", answer: "Creators will need to choose and describe an appropriate external video or learning service. CloverLoop video hosting is not currently available." },
-  { question: "Can I offer free preview lessons?", answer: "You can plan a preview using a service you control. CloverLoop does not currently provide preview-lesson or course-player functionality." },
-  { question: "How will students access purchased courses?", answer: "Checkout and student-access management are not live CloverLoop capabilities. Do not promise automated enrolment or course access through CloverLoop." },
-  { question: "Can I offer live workshops?", answer: "Creators may plan live workshops or cohorts using their own scheduling and meeting tools. CloverLoop does not currently host webinars or paid calls." },
+  { question: "What types of courses can creators offer?", answer: "Common formats include recorded courses, live workshops, cohorts and related learning resources. Choose a format that suits your subject, teaching style and learners." },
+  { question: "Can I sell recorded video courses?", answer: "When planning a recorded course, decide how lessons will be hosted and how learners will receive access, then explain those details clearly." },
+  { question: "Where should course videos be hosted?", answer: "Compare video and learning services based on accessibility, privacy, playback quality, learner needs and the level of support you want to provide." },
+  { question: "Can I offer free preview lessons?", answer: "A preview lesson can help learners understand your teaching style and course fit. Explain what it covers and how people can access it." },
+  { question: "How will students access a course?", answer: "Set clear enrolment, access and support instructions so learners know what to expect after signing up." },
+  { question: "Can I offer live workshops?", answer: "Live workshops and cohorts can combine scheduled sessions, practice and discussion. Plan your schedule, meeting format and learner support in advance." },
   { question: "What platform fees apply to courses?", answer: "The published plan rates are Free: 0% on the first ₹10,000 of monthly Gross Sales and 4% only above it; Creator: 4%; Pro Creator: 2.5%. Monthly plan prices are ₹0, ₹0 and ₹1,499 respectively. Payment-provider fees and applicable taxes are separate. See Pricing for plan limits and details." },
   { question: "Do I need GST registration to sell online courses?", answer: "GST registration and tax treatment depend on your turnover, supply, location and applicable provisions or exceptions. This is general information, not tax advice; consult a qualified Indian tax professional about your circumstances." },
 ];
@@ -152,7 +152,7 @@ export function DigitalProductsLandingPage() {
       <section className="feature-hero page-width">
         <div className="feature-hero-copy">
           <span className="eyebrow">Digital products</span>
-          <h1>A simpler way to sell digital downloads</h1>
+          <h1>Plan a clear digital download offer</h1>
           <p>Plan clear product details and access instructions for downloadable products such as ebooks, templates and presets.</p>
           <div className="landing-actions">
             <TrackLink href="/signup" event="signup_click" className="button">Get Started for Free <ArrowRight size={17} /></TrackLink>
@@ -186,7 +186,7 @@ export function DigitalProductsLandingPage() {
         <div className="page-width keep-card">
           <div><span className="eyebrow">What you keep</span><h2>Understand the costs behind each sale</h2></div>
           <div>
-            <p>Your estimated amount depends on your selected CloverLoop plan, payment-provider processing charges and applicable taxes. Provider fees can vary, and CloverLoop checkout and payment processing are not live yet. Use the calculator to estimate selected costs once your own assumptions are known.</p>
+            <p>Your estimated earnings depend on your selected CloverLoop plan, payment-provider processing charges and applicable taxes. Use the calculator to explore how different pricing and sales assumptions affect your estimated earnings.</p>
             <Link href="/pricing#earnings-calculator" className="subtle-link">Try the creator earnings calculator <ArrowRight size={16} /></Link>
           </div>
         </div>
@@ -216,8 +216,8 @@ export function CoursesLandingPage() {
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Courses" }]} />
       <section className="feature-hero page-width">
         <div className="feature-hero-copy">
-          <span className="eyebrow">Online courses</span>
-          <h1>Turn what you know into an online course.</h1>
+          <span className="eyebrow">Online course planning</span>
+          <h1>Shape what you know into an online course.</h1>
           <p>Help learners move toward a clear outcome with structured learning, organised lessons and useful educational resources.</p>
           <div className="landing-actions">
             <TrackLink href="/signup" event="signup_click" className="button">Get Started for Free <ArrowRight size={17} /></TrackLink>
@@ -237,7 +237,6 @@ export function CoursesLandingPage() {
               <article className="landing-card" key={title}><span className="landing-icon"><Icon size={22} /></span><h3>{title}</h3><p>{body}</p></article>
             ))}
           </div>
-          <p className="scope-note">Course building, video hosting, a course player, student access management, progress tracking and certificates are not currently available on CloverLoop.</p>
         </div>
       </section>
 

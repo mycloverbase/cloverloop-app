@@ -1,6 +1,6 @@
 ## The short answer
 
-CloverLoop is a platform for creators to sell digital products through a creator storefront. Free is ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission.
+CloverLoop is designed around creator storefronts for digital products. Its published plans are Free at ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission.
 
 Instamojo's [current official Online Store pricing page](https://www.instamojo.com/pricing/) lists Lite at 5% + ₹3, Starter at 5% + ₹3, and Growth at 2% + ₹3. It states that GST is charged in addition to the listed prices. The page reviewed does not show a separate current digital-product fee schedule. Older online calculator figures of 10% + ₹3 and 5% + ₹3 are not used as current pricing.
 

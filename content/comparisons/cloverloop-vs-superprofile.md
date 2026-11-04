@@ -1,6 +1,6 @@
 ## The short answer
 
-CloverLoop is a platform for creators to sell digital products through a creator storefront. Free is ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission. SuperProfile offers a broader creator toolkit with Instagram automation and other monetisation features.
+CloverLoop is designed around creator storefronts for digital products. Its published plans are Free at ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission. SuperProfile offers a broader creator toolkit with Instagram automation and other monetisation features.
 
 The [current SuperProfile pricing page](https://superprofile.bio/pricing), reviewed on 2 November 2026, lists its Creator plan at US$4.99 for the first month and US$29 per month after that, and states there is no platform fee. It lists Starter as free and Pro as custom-priced. The page shows USD pricing rather than an India-specific INR schedule. Older claims of ₹99/₹499 and a 5% + GST India commission could not be verified against the current official pricing page, so they are not used as current prices here.
 

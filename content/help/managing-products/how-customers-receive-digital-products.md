@@ -9,15 +9,15 @@ lastUpdated: "2026-11-03"
 related: []
 ---
 
-The delivery method for a digital product depends on the creator's product and the terms provided to the customer. Make access instructions clear and share them through a secure method appropriate for the product.
+The delivery method for a digital product depends on the creator's product and chosen tools. Make access instructions clear and use an approach appropriate for the product.
 
 ## Paid products
 
-Tell customers what they will receive, how they will receive it and whom to contact if they need help. Follow the relevant payment provider's records and terms when confirming a paid order.
+Tell customers what they will receive, how access is arranged and whom to contact if they need help. If payment is involved, follow the relevant provider's records and terms.
 
 ## Free products
 
-Free products do not incur platform transaction commission under the published pricing terms. The Free plan allows five free product listings per account lifetime; Creator and Pro Creator allow unlimited paid and free product listings.
+Free products do not incur platform transaction commission under the published pricing terms. The Free plan has a published limit of five free product listings per account lifetime; Creator and Pro Creator plan terms include unlimited paid and free product listings.
 
 ## Protecting access
 

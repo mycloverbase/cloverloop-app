@@ -2,8 +2,8 @@ import { ArrowRight } from "lucide-react";
 import { TrackLink } from "@/components/track-link";
 
 export function PublicCta({
-  title = "Build a dedicated home for your digital products.",
-  body = "Bring your work together in a storefront made for sharing directly with your audience.",
+  title = "Give your digital products a dedicated home.",
+  body = "Plan how to present your work and connect it with the people who value it.",
 }: {
   title?: string;
   body?: string;

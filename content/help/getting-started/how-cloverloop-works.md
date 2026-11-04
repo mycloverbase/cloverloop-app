@@ -3,17 +3,17 @@ title: "How CloverLoop Works"
 slug: "how-cloverloop-works"
 category: "getting-started"
 order: 1
-description: "An overview of CloverLoop creator storefronts, published plans and platform fees."
+description: "An overview of CloverLoop's creator storefront concept, published plans and platform fees."
 status: "published"
 lastUpdated: "2026-11-03"
 related: []
 ---
 
-CloverLoop helps independent creators present digital products through a dedicated online storefront.
+CloverLoop is designed around helping independent creators plan how to present digital products through a dedicated online storefront.
 
-## Your creator storefront
+## The creator storefront concept
 
-Each creator has a dedicated storefront address, for example cloverloop.in/creatorname. It presents the creator's profile and digital products. Creators can share this link through social media, messaging apps, email and their own websites.
+A creator storefront brings a creator's identity and digital-product information together in a shareable destination. Creators can plan how to describe their work and where a storefront link would fit across their channels.
 
 ## Published plans
 

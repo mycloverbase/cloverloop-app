@@ -1,32 +1,32 @@
 ---
-title: "How to Add a Digital Product"
+title: "Preparing a Digital Product Offer"
 slug: "how-to-add-a-digital-product"
 category: "managing-products"
 order: 8
-description: "Prepare clear product information and the final file before publishing a digital product."
+description: "Plan clear product information, pricing and access instructions for a digital product."
 status: "published"
 lastUpdated: "2026-11-01"
 related: []
 ---
 
-Prepare the product information and final file before publishing your product.
+Use these steps to plan a clear digital product offer and the information customers will need.
 
 ## Prepare the product
 
 Choose a clear title, write an accurate description and prepare a cover image that represents the actual contents.
 
-## Set the price
+## Plan the price
 
-Choose the price shown to customers, or select the free option if the product is intended to be distributed without charge.
+Consider the product's value, audience, costs and whether it is intended to be free or paid.
 
-## Upload the file
+## Prepare the files
 
-Upload the final digital file in a supported format.
+Prepare the final files, use clear filenames and check that each file opens as expected. Check your signed-in account for current file requirements.
 
-## Configure access
+## Explain access
 
-Review available download-limit or link-expiry settings. Explain restrictions clearly to customers before they obtain the product.
+Describe how customers should access the product, any requirements and what support they can expect.
 
-## Review and publish
+## Review before sharing
 
-Check the title, description, price, file and customer-facing presentation before publishing.
+Check the title, description, price, files and customer-facing information before sharing the offer.

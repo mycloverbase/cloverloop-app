@@ -78,15 +78,15 @@ export default async function DashboardPage({
 
       <section className="dashboard-founder-banner" aria-labelledby="founder-banner-title">
         <span className="dashboard-card-label">CloverLoop Founding Creator Programme</span>
-        <h2 id="founder-banner-title">Welcome to the CloverLoop Founding Creator Programme!</h2>
+        <h2 id="founder-banner-title">Pilot status and account availability</h2>
         <p>
-          You&apos;re among the early creators joining CloverLoop. We&apos;re currently in the pilot
-          testing phase, refining the platform based on creator feedback. Our creator storefront
-          feature, enabling you to showcase and sell digital products, will be introduced soon.
+          You&apos;re among the early creators in CloverLoop&apos;s pilot. Your creator profile,
+          account settings, help and feedback tools are available in your account.
         </p>
         <p>
-          <strong>Your next step:</strong> Complete your creator profile and share your feedback to
-          help us shape CloverLoop.
+          <strong>Not available yet:</strong> storefront publishing and product uploads; checkout,
+          payment processing and Razorpay connection; automated order handling and digital product
+          delivery; and course hosting, course-player and student-access tools.
         </p>
         <div className="dashboard-founder-banner-actions">
           <Link className="button" href="/dashboard/profile">

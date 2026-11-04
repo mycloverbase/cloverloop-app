@@ -62,13 +62,25 @@ export const publicLinks = {
   ],
 };
 
+const footerResourceHrefs = new Set([
+  "/resources/marketing-ideas-tool",
+  "/resources/how-to-sell-digital-products-online",
+  "/resources/how-to-sell-templates-online",
+  "/resources/online-course-ideas",
+  "/resources",
+]);
+
+export const footerResourceLinks = publicLinks.resources.filter((link) =>
+  footerResourceHrefs.has(link.href),
+);
+
 export const featurePages = [
   {
     slug: "sell-online",
-    title: "Sell Directly to Your Audience | CloverLoop",
+    title: "Creator Storefronts for Digital Products | CloverLoop",
     description:
-      "Learn about CloverLoop storefronts and published plans for digital-product creators.",
-    heading: "Sell digital products directly to your audience",
+      "Explore CloverLoop's creator storefront concept and published plans for digital-product creators.",
+    heading: "Plan a direct-to-audience digital product offer",
     intro:
       "Explore a dedicated storefront concept for digital products, with clear published plan pricing for creators.",
     image: "/images/home/digital-product-collection.webp",
@@ -76,7 +88,7 @@ export const featurePages = [
     sections: [
       {
         heading: "A direct destination for your work",
-        body: "Bring your ebooks, templates, presets, printables and other downloadable resources together in a storefront you can share with your audience.",
+        body: "A dedicated storefront can bring your ebooks, templates, presets, printables and other downloadable resources together in one shareable destination.",
       },
       {
         heading: "Built around creator ownership",
@@ -90,10 +102,10 @@ export const featurePages = [
   },
   {
     slug: "sell-digital-downloads",
-    title: "Sell Digital Downloads Online | CloverLoop",
+    title: "Plan Digital Downloads Online | CloverLoop",
     description:
       "Guidance for preparing a clear digital download experience for ebooks, templates, presets and other creator products.",
-    heading: "A simpler way to sell digital downloads",
+    heading: "Plan a clear digital download offer",
     intro:
       "Plan clear product details and access instructions for downloadable products such as ebooks, templates and presets.",
     image: "/images/home/digital-product-collection.webp",
@@ -117,24 +129,24 @@ export const featurePages = [
     slug: "store-builder",
     title: "Creator Store Builder | CloverLoop",
     description:
-      "Give your audience one dedicated place to explore your digital products with an independent storefront.",
+      "Explore a creator-focused storefront concept for presenting digital products in one dedicated place.",
     heading: "Your own storefront, made for your work",
     intro:
-      "Give your audience a dedicated place to explore what you create at a shareable CloverLoop.in/creatorname address.",
+      "Plan a dedicated, shareable destination where your audience can learn about what you create.",
     image: "/images/home/storefront-mockup.webp",
     imageAlt: "CloverLoop storefront concept displaying creator digital products",
     sections: [
       {
         heading: "One link for your digital products",
-        body: "Share a central destination from your social profiles, video descriptions, website and other channels where your audience already finds you.",
+        body: "A central destination can be included in social profiles, video descriptions, websites and other channels where your audience already finds you.",
       },
       {
         heading: "An independent creator destination",
-        body: "Bring your work together under a shareable address such as cloverloop.in/creatorname.",
+        body: "A shareable address can give your work a consistent identity across the places your audience finds you.",
       },
       {
         heading: "Designed for a direct relationship",
-        body: "CloverLoop is centred on independent storefronts rather than a central marketplace catalogue. Creators share their storefront directly with their audience.",
+        body: "CloverLoop is designed around independent creator storefronts rather than a central marketplace catalogue, supporting a direct relationship between creators and their audiences.",
       },
     ],
   },
@@ -180,7 +192,7 @@ export const companyPages: Record<
   about: {
     title: "About CloverLoop | A Platform Built for Independent Creators",
     description:
-      "Discover how CloverLoop helps independent creators sell digital products through their own storefronts with transparent pricing and creator-owned payment arrangements.",
+      "Discover CloverLoop's approach to creator storefronts, digital products, transparent pricing and creator-owned payment arrangements.",
     keywords: [
       "Platform for independent creators",
       "Sell digital products online",
@@ -195,20 +207,20 @@ export const companyPages: Record<
       { type: "p", text: "The internet has made it easier than ever to create, share and build an audience. Independent creators are publishing valuable work across social media, YouTube, blogs, online communities and other digital platforms. From educational resources and ebooks to design templates, presets and creative tools, there is no shortage of knowledge and creativity worth sharing." },
       { type: "p", text: "But turning that work into a sustainable source of income is not always straightforward." },
       { type: "p", text: "Creators often have to navigate multiple platforms, complicated monetisation models, payment arrangements and fragmented ways of delivering digital products. Their audience may belong to them, but the tools they rely on to monetise their work are often spread across different services." },
-      { type: "strong", text: "CloverLoop makes that process simpler." },
-      { type: "p", text: "CloverLoop gives independent creators a more direct way to present, distribute and sell digital products through their own storefronts. It brings the essential parts of digital product selling together in one straightforward experience, while keeping creators in control of their audience relationships and payment arrangements." },
+      { type: "strong", text: "CloverLoop is focused on making that process simpler." },
+      { type: "p", text: "CloverLoop's product concept is centred on a more direct way for independent creators to present and sell digital products through creator-owned storefronts. Its approach brings the essential parts of digital product selling into one clear experience while keeping creators in control of their audience relationships and payment arrangements." },
       { type: "h2", text: "Why we are building CloverLoop" },
       { type: "p", text: "We believe that valuable creative work should have a clear path to monetisation." },
       { type: "p", text: "A musician should be able to sell guitar tabs, backing tracks or learning resources. A designer should be able to distribute templates and creative assets. An educator should be able to offer ebooks, guides and downloadable learning material. A content creator should be able to turn their knowledge and expertise into products their audience can access." },
       { type: "p", text: "These creators should not need to build an entire ecommerce operation just to sell a digital file." },
-      { type: "p", text: "We see an opportunity to make the process more accessible by providing the infrastructure required to present digital products, manage a creator-owned storefront and facilitate online sales." },
+      { type: "p", text: "We see an opportunity to make the process more accessible through creator-focused tools for presenting digital products, shaping a storefront and planning online sales." },
       { type: "p", text: "CloverLoop follows this principle: simplify the infrastructure so creators can focus on what they do best — creating useful work and building meaningful relationships with their audiences." },
       { type: "h2", text: "Built around creator independence" },
       { type: "p", text: "We believe creators should have greater control over how they present and monetise their work." },
       { type: "p", text: "That belief informs three principles behind CloverLoop." },
       { type: "h3", text: "1. Your own storefront, your identity" },
       { type: "p", text: "Your products deserve a dedicated space that represents your work." },
-      { type: "p", text: "CloverLoop is designed to give each creator their own storefront, with a shareable address and a place to present digital products directly to their audience. Instead of relying entirely on marketplace listings or scattered payment links, creators can build a consistent destination for their digital offerings." },
+      { type: "p", text: "CloverLoop is designed around the idea of a creator-owned storefront, with a shareable address and a clear way to present digital products to an audience. Instead of relying entirely on marketplace listings or scattered payment links, creators can plan a consistent destination for their digital offerings." },
       { type: "p", text: "Your storefront should be an extension of your creator identity, not just another product listing." },
       { type: "h3", text: "2. Transparent payment arrangements" },
       { type: "p", text: "We believe payment arrangements should be straightforward and easy to understand." },
@@ -307,7 +319,7 @@ export const pageTitles: Record<string, { title: string; description: string }> 
       "Compare CloverLoop's Free, Creator and Pro Creator plans, including platform transaction fees and monthly pricing.",
   },
   courses: {
-    title: "Plan and Sell an Online Course | CloverLoop",
+    title: "Online Course Planning for Creators | CloverLoop",
     description:
       "Plan a clear online course with structured learning, organised lessons and useful educational resources.",
   },
@@ -465,7 +477,7 @@ export const faqItems = [
   {
     question: "What is CloverLoop?",
     answer:
-      "CloverLoop helps independent creators establish their own digital storefronts and sell downloadable products directly to their audiences, with creator-owned payments and secure digital delivery.",
+      "CloverLoop is designed to help independent creators plan how to present digital products to their audiences through a creator-focused storefront, with transparent plan pricing and creator-owned payment arrangements.",
   },
   {
     question: "Who can use CloverLoop?",
@@ -475,12 +487,12 @@ export const faqItems = [
   {
     question: "What kinds of digital products can creators sell?",
     answer:
-      "Creators can offer ebooks, PDF guides, music tabs, backing tracks, audio resources, presets, templates, printables, educational materials and other downloadable files. Creators are responsible for ensuring that they own or have permission to distribute the content they sell.",
+      "Creators often package ebooks, PDF guides, music tabs, backing tracks, audio resources, presets, templates, printables, educational materials and other downloadable files. Creators are responsible for ensuring that they own or have permission to distribute the content they offer.",
   },
   {
     question: "Will I get my own storefront?",
     answer:
-      "Yes. Each creator gets an independent storefront with a shareable URL in the format cloverloop.in/creatorname, where an audience can explore their digital products.",
+      "CloverLoop is designed around independent creator storefronts: a dedicated, shareable destination for presenting digital products directly to an audience.",
   },
   {
     question: "Who sets payment processing charges?",
@@ -500,7 +512,7 @@ export const faqItems = [
   {
     question: "What are the available plans?",
     answer:
-      "Free is ₹0/month, with 1 paid and 5 free product listings per account lifetime. Its platform fee is 0% on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator is ₹1,499/month with a 2.5% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Provider processing charges are separate.",
+      "Free is ₹0/month, with a published allowance of 1 paid and 5 free product listings per account lifetime. Its platform fee is 0% on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator is ₹1,499/month with a 2.5% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Provider processing charges are separate.",
   },
   {
     question: "How is the platform transaction fee calculated?",
@@ -510,7 +522,7 @@ export const faqItems = [
   {
     question: "Does the Free plan have a limit on free products?",
     answer:
-      "Yes. Free includes one paid product and five free product listings as a lifetime account-level limit. Creator and Pro Creator include unlimited paid and free product listings.",
+      "The published Free plan allowance is one paid and five free product listings per account lifetime. Creator and Pro Creator plan terms include unlimited paid and free product listings.",
   },
   {
     question: "Are free products charged a transaction fee?",
@@ -525,7 +537,7 @@ export const faqItems = [
   {
     question: "Is CloverLoop a marketplace?",
     answer:
-      "No. CloverLoop is built around independent creator storefronts rather than a central marketplace catalogue. Each creator shares their storefront directly with their audience.",
+      "No. CloverLoop is designed around independent creator storefronts rather than a central marketplace catalogue, with creators presenting their work directly to their audiences.",
   },
   {
     question: "Can I create an account now?",

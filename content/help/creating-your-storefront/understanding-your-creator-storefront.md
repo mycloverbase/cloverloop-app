@@ -3,22 +3,22 @@ title: "Understanding Your Creator Storefront"
 slug: "understanding-your-creator-storefront"
 category: "creating-your-storefront"
 order: 4
-description: "Your CloverLoop storefront is a dedicated page where your audience can view the digital products you offer. It gives you one link to share wherever your audience follows your work."
+description: "Learn how a creator storefront can present digital-product information in one shareable destination."
 status: "published"
 lastUpdated: "2026-11-01"
 related: []
 ---
 
-Your CloverLoop storefront is a dedicated page where your audience can view the digital products you offer. It gives you one link to share wherever your audience follows your work.
+A creator storefront is a dedicated destination for presenting a creator's identity and digital-product information to an audience.
 
-## Your storefront address
+## Plan a storefront address
 
-Your storefront address uses the format cloverloop.in/creatorname. Choose a unique, easy-to-remember creatorname that represents your work.
+Choose a name that is easy to remember and represents your work. Check the current options shown in your signed-in account before using an address in public materials.
 
-## What visitors see
+## Plan what visitors should see
 
-A storefront may display your creator identity, a short introduction and the products you have published. Keep the information accurate and make product titles and descriptions easy to understand.
+A storefront can introduce your creator identity, explain what you make and present clear product information. Keep descriptions accurate and easy to understand.
 
-## Use one link across channels
+## Keep your identity consistent
 
-Add your storefront link to social profiles, video descriptions, newsletters and your website.
+When you have a shareable destination, use a consistent name and description across social profiles, video descriptions, newsletters and your website.

@@ -3,13 +3,13 @@ title: "Your First Steps on CloverLoop"
 slug: "your-first-steps-on-cloverloop"
 category: "getting-started"
 order: 3
-description: "Use this checklist to prepare your creator business on CloverLoop. The exact sequence may vary depending on which product features are available in your account."
+description: "Use this checklist to prepare your creator business and review your account's current setup options."
 status: "published"
 lastUpdated: "2026-11-01"
 related: []
 ---
 
-Use this checklist to prepare your creator business on CloverLoop. The exact sequence may vary depending on which product features are available in your account.
+Use this checklist to prepare your creator business and review your account's current setup options.
 
 ## 1. Create your account
 
@@ -27,10 +27,10 @@ Check that you own or have permission to distribute every file. Prepare clear ti
 
 Choose a plan based on the number of paid and free product listings you need and the platform transaction fee.
 
-## 5. Set up Razorpay
+## 5. Review payment-provider requirements
 
-If you intend to sell paid products, create and activate your own Razorpay merchant account and connect it through the supported CloverLoop flow.
+If you intend to accept payments, review your provider's merchant onboarding requirements, fees and policies. Check the payment options shown in your signed-in account before making commitments to buyers.
 
-## 6. Test before promoting
+## 6. Review your selling plan
 
-Once the relevant features are available, review your storefront, product information, checkout and delivery experience before sharing the link.
+Before promoting an offer, confirm the storefront, product, payment and delivery options available in your account, and make sure your product information and customer instructions match your chosen setup.

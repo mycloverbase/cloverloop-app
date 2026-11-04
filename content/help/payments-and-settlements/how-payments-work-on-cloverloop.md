@@ -1,5 +1,5 @@
 ---
-title: "CloverLoop Plan Fees and Payment Provider Charges"
+title: "Plan Fees and Payment Provider Charges"
 slug: "how-payments-work-on-cloverloop"
 category: "payments-and-settlements"
 order: 17

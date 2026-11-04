@@ -1,27 +1,27 @@
 ---
-title: "File Upload Requirements"
+title: "Preparing Digital Product Files"
 slug: "file-upload-requirements"
 category: "managing-products"
 order: 9
-description: "Each uploaded file must be no larger than 100 MB. If a product requires several files, check the actual upload interface for the permitted number of files and any additional restrictions."
+description: "Prepare clear, reliable digital product files and check your account for current file requirements."
 status: "published"
 lastUpdated: "2026-11-01"
 related: []
 ---
 
-Each uploaded file must be no larger than 100 MB. If a product requires several files, check the actual upload interface for the permitted number of files and any additional restrictions.
+Prepare clear, reliable files for your digital product. Check your signed-in account for current file requirements before finalising materials.
 
-## Before uploading
+## Prepare your files
 
-Use clear filenames, remove temporary files and confirm that the file opens correctly on a typical device.
+Use clear filenames, remove temporary files and confirm that each file opens correctly on a typical device.
 
-## File size
+## Choose a suitable file size
 
-A single file must not exceed 100 MB. If a file is larger, consider compressing or splitting it where doing so does not reduce usability or quality.
+Consider how quickly customers can download a file and whether compressing or splitting it would affect usability or quality.
 
 ## Supported formats
 
-Supported formats depend on CloverLoop's implemented upload rules. Check the upload interface rather than assuming every file type is accepted.
+Choose formats that suit your product and audience. Confirm any format or size restrictions in your account before preparing a final version.
 
 ## Final quality check
 

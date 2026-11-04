@@ -1,31 +1,31 @@
 ---
-title: "How Free Products Work"
+title: "Free Product Plan Allowances"
 slug: "how-free-products-work"
 category: "free-products"
 order: 21
-description: "Free products let creators distribute useful digital resources without charging customers. They can be used for samples, introductory materials or community resources."
+description: "Review CloverLoop's published listing allowances and commission terms for free products."
 status: "published"
 lastUpdated: "2026-11-01"
 related: []
 ---
 
-Free products let creators distribute useful digital resources without charging customers. They can be used for samples, introductory materials or community resources.
+Free products can help creators share samples, introductory materials or community resources without charging customers.
 
-## Free listing limit
+## Free-plan listing allowance
 
-The Free plan permits five free product listings per account. This limit counts listed free products, not customer downloads.
+The Free plan's published allowance is five free product listings per account. This limit counts listings, not customer downloads.
 
 ## No monthly reset
 
-The five-listing limit is an account-level cap. It does not renew each month and must not be described as a monthly download allowance.
+The five-listing allowance is an account-level limit. It does not renew each month and is separate from any download count.
 
 ## Paid product allowance
 
-The Free plan also permits one paid product listing.
+The Free plan's published terms also include one paid product listing.
 
 ## Higher plans
 
-Creator and Pro Creator plans allow unlimited free and paid product listings.
+Creator and Pro Creator plan terms include unlimited free and paid product listings.
 
 ## Platform commission
 
@@ -33,4 +33,4 @@ Free products do not incur CloverLoop platform transaction commission because th
 
 ## Download access
 
-Download restrictions or secure-link expiry settings are separate from the number of free product listings. Refer to actual product settings for download behaviour.
+The number of free product listings is separate from how a creator chooses to provide access to a resource. Check your signed-in account for current product options.

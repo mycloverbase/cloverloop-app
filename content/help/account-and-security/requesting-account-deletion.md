@@ -17,7 +17,7 @@ Review outstanding customer obligations, active products, payment records and in
 
 ## Understand the effect
 
-Account deletion may affect access to your storefront and product management. The exact consequences and treatment of records must match CloverLoop's implemented deletion process and applicable legal obligations.
+Account deletion may affect access to account information and any associated records. Review the applicable policies and contact CloverLoop support if you need details about your request.
 
 ## Confirm the request
 

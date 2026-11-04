@@ -1,6 +1,6 @@
 ## The short answer
 
-CloverLoop is a platform for creators to sell digital products through a creator storefront. Free is ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission.
+CloverLoop is designed around creator storefronts for digital products. Its published plans are Free at ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission.
 
 Payhip's [official pricing page](https://payhip.com/pricing) lists three plans in US dollars: Free at 5%, Plus at US$29/month plus 2%, and Pro at US$99/month plus 0% Payhip transaction fee. Stripe or PayPal processing fees remain additional. Payhip's percentage fees are shown as provider-listed rates; its pricing materials do not establish an India-specific GST-inclusive rate.
 

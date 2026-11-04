@@ -1,6 +1,6 @@
 ## The short answer
 
-CloverLoop is a platform for creators to sell digital products through a creator storefront. Free is ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission.
+CloverLoop is designed around creator storefronts for digital products. Its published plans are Free at ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission.
 
 Gumroad's [official pricing](https://gumroad.com/pricing) lists 10% + US$0.50 per direct sale, with standard payment-processing fees additional. Its [fee help page](https://gumroad.com/help/article/66-gumroads-fees) lists standard card processing at 2.9% + US$0.30; exact payment-method and country terms can vary. Discover marketplace sales incur a 30% fee that includes processing. Gumroad also acts as Merchant of Record for applicable indirect-tax collection and remittance. CloverLoop plan pricing is in INR; Razorpay or other payment-provider processing charges are separate.
 

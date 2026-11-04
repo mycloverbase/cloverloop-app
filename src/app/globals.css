@@ -164,7 +164,7 @@ a {
   }
 
   .section-space {
-    padding-block: 44px;
+    padding-block: 32px;
   }
 
   .prose-content {
@@ -5144,5 +5144,264 @@ a {
 
   .launch-checklist-section {
     padding-inline: 18px;
+  }
+}
+
+@media (max-width: 700px) {
+  .hero-grid {
+    padding-block: 32px 20px;
+  }
+
+  .hero-copy h1,
+  .feature-hero h1,
+  .resource-hub-hero h1,
+  .tool-hero h1,
+  .article-header h1 {
+    margin: 10px 0 12px;
+  }
+
+  .hero-actions {
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .feature-hero,
+  .resource-hub-hero,
+  .tool-hero {
+    gap: 22px;
+    padding-block: 30px 34px;
+  }
+
+  .feature-hero-copy .button {
+    margin-top: 12px;
+  }
+
+  .section-heading {
+    margin-bottom: 26px;
+  }
+
+  .section-heading h1,
+  .section-heading h2 {
+    margin: 9px 0 8px;
+  }
+
+  .storefront-cta-card {
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .split-grid {
+    gap: 24px;
+  }
+
+  .faq-page {
+    padding-block: 36px 48px;
+  }
+
+  .faq-page > .section-heading {
+    margin-bottom: 24px;
+  }
+
+  .faq-item summary {
+    padding-block: 14px;
+  }
+
+  .faq-item summary::after {
+    top: 15px;
+  }
+
+  .faq-item p {
+    margin-bottom: 14px;
+  }
+
+  .pricing-page {
+    padding-block: 16px 48px;
+  }
+
+  .pricing-intro {
+    margin: 20px auto 28px;
+  }
+
+  .pricing-intro h1 {
+    margin: 10px 0;
+  }
+
+  .pricing-card,
+  .pricing-card-featured {
+    padding: 18px;
+  }
+
+  .pricing-earnings {
+    margin-top: 30px;
+    padding-top: 20px;
+  }
+
+  .pricing-notes {
+    margin-top: 30px;
+    padding: 18px;
+  }
+
+  .comparison-hub {
+    padding-block: 18px 40px;
+  }
+
+  .comparison-hub-header {
+    margin-bottom: 18px;
+  }
+
+  .comparison-article {
+    padding-block: 14px 40px;
+  }
+
+  .legal-document {
+    padding-block: 8px 40px;
+  }
+
+  .legal-toc {
+    margin-block: 14px 18px;
+  }
+
+  .simple-page {
+    padding-block: 42px 52px;
+  }
+
+  .simple-page-body {
+    margin-top: 16px;
+  }
+
+  .simple-page-body h1 {
+    margin-bottom: 18px;
+  }
+
+  .simple-page-body h2 {
+    margin: 34px 0 12px;
+  }
+
+  .simple-page-body h3 {
+    margin: 24px 0 8px;
+  }
+
+  .cta-section {
+    padding-block: 42px;
+  }
+
+  .site-footer {
+    padding-top: 30px;
+  }
+
+  .footer-grid {
+    gap: 22px 18px;
+  }
+
+  .article-header {
+    padding-top: 20px;
+  }
+
+  .article-toc {
+    margin-block: 28px 24px;
+    padding: 16px;
+  }
+
+  .sitemap-columns {
+    gap: 14px;
+  }
+
+  .dashboard-main {
+    padding: 20px 16px 36px;
+  }
+
+  .dashboard-page-heading {
+    margin-bottom: 18px;
+  }
+
+  .dashboard-overview-grid,
+  .dashboard-lower-grid {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .help-docs {
+    padding-block: 16px 40px;
+  }
+
+  .help-hero {
+    padding: 38px 0 34px;
+  }
+
+  .help-article-body h2 {
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+
+  .help-article-body h3 {
+    margin-top: 20px;
+  }
+
+  .help-article-body p {
+    margin-bottom: 10px;
+  }
+
+  .help-prevnext {
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .auth-panel {
+    padding-block: 24px;
+  }
+
+  .auth-brand {
+    margin-bottom: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing-card-grid,
+  .steps-grid,
+  .calculator-steps {
+    gap: 12px;
+  }
+
+  .landing-card {
+    padding: 18px;
+  }
+
+  .landing-card h3 {
+    margin-top: 12px;
+  }
+
+  .step-card {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: start;
+    column-gap: 12px;
+    row-gap: 6px;
+    padding: 16px;
+  }
+
+  .step-card .step-number {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .step-card h3 {
+    grid-column: 2;
+    margin: 2px 0 0;
+    align-self: center;
+    font-size: 1rem;
+  }
+
+  .step-card p {
+    grid-column: 2;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .dashboard-card {
+    padding: 16px;
+  }
+
+  .footer-grid {
+    gap: 20px 14px;
   }
 }

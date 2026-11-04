@@ -1,5 +1,5 @@
 ---
-title: "Razorpay Fees and CloverLoop Platform Commission"
+title: "Razorpay Fees and Platform Commission"
 slug: "how-to-connect-razorpay-to-cloverloop"
 category: "razorpay-setup"
 order: 14
