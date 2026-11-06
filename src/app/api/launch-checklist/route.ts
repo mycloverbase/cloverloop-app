@@ -1,59 +1,12 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { NextResponse } from "next/server";
+import { getLaunchChecklistEmailHtml, launchChecklistEmailText } from "@/lib/launch-checklist-email";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-const checklistItems = [
-  "Choose one specific customer problem to solve.",
-  "Define the audience and the outcome your offer supports.",
-  "Select a format that fits the product and customer need.",
-  "Check similar offers and write down what makes yours useful.",
-  "Set a price after considering value, costs and support.",
-  "List every included file, format and software requirement.",
-  "Use clear file names and add a start-here guide.",
-  "Test links, files and instructions on a separate account.",
-  "Confirm you have rights to all included content and assets.",
-  "Write an honest product description with useful previews.",
-  "Decide how you will answer questions and handle refunds.",
-  "Choose the channels where your intended audience spends time.",
-  "Prepare a useful demonstration and launch messages.",
-  "Review provider charges, applicable taxes and operating costs.",
-  "Set a date to review feedback and improve the offer.",
-];
-
-function createChecklistPdf() {
-  const content = [
-    "BT",
-    "/F1 17 Tf",
-    "50 748 Td",
-    "(CloverLoop Free Launch Checklist) Tj",
-    "/F1 10 Tf",
-    "0 -28 Td",
-    "(Use these prompts to plan a clear, practical first launch.) Tj",
-    ...checklistItems.flatMap((item) => ["0 -27 Td", `([ ] ${item.replace(/[()\\]/g, "\\$&")}) Tj`]),
-    "ET",
-  ].join("\n");
-  const objects = [
-    "<< /Type /Catalog /Pages 2 0 R >>",
-    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>",
-    `<< /Length ${Buffer.byteLength(content, "ascii") + 1} >>\nstream\n${content}\nendstream`,
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-  ];
-
-  let pdf = "%PDF-1.4\n";
-  const offsets = [0];
-  objects.forEach((object, index) => {
-    offsets.push(Buffer.byteLength(pdf, "ascii"));
-    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
-  });
-  const xrefOffset = Buffer.byteLength(pdf, "ascii");
-  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  for (const offset of offsets.slice(1)) {
-    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
-  }
-  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-  return Buffer.from(pdf, "ascii").toString("base64");
-}
+const checklistPdfFilename = "cloverloop-link-in-bio-launch-checklist.pdf";
 
 export async function POST(request: Request) {
   let body: { email?: unknown; marketingConsent?: unknown };
@@ -78,6 +31,17 @@ export async function POST(request: Request) {
     );
   }
 
+  let checklistPdf: Buffer;
+  try {
+    checklistPdf = await readFile(join(process.cwd(), "public", "downloads", checklistPdfFilename));
+  } catch (error) {
+    console.error("Could not load the launch checklist PDF for email delivery.", error);
+    return NextResponse.json(
+      { error: "The checklist email is temporarily unavailable. Please try again later." },
+      { status: 500 },
+    );
+  }
+
   let emailResponse: Response;
   try {
     const requestId = request.headers.get("Idempotency-Key");
@@ -91,9 +55,11 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         from,
         to: [email],
-        subject: "Your CloverLoop free launch checklist",
-        text: `Here is your CloverLoop free launch checklist.\n\n${checklistItems.map((item) => `[ ] ${item}`).join("\n")}\n\nThe attached PDF is also ready to save or print.`,
-        attachments: [{ filename: "cloverloop-free-launch-checklist.pdf", content: createChecklistPdf() }],
+        reply_to: "info@cloverloop.in",
+        subject: "Your link-in-bio store launch checklist",
+        html: getLaunchChecklistEmailHtml(),
+        text: launchChecklistEmailText,
+        attachments: [{ filename: checklistPdfFilename, content: checklistPdf.toString("base64") }],
       }),
     });
   } catch {
@@ -112,24 +78,25 @@ export async function POST(request: Request) {
 
   let marketingConsentSaved = !marketingConsent;
   if (marketingConsent) {
-    const audienceId = process.env.RESEND_AUDIENCE_ID;
-    if (audienceId) {
+    const supabase = createSupabaseAdminClient();
+    if (supabase) {
       try {
-        const contactResponse = await fetch(
-          `https://api.resend.com/audiences/${encodeURIComponent(audienceId)}/contacts`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, unsubscribed: false }),
-          },
+        const { error } = await supabase
+          .from("email_subscriptions")
+          .upsert({ email }, { onConflict: "email", ignoreDuplicates: true });
+        if (error) {
+          console.error("Could not save launch checklist marketing consent.", error.message);
+        } else {
+          marketingConsentSaved = true;
+        }
+      } catch (error) {
+        console.error(
+          "Could not save launch checklist marketing consent.",
+          error instanceof Error ? error.message : "Unknown Supabase error.",
         );
-        marketingConsentSaved = contactResponse.ok;
-      } catch {
-        marketingConsentSaved = false;
       }
+    } else {
+      console.error("Could not save launch checklist marketing consent: Supabase admin client is not configured.");
     }
   }
 

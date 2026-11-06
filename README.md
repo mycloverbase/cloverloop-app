@@ -45,7 +45,7 @@ Production domain: **https://cloverloop.in**
    npm run build
    ```
 
-The Supabase URL and public anon/publishable key are required to use email or Google authentication. Storefront image uploads also require `SUPABASE_SERVICE_ROLE_KEY` on the server. It is read only by a `server-only` module used from the authenticated image-upload action; never prefix it with `NEXT_PUBLIC_` or expose it in browser code.
+The Supabase URL and public anon/publishable key are required to use email or Google authentication. Storefront image uploads and launch-checklist marketing opt-ins require `SUPABASE_SERVICE_ROLE_KEY` on the server. It is read only by server-only modules; never prefix it with `NEXT_PUBLIC_` or expose it in browser code.
 
 ## Environment variables
 
@@ -54,12 +54,15 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `NEXT_PUBLIC_SITE_URL` | Yes for authentication redirects | Local URL during development (`http://localhost:3000`); production origin is `https://cloverloop.in`. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes for authentication | Supabase project URL. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for authentication | Supabase public anon/publishable key. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes for storefront image uploads | Server-only Supabase service-role key used by the authenticated image upload action. Never expose it to client code. |
+| `SUPABASE_SERVICE_ROLE_KEY` | For storefront image uploads and checklist opt-ins | Server-only Supabase service-role key used for image uploads and writing consented emails to `email_subscriptions`. Never expose it to client code. |
 | `NEXT_PUBLIC_FOUNDING_CREATOR_FORM_URL` | For the dashboard programme CTA | External Google Form URL. It is intentionally not hardcoded. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Before launch | Confirmed CloverLoop support address. The Contact page shows a setup notice until provided. |
-| `RESEND_API_KEY` | For the launch checklist | Server-only Resend API key used to email the launch checklist PDF. |
+| `RESEND_API_KEY` | For the launch checklist | Server-only Resend API key used to email the branded launch checklist and PDF attachment. |
 | `RESEND_FROM_EMAIL` | For the launch checklist | Verified sender address for checklist email. |
-| `RESEND_AUDIENCE_ID` | Optional | Resend audience used only when a visitor separately opts in to marketing emails. |
+
+The launch-checklist email uses the branded HTML in `src/lib/launch-checklist-email.ts`. Its PDF attachment is `public/downloads/cloverloop-link-in-bio-launch-checklist.pdf`, also served as the fallback download link.
+
+The launch-checklist form continues to use Resend for delivery. When a visitor separately opts in to updates, their email and consent timestamp are stored in the private Supabase `email_subscriptions` table. Apply the migration in `supabase/migrations` before enabling this opt-in.
 
 Set the same environment variables in the Vercel project. Keep `.env.local` private; it is ignored by Git.
 
@@ -80,7 +83,7 @@ The application returns OAuth and email-authentication callbacks to `/auth/callb
 
 ### Email and password
 
-Enable the Email provider in **Authentication → Providers**. Configure email confirmation according to the launch policy. When confirmation is enabled, new users receive a confirmation message and continue to `/dashboard` after completing the callback. Configure the authentication email templates in Supabase. The separate launch-checklist form uses the Resend settings above.
+Enable the Email provider in **Authentication → Providers**. Configure email confirmation according to the launch policy. When confirmation is enabled, new users receive a confirmation message and continue to `/dashboard` after completing the callback. Configure the authentication email templates in Supabase. The separate launch-checklist form uses Resend for delivery and Supabase for its optional marketing opt-ins.
 
 Password reset requests return to `/auth/callback?next=/forgot-password`. Supabase must allow the callback URL above. The reset page accepts a new password only after the recovery callback has established a session.
 

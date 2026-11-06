@@ -5,6 +5,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   : null;
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    "/api/launch-checklist": ["./public/downloads/cloverloop-link-in-bio-launch-checklist.pdf"],
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: "11mb",
