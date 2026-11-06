@@ -5,6 +5,11 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   : null;
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "11mb",
+    },
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: supabaseUrl
