@@ -1,4 +1,4 @@
-import type { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { createSupabasePublicClient } from "@/lib/supabase/public";
 import {
   type PublicStorefront,
   type PublicStorefrontDisplay,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/storefront/types";
 import { parseStorefrontDraft } from "@/lib/storefront/validation";
 
-type StorefrontSupabaseClient = NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>;
+type StorefrontSupabaseClient = NonNullable<ReturnType<typeof createSupabasePublicClient>>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

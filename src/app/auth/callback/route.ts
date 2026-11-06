@@ -1,10 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getSupabaseConfig } from "@/lib/supabase/config";
-
-function safeNextPath(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/dashboard";
-}
+import { safeInternalPath } from "@/lib/auth-redirect";
 
 export async function GET(request: NextRequest) {
   const config = getSupabaseConfig();
@@ -15,7 +12,7 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
-  const nextPath = safeNextPath(request.nextUrl.searchParams.get("next"));
+  const nextPath = safeInternalPath(request.nextUrl.searchParams.get("next"));
   const response = NextResponse.redirect(new URL(nextPath, request.url));
   const supabase = createServerClient(config.url, config.key, {
     cookies: {

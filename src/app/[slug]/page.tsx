@@ -13,7 +13,7 @@ import { PricingPage } from "@/components/pricing-page";
 import { CoursesLandingPage, DigitalProductsLandingPage } from "@/components/marketing-landing-pages";
 import { LegalPolicyPage } from "@/components/legal-policy-page";
 import { legalPolicyPages } from "@/lib/legal-policies";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { getPublishedStorefront } from "@/lib/storefront/server";
 
 const slugs = [
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       ? { title: company.title, description: company.description }
       : pageTitles[slug];
   if (!meta) {
-    const supabase = await createSupabaseServerClient();
+    const supabase = createSupabasePublicClient();
     if (!supabase) return { robots: { index: false, follow: false } };
     const storefront = await getPublishedStorefront(supabase, slug);
     if (!storefront) return { robots: { index: false, follow: false } };
@@ -299,7 +299,7 @@ function SitemapPage() {
 export default async function ContentPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!slugs.includes(slug)) {
-    const supabase = await createSupabaseServerClient();
+    const supabase = createSupabasePublicClient();
     if (!supabase) notFound();
     const storefront = await getPublishedStorefront(supabase, slug);
     if (!storefront) notFound();

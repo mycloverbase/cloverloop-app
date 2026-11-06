@@ -194,6 +194,23 @@ export async function uploadStorefrontImageAction(formData: FormData): Promise<S
 
   const auth = await getStorefrontAuth();
   if (!auth.ok) return auth.result;
+  const { data: storefront, error: storefrontError } = await auth.supabase
+    .from("creator_storefronts")
+    .select("id,status")
+    .eq("id", storefrontId)
+    .eq("user_id", auth.userId)
+    .maybeSingle();
+  if (storefrontError) {
+    console.error("Could not verify storefront image ownership.", storefrontError);
+    return { ok: false, message: "The storefront could not be verified. Refresh and try again." };
+  }
+  if (!storefront) {
+    return { ok: false, message: "You can only upload images to your own storefront." };
+  }
+  if (storefront.status === "deletion_pending") {
+    return { ok: false, message: "This storefront is scheduled for deletion and can no longer be changed." };
+  }
+
   const storageAdmin = createSupabaseAdminClient();
   if (!storageAdmin) {
     return { ok: false, message: "Secure image uploads are not configured. Please contact support." };

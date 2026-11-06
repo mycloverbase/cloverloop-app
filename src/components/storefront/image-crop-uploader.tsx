@@ -50,6 +50,9 @@ export function ImageCropUploader({
 
   function chooseFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
+    event.target.value = "";
+    setSelectedFile(null);
+    setSelectedUrl(null);
     setError("");
     setMessage("");
     setZoom(1);

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { track } from "@/lib/analytics";
+import { safeInternalPath } from "@/lib/auth-redirect";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type AuthMode = "login" | "signup";
@@ -73,7 +74,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
         if (authError) throw authError;
         const next = searchParams.get("next");
-        router.replace(next?.startsWith("/") && !next.startsWith("//") ? next : "/dashboard");
+        router.replace(safeInternalPath(next));
         router.refresh();
         return;
       }
@@ -92,7 +93,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     try {
       const supabase = createSupabaseBrowserClient();
       const next = mode === "signup" ? onboardingPath : searchParams.get("next") || "/dashboard";
-      const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+      const safeNext = safeInternalPath(next);
       track("google_oauth_initiation", { mode });
       window.localStorage.setItem(AUTH_FLOW_KEY, mode);
       window.localStorage.setItem(AUTH_METHOD_KEY, "google");
