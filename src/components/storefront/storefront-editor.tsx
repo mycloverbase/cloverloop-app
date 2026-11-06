@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowDown, ArrowUp, Check, Copy, ExternalLink, GripVertical, LoaderCircle, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, Copy, ExternalLink, GripVertical, LoaderCircle, Plus, Share2, Trash2 } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   checkStorefrontUsernameAction,
@@ -322,6 +323,26 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
     }
   }
 
+  async function shareStorefront() {
+    if (!navigator.share) {
+      await copyStorefrontUrl();
+      return;
+    }
+
+    try {
+      await navigator.share({
+        title: `${draft.storeName} | CloverLoop`,
+        text: `Visit ${draft.storeName} on CloverLoop.`,
+        url: publicUrl,
+      });
+      setFeedback("Storefront shared.");
+    } catch (shareError) {
+      if (shareError instanceof DOMException && shareError.name === "AbortError") return;
+      console.error("Could not share the storefront URL.", shareError);
+      setError("The storefront could not be shared. Copy the URL to share it manually.");
+    }
+  }
+
   function setImage(kind: StorefrontImageKind, path: string, url: string) {
     if (kind === "profile") {
       changeDraft((current) => ({ ...current, profileImagePath: path }));
@@ -426,7 +447,14 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                 status === "deletion_pending" ? "Deletion scheduled" : storefrontId ? "Draft" : "Not set up"}
           </strong>
           {storefrontId ? (
-            <p className="storefront-current-url">{publicUrl}</p>
+            <div className="storefront-current-url-row">
+              <p className="storefront-current-url">{publicUrl}</p>
+              {isPublished ? (
+                <button type="button" className="dashboard-small-button" onClick={() => void shareStorefront()}>
+                  <Share2 size={16} aria-hidden="true" /> Share
+                </button>
+              ) : null}
+            </div>
           ) : (
             <p>Choose your store name and URL to begin.</p>
           )}
@@ -1021,9 +1049,40 @@ function StorefrontPreviewFrame({
   store: Parameters<typeof PublicStorefront>[0]["store"];
   device: DevicePreview;
 }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [previewRoot, setPreviewRoot] = useState<HTMLElement | null>(null);
+  const onFrameLoad = useCallback(() => {
+    const frameDocument = iframeRef.current?.contentDocument;
+    const root = frameDocument?.getElementById("storefront-preview-root");
+    if (!frameDocument || !root) return;
+
+    document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]').forEach((source) => {
+      const stylesheet = frameDocument.createElement("link");
+      stylesheet.rel = "stylesheet";
+      stylesheet.href = source.href;
+      stylesheet.media = source.media;
+      frameDocument.head.append(stylesheet);
+    });
+    document.querySelectorAll("style").forEach((source) => {
+      const style = frameDocument.createElement("style");
+      style.media = source.media;
+      style.textContent = source.textContent;
+      frameDocument.head.append(style);
+    });
+    setPreviewRoot(root);
+  }, []);
+
   return (
     <div className={`storefront-preview-frame storefront-preview-${device}`}>
-      <PublicStorefront store={store} />
+      <iframe
+        ref={iframeRef}
+        title={`${device === "mobile" ? "Mobile" : "Desktop"} storefront preview`}
+        width={device === "mobile" ? 390 : 1024}
+        height={720}
+        srcDoc={'<!doctype html><html><head></head><body style="margin:0"><div id="storefront-preview-root"></div></body></html>'}
+        onLoad={onFrameLoad}
+      />
+      {previewRoot ? createPortal(<PublicStorefront store={store} />, previewRoot) : null}
     </div>
   );
 }

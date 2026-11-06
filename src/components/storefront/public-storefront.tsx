@@ -36,7 +36,6 @@ function ProductsSection({ store }: { store: StorefrontView }) {
     <section className="storefront-section storefront-products" id="products" aria-labelledby="storefront-products-title">
       <div className="storefront-section-heading">
         <div>
-          <span className="storefront-eyebrow">Creator previews</span>
           <h2 id="storefront-products-title">Coming soon</h2>
         </div>
       </div>
@@ -161,7 +160,6 @@ export function PublicStorefront({ store }: { store: StorefrontView }) {
             <div className="storefront-profile-fallback" aria-hidden="true">{initials(store.store_name)}</div>
           )}
           <div className="storefront-hero-copy">
-            <span className="storefront-eyebrow">Creator storefront</span>
             <h1>{store.store_name}</h1>
             <p>@{store.username}</p>
           </div>

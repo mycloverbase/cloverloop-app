@@ -8,6 +8,17 @@ type SubmissionResult = {
   marketingConsentSaved?: boolean;
 };
 
+function isSubmissionResult(value: unknown): value is SubmissionResult {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+
+  const result = value as Record<string, unknown>;
+  return (
+    (result.ok === undefined || typeof result.ok === "boolean") &&
+    (result.error === undefined || typeof result.error === "string") &&
+    (result.marketingConsentSaved === undefined || typeof result.marketingConsentSaved === "boolean")
+  );
+}
+
 export function LaunchChecklistForm() {
   const [email, setEmail] = useState("");
   const [marketingConsent, setMarketingConsent] = useState(false);
@@ -36,7 +47,18 @@ export function LaunchChecklistForm() {
         },
         body: JSON.stringify({ email, marketingConsent }),
       });
-      const result = (await response.json()) as SubmissionResult;
+      if (!response.headers.get("content-type")?.includes("application/json")) {
+        throw new Error(
+          `The server returned an unexpected response (${response.status}). Please try again later.`,
+        );
+      }
+
+      const responseBody: unknown = await response.json();
+      if (!isSubmissionResult(responseBody)) {
+        throw new Error("The server returned an invalid response. Please try again later.");
+      }
+
+      const result = responseBody;
       if (!response.ok || !result.ok) {
         throw new Error(result.error || "We couldn't email the checklist. Please try again.");
       }

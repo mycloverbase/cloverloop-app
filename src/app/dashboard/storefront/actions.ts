@@ -1,6 +1,7 @@
 "use server";
 
 import sharp from "sharp";
+import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { StorefrontActionResult } from "@/lib/storefront/types";
@@ -98,6 +99,7 @@ export async function publishStorefrontAction(): Promise<StorefrontActionResult>
   }
   const { error } = await auth.supabase.rpc("publish_my_storefront");
   if (error) return { ok: false, message: databaseMessage(error) };
+  revalidatePath(`/${data.username}`);
   return {
     ok: true,
     message: "Your storefront is live.",
