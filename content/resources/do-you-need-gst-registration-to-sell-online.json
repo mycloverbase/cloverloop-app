@@ -1,30 +1,233 @@
 {
   "slug": "do-you-need-gst-registration-to-sell-online",
-  "title": "Do You Need GST Registration to Sell Online?",
-  "seoTitle": "Do You Need GST Registration to Sell Online?",
-  "description": "A practical introduction to GST registration considerations for creators and small businesses selling online in India.",
-  "primaryKeyword": "GST registration to sell online",
+  "title": "GST Registration for Digital Product Sellers in India",
+  "seoTitle": "GST Rules for Digital Product Sellers in India | CloverLoop",
+  "description": "Understand GST registration thresholds for Indian digital-product sellers, including Maharashtra, inter-State services, aggregate turnover and e-commerce rules.",
+  "primaryKeyword": "GST registration digital products India",
   "category": "Guides",
   "canonicalUrl": "https://cloverloop.in/resources/do-you-need-gst-registration-to-sell-online",
   "indexable": true,
   "image": "/images/resources/digital-products.webp",
   "imageAlt": "A guide to selling digital products online",
-  "related": ["gst-on-ebooks-and-online-courses-india", "how-to-create-and-sell-online-course-india", "how-many-sales-to-hit-your-income-goal"],
+  "related": [
+    "gst-on-ebooks-and-online-courses-india",
+    "how-to-create-and-sell-online-course-india",
+    "accept-upi-payments-digital-products-razorpay"
+  ],
   "blocks": [
-    { "type": "paragraph", "text": "GST registration is not determined by the fact that you sell online alone. It can depend on aggregate turnover, supply type, location, customer and provisions or exemptions that apply." },
-    { "type": "paragraph", "text": "For many service providers, commonly cited thresholds are ₹20 lakh in most states and ₹10 lakh in certain special category states, subject to statutory changes, notifications and exceptions. Aggregate turnover is generally calculated on an all-India basis for a person with the same PAN. Do not treat these figures as a universal answer." },
-    { "type": "paragraph", "text": "Identify what you supply. A downloadable publication, design file, recorded course and live training service may require different classification analysis. GST treatment and rates depend on the precise supply and applicable notifications." },
-    { "type": "paragraph", "text": "GST has provisions for inter-state supplies and e-commerce operators, along with exemptions and exceptions. The result depends on the type of supply and actual transaction structure. Not every online sale automatically triggers compulsory registration." },
-    { "type": "paragraph", "text": "A creator selling their own product and a platform facilitating third-party supplies may have different GST roles. Review contracts, payment flows and who supplies the product to the customer. Maintain records of sales, invoices, refunds, provider statements and expenses. Seek advice if approaching a threshold, selling across states or countries, using a marketplace or unsure about classification." },
-    { "type": "heading", "text": "Frequently asked questions" },
-    { "type": "subheading", "text": "Is ₹20 lakh always the threshold?" },
-    { "type": "paragraph", "text": "No. Thresholds vary by state and supply type, and exceptions may apply." },
-    { "type": "subheading", "text": "Do online sales automatically require registration?" },
-    { "type": "paragraph", "text": "No single rule covers every seller." },
-    { "type": "subheading", "text": "Are ebooks and courses taxed identically?" },
-    { "type": "paragraph", "text": "Do not assume so; classification and notifications matter." },
-    { "type": "subheading", "text": "Does the earnings calculator determine GST registration?" },
-    { "type": "paragraph", "text": "No. It estimates selected selling costs only." },
-    { "type": "disclaimer", "text": "Tax disclaimer: General information, not tax or legal advice. Confirm current law and your facts with a qualified Indian tax professional." }
-  ]
+    {
+      "type": "paragraph",
+      "text": "GST is one of the areas where online creators receive conflicting advice. One person says registration is compulsory as soon as you sell online. Another says you can wait until ₹20 lakh. Both statements can be wrong when applied without looking at the seller’s product, location, customer locations and sales channel."
+    },
+    {
+      "type": "paragraph",
+      "text": "The useful starting point is to separate two questions: (1) Is the supply taxable or exempt? (2) Is the seller required to register? A product can be taxable even when a small seller is not yet required to register. Conversely, certain registration rules can apply before a seller reaches the ordinary turnover threshold."
+    },
+    {
+      "type": "heading",
+      "text": "1. What is the usual GST registration threshold?"
+    },
+    {
+      "type": "paragraph",
+      "text": "For a supplier of taxable services in most states, the general registration threshold is aggregate turnover exceeding ₹20 lakh in a financial year. The CGST Act provides a lower ₹10 lakh threshold for specified special category states, subject to state-specific notifications that may enhance the limit. Maharashtra’s ordinary services threshold is generally ₹20 lakh. The applicable threshold must be checked for the state from which the seller makes the supply. [CGST Act, Section 22](https://taxinformation.cbic.gov.in/content-page/explore-act/1000291/1000001)"
+    },
+    {
+      "type": "paragraph",
+      "text": "The threshold is based on aggregate turnover, not profit and not the amount left after payment gateway fees. If you sell ₹18 lakh of products and pay ₹1 lakh in gateway/platform charges, you do not ordinarily calculate threshold turnover as ₹17 lakh. Business expenses and payment fees are not deducted from the sale value merely to test the threshold."
+    },
+    {
+      "type": "heading",
+      "text": "2. What counts as aggregate turnover?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Aggregate turnover is calculated on an all-India basis for persons having the same PAN. It includes taxable supplies, exempt supplies, exports and inter-State supplies. It excludes GST/cess charged and inward supplies on which the recipient pays tax under reverse charge. The definition matters because creators sometimes look only at the sales from one product, one website or one state."
+    },
+    {
+      "type": "table",
+      "text": "Table: 2. What counts as aggregate turnover?",
+      "headers": [
+        "**Example**",
+        "**How it affects the threshold calculation**"
+      ],
+      "rows": [
+        [
+          "**₹12 lakh from ebooks and ₹9 lakh from courses under the same PAN**",
+          "**Combined aggregate turnover is ₹21 lakh, not two separate ₹12 lakh and ₹9 lakh tests.**"
+        ],
+        [
+          "**₹16 lakh domestic sales and ₹3 lakh exports of services**",
+          "**Exports are included in aggregate turnover for the threshold test, even though qualifying exports may be zero-rated.**"
+        ],
+        [
+          "**₹15 lakh sales and ₹2 lakh GST charged on invoices**",
+          "**The GST component itself is excluded from aggregate turnover; the underlying supply value is counted.**"
+        ],
+        [
+          "**₹18 lakh sales with ₹1.5 lakh gateway charges**",
+          "**Gateway charges are business expenses; they do not automatically reduce aggregate turnover to ₹16.5 lakh.**"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "CBIC’s explanation of aggregate turnover confirms the PAN-wide, all-India calculation and inclusion of exempt supplies and exports. [CBIC aggregate-turnover FAQ](https://cbic-gst.gov.in/hindi/pdf/new-faq-on-gst-second-edition.pdf)"
+    },
+    {
+      "type": "heading",
+      "text": "3. Does selling online automatically require GST registration?"
+    },
+    {
+      "type": "paragraph",
+      "text": "No. Selling through Instagram, YouTube, WhatsApp, a personal website or a hosted storefront does not, by itself, mean every small creator must register immediately. The seller must apply the normal threshold and any applicable compulsory-registration rules."
+    },
+    {
+      "type": "paragraph",
+      "text": "A particularly important nuance for service sellers is inter-State supply. The general law contains a compulsory-registration rule for inter-State taxable supplies, but Notification No. 10/2017–Integrated Tax exempts persons making inter-State supplies of taxable services from registration where their aggregate turnover does not exceed the applicable threshold (₹20 lakh, or the lower notified limit for specified special category states). A small creator selling a service to a customer in another state should therefore not rely on an old blanket statement that every inter-State service sale automatically forces registration. The facts and current notification must be checked. [Notification 10/2017-Integrated Tax](https://cbic-gst.gov.in/hindi/pdf/integrated-tax/10_2017_IT.pdf)"
+    },
+    {
+      "type": "heading",
+      "text": "4. What if you sell through an e-commerce platform?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do not assume that every website or software storefront is treated identically under GST. The rules can depend on whether the platform is an electronic commerce operator covered by the relevant provisions, whether it collects the consideration for supplies made by other sellers, whether it is required to collect tax at source, and whether the seller is supplying goods or services."
+    },
+    {
+      "type": "paragraph",
+      "text": "For services supplied through an e-commerce operator, Notification No. 65/2017–Central Tax provides a threshold-based exemption from compulsory registration for specified suppliers of services, subject to its conditions. The treatment of goods sellers and certain notified services can be different. A platform that merely provides software while the creator contracts with the customer and receives payment directly may have a different role from a marketplace that collects the buyer’s money and settles it to multiple sellers. Read the platform agreement and map the actual payment flow. [CBIC Central Tax Notifications](https://cbic-gst.gov.in/hindi/central-tax-notifications.html)"
+    },
+    {
+      "type": "heading",
+      "text": "5. When can registration be required below the normal threshold?"
+    },
+    {
+      "type": "paragraph",
+      "text": "The ₹20 lakh figure is not a universal safe harbour. Compulsory-registration provisions and special categories can override the ordinary threshold. Examples include certain persons liable under reverse charge, non-resident taxable persons, casual taxable persons, agents and other categories specified in section 24. There are also exceptions and notifications, so a creator should not simply read a list and assume every item applies to a normal direct-to-customer digital download business."
+    },
+    {
+      "type": "heading",
+      "text": "6. A practical decision path for a creator"
+    },
+    {
+      "type": "ordered-list",
+      "text": "Identify the legal supplier. Is the sale made by you as an individual/proprietor, a partnership or a company? Use the PAN of the supplier to assess aggregate turnover.\nList every supply under that PAN. Include ebooks, templates, audio files, courses, consulting, sponsorship services and other business supplies. Separate exempt and taxable items but do not ignore exempt supplies in the aggregate-turnover calculation.\nIdentify the place from which you make the supply and the states/countries of your customers. For services, determine the place-of-supply rule and whether the sale is intra-State, inter-State or an export.\nIdentify the sales channel. Record whether the platform collects money as an e-commerce operator, whether it deducts TCS, and who issues the customer invoice.\nCompare aggregate turnover with the correct state threshold and review section 24 plus applicable notifications.\nIf you become liable, apply on the GST portal within the statutory time and configure invoicing, tax collection, returns and records before continuing taxable sales as a registered person.",
+      "items": [
+        "Identify the legal supplier. Is the sale made by you as an individual/proprietor, a partnership or a company? Use the PAN of the supplier to assess aggregate turnover.",
+        "List every supply under that PAN. Include ebooks, templates, audio files, courses, consulting, sponsorship services and other business supplies. Separate exempt and taxable items but do not ignore exempt supplies in the aggregate-turnover calculation.",
+        "Identify the place from which you make the supply and the states/countries of your customers. For services, determine the place-of-supply rule and whether the sale is intra-State, inter-State or an export.",
+        "Identify the sales channel. Record whether the platform collects money as an e-commerce operator, whether it deducts TCS, and who issues the customer invoice.",
+        "Compare aggregate turnover with the correct state threshold and review section 24 plus applicable notifications.",
+        "If you become liable, apply on the GST portal within the statutory time and configure invoicing, tax collection, returns and records before continuing taxable sales as a registered person."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "7. What changes after you register?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Registration creates ongoing responsibilities. You may need to issue tax invoices or bills of supply depending on the transaction, charge the correct tax, report sales in returns, pay tax by the due date, maintain records and reconcile platform settlements with bank credits. Registration can also allow input tax credit on eligible business purchases, subject to the conditions and restrictions in the law."
+    },
+    {
+      "type": "paragraph",
+      "text": "A registered seller should not treat the full amount deposited by a payment gateway as revenue available to spend. Reconcile the gross customer payment, GST collected, gateway fee, GST on gateway fee, platform fee, refunds and net bank settlement. If a customer pays ₹1,000, the bank deposit may be less than ₹1,000 even though the sale value remains ₹1,000 before tax adjustments."
+    },
+    {
+      "type": "heading",
+      "text": "8. What records should a small creator keep?"
+    },
+    {
+      "type": "unordered-list",
+      "text": "Monthly sales register: order date, invoice/order number, product, customer state/country, gross amount, discount, refund and payment status.\nExpense records: gateway invoices, platform invoices, software subscriptions, advertising, contractors and other business costs.\nSettlement reconciliation: gross collections matched to gateway deductions and bank credits.\nProduct and tax classification notes: what is sold, how it is delivered, and why a particular GST treatment is being used.\nCustomer and export evidence where relevant: billing details, payment records, contracts and foreign remittance documentation.",
+      "items": [
+        "Monthly sales register: order date, invoice/order number, product, customer state/country, gross amount, discount, refund and payment status.",
+        "Expense records: gateway invoices, platform invoices, software subscriptions, advertising, contractors and other business costs.",
+        "Settlement reconciliation: gross collections matched to gateway deductions and bank credits.",
+        "Product and tax classification notes: what is sold, how it is delivered, and why a particular GST treatment is being used.",
+        "Customer and export evidence where relevant: billing details, payment records, contracts and foreign remittance documentation."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "9. GST is not the same as income tax"
+    },
+    {
+      "type": "paragraph",
+      "text": "GST is an indirect tax on supplies. Income tax is calculated on taxable income under the Income-tax Act. A creator may have income-tax reporting obligations even when not registered for GST. Conversely, GST registration does not mean all customer receipts are personal income. Keep revenue, expenses and tax records separately, and do not treat the GST amount collected from customers as money available for personal use."
+    },
+    {
+      "type": "heading",
+      "text": "Frequently asked questions"
+    },
+    {
+      "type": "subheading",
+      "text": "I am based in Maharashtra and sell PDFs to customers across India. Is ₹20 lakh my threshold?"
+    },
+    {
+      "type": "paragraph",
+      "text": "For a typical supplier of taxable services based in Maharashtra, the ordinary threshold is ₹20 lakh of aggregate turnover in a financial year. The fact that customers are in other states does not automatically remove the threshold benefit for inter-State services because Notification No. 10/2017–Integrated Tax provides a threshold exemption for qualifying small service suppliers. However, your PDF’s tax classification, other supplies under the same PAN, sales channel and any compulsory-registration condition must also be checked. [S3, S5]"
+    },
+    {
+      "type": "subheading",
+      "text": "Do I calculate the threshold after deducting Razorpay and platform fees?"
+    },
+    {
+      "type": "paragraph",
+      "text": "No. Aggregate turnover is based on the value of supplies, not the net settlement received in your bank account. If you sell a product for ₹1,000 and the gateway deducts ₹23.60, your turnover is not reduced to ₹976.40 just because that is closer to the settlement. Record the sale and the fee separately."
+    },
+    {
+      "type": "subheading",
+      "text": "Do exempt sales count toward the ₹20 lakh threshold?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Yes. The statutory definition of aggregate turnover includes exempt supplies as well as taxable supplies, exports and inter-State supplies under the same PAN. A person exclusively making wholly exempt supplies may not be liable to register under section 23, but a creator with a mix of taxable and exempt products should include the exempt sales when testing aggregate turnover and obtain advice on the exact position. [CBIC aggregate-turnover FAQ](https://cbic-gst.gov.in/hindi/pdf/new-faq-on-gst-second-edition.pdf)"
+    },
+    {
+      "type": "subheading",
+      "text": "If I sell only to customers in other states, must I register immediately?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Not necessarily if you are supplying services and your aggregate turnover is within the applicable threshold. Notification No. 10/2017–Integrated Tax provides an exemption from registration for qualifying inter-State suppliers of taxable services up to the threshold. Do not apply this automatically to goods, notified categories or a marketplace arrangement without checking the relevant provisions. [Notification 10/2017-Integrated Tax](https://cbic-gst.gov.in/hindi/pdf/integrated-tax/10_2017_IT.pdf)"
+    },
+    {
+      "type": "subheading",
+      "text": "Does a GST registration mean I must charge 18% on every product?"
+    },
+    {
+      "type": "paragraph",
+      "text": "No. Registration and the rate of tax are separate questions. The rate depends on the classification and nature of each supply. Some items are exempt or attract a concessional rate; other digital services may attract 18%. An e-book that meets the specific GST definition is not automatically treated the same as a video course, template bundle or coaching service."
+    },
+    {
+      "type": "subheading",
+      "text": "Can I register voluntarily before reaching the threshold?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Voluntary registration is possible, but it is not just a badge of credibility. Once registered, you generally become responsible for charging and paying applicable GST on taxable supplies and filing returns, even if turnover remains below the threshold. Consider whether customers value GST invoices, whether eligible input tax credit matters, and whether you can manage compliance before opting in. [CBIC GST registration FAQ](https://cbic-gst.gov.in/hindi/sectoral-faq.html)"
+    },
+    {
+      "type": "heading",
+      "text": "Sources and current official information"
+    },
+    {
+      "type": "unordered-list",
+      "text": "[Central Goods and Services Tax Act, 2017 - Section 22, persons liable for registration](https://taxinformation.cbic.gov.in/content-page/explore-act/1000291/1000001).\n[CBIC - GST FAQs, aggregate turnover and PAN-wide calculation](https://cbic-gst.gov.in/hindi/pdf/new-faq-on-gst-second-edition.pdf).\n[CBIC - Notification No. 10/2017-Integrated Tax, exemption for qualifying inter-State service suppliers](https://cbic-gst.gov.in/hindi/pdf/integrated-tax/10_2017_IT.pdf).\n[CBIC - Central Tax Notifications, including Notification No. 65/2017-Central Tax](https://cbic-gst.gov.in/hindi/central-tax-notifications.html).\n[CBIC - Sectoral FAQs on GST registration and thresholds](https://cbic-gst.gov.in/hindi/sectoral-faq.html).",
+      "items": [
+        "[Central Goods and Services Tax Act, 2017 - Section 22, persons liable for registration](https://taxinformation.cbic.gov.in/content-page/explore-act/1000291/1000001).",
+        "[CBIC - GST FAQs, aggregate turnover and PAN-wide calculation](https://cbic-gst.gov.in/hindi/pdf/new-faq-on-gst-second-edition.pdf).",
+        "[CBIC - Notification No. 10/2017-Integrated Tax, exemption for qualifying inter-State service suppliers](https://cbic-gst.gov.in/hindi/pdf/integrated-tax/10_2017_IT.pdf).",
+        "[CBIC - Central Tax Notifications, including Notification No. 65/2017-Central Tax](https://cbic-gst.gov.in/hindi/central-tax-notifications.html).",
+        "[CBIC - Sectoral FAQs on GST registration and thresholds](https://cbic-gst.gov.in/hindi/sectoral-faq.html)."
+      ]
+    }
+  ],
+  "datePublished": "2026-11-05",
+  "dateModified": "2026-11-05",
+  "publishedDate": "5 November 2026",
+  "lastReviewed": "5 November 2026",
+  "authorName": "CloverLoop Editorial Team",
+  "authorBio": "The CloverLoop Editorial Team publishes practical, research-led guides for independent creators in India."
 }

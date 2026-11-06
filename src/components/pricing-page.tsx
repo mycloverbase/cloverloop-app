@@ -22,11 +22,11 @@ const pricingFaqs = [
   },
   {
     question: "How is the CloverLoop platform fee calculated?",
-    answer: "Free is 0% on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is 4% and Pro Creator is 2.5% of Gross Sales.",
+    answer: "Free has a 0% platform fee. Creator has a 4% platform fee on Gross Sales. Pro Creator has a 0% platform fee and a ₹2,999 monthly subscription.",
   },
   {
     question: "What is the difference between Free, Creator and Pro Creator?",
-    answer: "Free costs ₹0/month and includes one paid product listing and five free product listings per account lifetime. Creator costs ₹0/month with a 4% platform fee and unlimited paid and free listings. Pro Creator costs ₹1,499/month with a 2.5% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
+    answer: "Free costs ₹0/month, has a 0% platform fee and includes one paid product listing and five free product listings per account lifetime. Creator costs ₹0/month with a 4% platform fee and unlimited paid and free listings. Pro Creator costs ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
   },
   {
     question: "Does the calculator show guaranteed earnings?",
@@ -37,7 +37,7 @@ const pricingFaqs = [
 const calculatorSteps = [
   "Gross sales = product price × number of sales.",
   "Payment fee = gross sales × your provider fee.",
-  "Platform fee = gross sales × selected plan rate (Free applies 4% only above its monthly allowance).",
+  "Platform fee = gross sales × the selected plan rate.",
   "Estimated amount after selected costs = gross sales minus provider fee, platform fee and monthly plan charge.",
 ];
 
@@ -131,15 +131,15 @@ export function PricingPage() {
 
         <section className="pricing-earnings" aria-labelledby="pricing-earnings-title">
           <header className="pricing-earnings-heading">
-            <h2 id="pricing-earnings-title">How the Free plan&apos;s monthly allowance works</h2>
+            <h2 id="pricing-earnings-title">How platform fees and subscriptions work</h2>
             <p>
-              The 4% Free-plan commission applies only to Gross Sales above ₹10,000 in a calendar month,
-              not to the full month&apos;s sales.
+              Free has a 0% platform fee. Creator has a 4% platform fee with no monthly subscription.
+              Pro Creator has a 0% platform fee and costs ₹2,999/month.
             </p>
           </header>
           <p className="pricing-earnings-accounting">
-            The allowance resets on the first day of each calendar month (IST). Sales are not stopped
-            when the allowance is used. Payment-provider charges and applicable taxes are separate.
+            Payment-provider charges and applicable taxes are separate. Free includes one paid and five
+            free product listings per account lifetime.
           </p>
         </section>
 

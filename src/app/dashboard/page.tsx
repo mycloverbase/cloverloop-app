@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Bell, CircleCheck, CircleHelp, UserRound } from "lucide-react";
+import { ArrowRight, CircleCheck, CircleHelp, UserRound } from "lucide-react";
 import { getCreatorPlan, creatorPlans } from "@/lib/account/plans";
 import { requireCreatorContext } from "@/lib/account/server";
 
@@ -84,13 +84,16 @@ export default async function DashboardPage({
           account settings, help and feedback tools are available in your account.
         </p>
         <p>
-          <strong>Not available yet:</strong> storefront publishing and product uploads; checkout,
-          payment processing and Razorpay connection; automated order handling and digital product
-          delivery; and course hosting, course-player and student-access tools.
+        <strong>Available now:</strong> create and publish a branded storefront with sample cards
+        marked Coming Soon. Checkout, payment processing, product delivery and course hosting are
+        not included.
         </p>
         <div className="dashboard-founder-banner-actions">
-          <Link className="button" href="/dashboard/profile">
-            Complete Your Profile <ArrowRight size={16} aria-hidden="true" />
+        <Link className="button" href="/dashboard/storefront">
+          Set Up Your Storefront <ArrowRight size={16} aria-hidden="true" />
+        </Link>
+        <Link className="button" href="/dashboard/profile">
+          Complete Your Profile <ArrowRight size={16} aria-hidden="true" />
           </Link>
           <Link className="dashboard-founder-feedback-link" href="/dashboard/help#feedback">
             Share Feedback <ArrowRight size={16} aria-hidden="true" />
@@ -108,10 +111,6 @@ export default async function DashboardPage({
             </div>
             <span className="dashboard-plan-price">{plan.monthlyPrice}</span>
           </div>
-          <p>{plan.commission}</p>
-          <ul className="dashboard-feature-list">
-            {plan.features.map((feature) => <li key={feature}>{feature}</li>)}
-          </ul>
           <Link className="dashboard-text-link" href="/pricing">
             View all plans <ArrowRight size={16} aria-hidden="true" />
           </Link>
@@ -172,34 +171,18 @@ export default async function DashboardPage({
         </Link>
       </section>
 
-      <section className="dashboard-lower-grid">
-        <article className="dashboard-card dashboard-announcement-card">
-          <div className="dashboard-card-heading">
-            <div>
-              <span className="dashboard-card-label">Platform announcements</span>
-              <h2>Plan details at a glance</h2>
-            </div>
-            <Bell size={21} aria-hidden="true" />
+      <section className="dashboard-card dashboard-support-card">
+        <div className="dashboard-card-heading">
+          <div>
+            <span className="dashboard-card-label">Need a hand?</span>
+            <h2>Help &amp; support</h2>
           </div>
-          <p>Review the published plan prices, listing allowances and how the Free plan&apos;s monthly Gross Sales allowance works.</p>
-          <Link className="dashboard-text-link" href="/pricing">
-            Read pricing details <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-        </article>
-
-        <article className="dashboard-card dashboard-support-card">
-          <div className="dashboard-card-heading">
-            <div>
-              <span className="dashboard-card-label">Need a hand?</span>
-              <h2>Help &amp; support</h2>
-            </div>
-            <CircleHelp size={21} aria-hidden="true" />
-          </div>
-          <p>Browse common questions, creator resources or contact the CloverLoop team.</p>
-          <Link className="dashboard-text-link" href="/dashboard/help">
-            Visit help &amp; support <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-        </article>
+          <CircleHelp size={21} aria-hidden="true" />
+        </div>
+        <p>Browse common questions, creator resources or contact the CloverLoop team.</p>
+        <Link className="dashboard-text-link" href="/dashboard/help">
+          Visit help &amp; support <ArrowRight size={16} aria-hidden="true" />
+        </Link>
       </section>
     </div>
   );

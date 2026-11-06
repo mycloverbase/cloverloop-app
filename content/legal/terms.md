@@ -43,11 +43,11 @@ The published plan structure is:
 
 | Plan | Subscription | Platform fee | Product allowance |
 | --- | --- | --- | --- |
-| Free | ₹0/month | 0% on the first ₹10,000 Gross Sales per calendar month; 4% only on incremental Gross Sales above ₹10,000 | 1 paid product and 5 free product listings per account lifetime |
+| Free | ₹0/month | 0% | 1 paid product and 5 free product listings per account lifetime |
 | Creator | ₹0/month | 4%; no monthly Gross Sales limit | Unlimited paid and free products |
-| Pro Creator | ₹1,499/month | 2.5%; no monthly Gross Sales limit | Unlimited paid and free products |
+| Pro Creator | ₹2,999/month | 0% | Unlimited paid and free products |
 
-The Free-plan ₹10,000 allowance resets on the first day of each calendar month (IST). Sales are not stopped after the allowance is used. Platform rates and monthly subscription prices are exclusive of applicable GST where required.
+Platform rates and monthly subscription prices are exclusive of applicable GST where required.
 
 Razorpay or other payment-provider processing charges, if applicable, are separate from CloverLoop's platform commission and payable by the creator to the provider under its terms. These charges are not included in CloverLoop's platform commission.
 

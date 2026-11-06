@@ -52,7 +52,7 @@ const digitalFaqs = [
   },
   {
     question: "What platform fees apply?",
-    answer: "Free is ₹0/month with 0% on the first ₹10,000 of Gross Sales per calendar month and 4% only on the amount above that allowance. Creator is ₹0/month with a 4% platform fee. Pro Creator is ₹1,499/month with a 2.5% platform fee. Payment-provider charges and applicable taxes are separate. See the full details on the Pricing page.",
+    answer: "Free is ₹0/month with a 0% platform fee. Creator is ₹0/month with a 4% platform fee. Pro Creator is ₹2,999/month with a 0% platform fee. Payment-provider charges and applicable taxes are separate. See the full details on the Pricing page.",
   },
   {
     question: "Can creators offer free products?",
@@ -92,7 +92,7 @@ const courseFaqs = [
   { question: "Can I offer free preview lessons?", answer: "A preview lesson can help learners understand your teaching style and course fit. Explain what it covers and how people can access it." },
   { question: "How will students access a course?", answer: "Set clear enrolment, access and support instructions so learners know what to expect after signing up." },
   { question: "Can I offer live workshops?", answer: "Live workshops and cohorts can combine scheduled sessions, practice and discussion. Plan your schedule, meeting format and learner support in advance." },
-  { question: "What platform fees apply to courses?", answer: "The published plan rates are Free: 0% on the first ₹10,000 of monthly Gross Sales and 4% only above it; Creator: 4%; Pro Creator: 2.5%. Monthly plan prices are ₹0, ₹0 and ₹1,499 respectively. Payment-provider fees and applicable taxes are separate. See Pricing for plan limits and details." },
+  { question: "What platform fees apply to courses?", answer: "The published plan rates are Free: 0%; Creator: 4%; Pro Creator: 0%. Monthly plan prices are ₹0, ₹0 and ₹2,999 respectively. Payment-provider fees and applicable taxes are separate. See Pricing for plan limits and details." },
   { question: "Do I need GST registration to sell online courses?", answer: "GST registration and tax treatment depend on your turnover, supply, location and applicable provisions or exceptions. This is general information, not tax advice; consult a qualified Indian tax professional about your circumstances." },
 ];
 

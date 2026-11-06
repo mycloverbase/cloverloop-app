@@ -1,6 +1,6 @@
 # CloverLoop
 
-CloverLoop is a creator-focused marketing website with Supabase authentication and a minimal authenticated onboarding experience. The public website describes the intended product architecture; it does not implement creator commerce, checkout, payments, product management or digital delivery.
+CloverLoop is a creator-focused website with Supabase authentication and creator storefront setup and publishing. Storefronts support branding, public profile sections and non-purchasable sample product cards; the app does not implement checkout, payment processing, product management or digital delivery.
 
 Production domain: **https://cloverloop.in**
 
@@ -24,6 +24,7 @@ Production domain: **https://cloverloop.in**
    NEXT_PUBLIC_SITE_URL=http://localhost:3000
    NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
+   SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_SUPABASE_SERVICE_ROLE_KEY
    ```
 
    Change `NEXT_PUBLIC_SITE_URL` from `https://cloverloop.in` to `http://localhost:3000` for local authentication redirects.
@@ -44,7 +45,7 @@ Production domain: **https://cloverloop.in**
    npm run build
    ```
 
-The Supabase URL and public anon/publishable key are required to use email or Google authentication. Do not add a service-role key to this project or expose one in browser code.
+The Supabase URL and public anon/publishable key are required to use email or Google authentication. Storefront image uploads also require `SUPABASE_SERVICE_ROLE_KEY` on the server. It is read only by a `server-only` module used from the authenticated image-upload action; never prefix it with `NEXT_PUBLIC_` or expose it in browser code.
 
 ## Environment variables
 
@@ -53,6 +54,7 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `NEXT_PUBLIC_SITE_URL` | Yes for authentication redirects | Local URL during development (`http://localhost:3000`); production origin is `https://cloverloop.in`. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes for authentication | Supabase project URL. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for authentication | Supabase public anon/publishable key. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes for storefront image uploads | Server-only Supabase service-role key used by the authenticated image upload action. Never expose it to client code. |
 | `NEXT_PUBLIC_FOUNDING_CREATOR_FORM_URL` | For the dashboard programme CTA | External Google Form URL. It is intentionally not hardcoded. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Before launch | Confirmed CloverLoop support address. The Contact page shows a setup notice until provided. |
 | `RESEND_API_KEY` | For the launch checklist | Server-only Resend API key used to email the launch checklist PDF. |
@@ -95,11 +97,44 @@ Password reset requests return to `/auth/callback?next=/forgot-password`. Supaba
 
 Google credentials belong in the Supabase provider configuration; do not put a Google client secret in a `NEXT_PUBLIC_*` environment variable.
 
+## Creator storefront setup
+
+The storefront feature adds one public page per creator at `https://cloverloop.in/{username}`. It uses a private `storefront-assets` Supabase Storage bucket; uploaded JPG, PNG and WebP files are cropped and optimized to WebP by the authenticated server action. The service-role key is used only by the Supabase Edge Function and must never be added to Vercel or `.env.local`.
+
+Apply the database migration with the Supabase CLI after linking the project:
+
+```sh
+supabase link --project-ref YOUR_PROJECT_REF
+supabase db push
+```
+
+The migration creates the storefront tables, RLS policies, private storage bucket, username redirect mapping and a daily `pg_cron` job. Permanent deletion and cleanup of replaced or abandoned images are processed by `supabase/functions/purge-storefronts/index.ts`. Deploy the function and configure its shared secret before applying the migration:
+
+1. Generate a high-entropy secret and set it for the Edge Function:
+
+   ```sh
+   supabase secrets set STOREFRONT_PURGE_SECRET=YOUR_RANDOM_SECRET
+   supabase functions deploy purge-storefronts
+   ```
+
+2. In the Supabase SQL Editor, store the project URL and the same secret in Vault before running `supabase db push`:
+
+   ```sql
+   select vault.create_secret('https://YOUR_PROJECT_REF.supabase.co', 'supabase_url');
+   select vault.create_secret('YOUR_RANDOM_SECRET', 'storefront_purge_secret');
+   ```
+
+   The scheduled job runs daily at 03:15 UTC. It hard-deletes storefronts after their 30-day deletion period, releasing usernames only after their assets have been removed. It also removes unreferenced uploads older than 24 hours. Monitor Supabase Edge Function and `pg_cron` logs for failures.
+
+No additional Next.js environment variable is required. The public site only needs the existing Supabase URL and anon/publishable key. Storefront publish, edit, unpublish and delete actions do not send email notifications.
+Account deletion is blocked until a scheduled storefront deletion has completed, so the 30-day retention and username reservation cannot be bypassed.
+
 ## Routes
 
 ### Public
 
 - `/`
+- `/{username}` for a published creator storefront
 - `/sell-online`
 - `/sell-digital-downloads`
 - `/courses`
@@ -142,6 +177,7 @@ Google credentials belong in the Supabase provider configuration; do not put a G
 - `/forgot-password`
 - `/auth/callback`
 - `/dashboard`
+- `/dashboard/storefront`
 
 Login, signup, password reset, auth callback and dashboard responses are noindex. The dashboard route is protected by Supabase session verification and redirects unauthenticated visitors to `/login`.
 
@@ -178,6 +214,6 @@ The sitemap uses the production canonical origin and excludes authentication, ut
 
 ## Product scope and launch configuration
 
-This sprint does **not** implement product upload, checkout, Razorpay connectivity, payment verification, digital file delivery, earnings, sales analytics, subscriptions, monthly commission invoicing, or creator management. Marketing copy describes these as intended architecture and planned capabilities rather than live integrations.
+Storefronts are presentation-only. Sample product cards are marked “Coming Soon” and cannot be opened or purchased. The app does **not** implement checkout, Razorpay connectivity, payment verification, digital file delivery, earnings, sales analytics, subscriptions, monthly commission invoicing, or order management. Marketing copy describes these as intended architecture and planned capabilities rather than live integrations.
 
 Before launch, configure Supabase and Google OAuth, confirm the support email and programme form, and obtain legal review of the Terms and Privacy drafts. Pricing is presented as the agreed intended pricing model; subscriptions and payment processing are not operational in this implementation.

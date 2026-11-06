@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   if (slug === "marketing-ideas-tool") {
     return {
-      title: "Digital Product Marketing Ideas Generator",
+      title: "Digital Product Marketing Ideas | CloverLoop",
       description: "Discover practical marketing ideas to promote ebooks, presets, templates, printables and other digital products.",
       alternates: { canonical: canonical(`/resources/${slug}`) },
       robots: { index: true, follow: true },

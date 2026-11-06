@@ -1,30 +1,234 @@
 {
   "slug": "how-to-price-digital-products",
-  "title": "How to Price Digital Products: A Simple Framework",
-  "seoTitle": "How to Price Digital Products: A Simple Framework",
-  "description": "A practical framework for pricing ebooks, templates and planners using value, costs and customer feedback.",
+  "title": "How to Price Digital Products: A Creator’s Working Method",
+  "seoTitle": "How to Price Digital Products in India | CloverLoop",
+  "description": "Learn a working method for pricing digital products in India, including cost, value, payment fees, INR 499 examples and product tiers.",
   "primaryKeyword": "how to price digital products",
   "category": "Guides",
   "canonicalUrl": "https://cloverloop.in/resources/how-to-price-digital-products",
   "indexable": true,
   "image": "/images/resources/how-to-sell-ebooks.webp",
   "imageAlt": "A guide to setting a price for a digital product",
-  "related": ["how-to-sell-digital-products-online", "how-many-sales-to-hit-your-income-goal", "digital-products"],
+  "related": [
+    "digital-products",
+    "how-many-sales-to-hit-your-income-goal",
+    "accept-upi-payments-digital-products-razorpay"
+  ],
   "blocks": [
-    { "type": "paragraph", "text": "Pricing should communicate value, support sustainable creation and make sense for your audience. Define the outcome: what task does the product help complete, how much time might it save and what uncertainty does it reduce?" },
-    { "type": "paragraph", "text": "Understand customers and alternatives. Compare products with similar audiences, depth, quality and support. Include free alternatives; your paid offer should provide a clearer, more specific or more useful solution." },
-    { "type": "paragraph", "text": "Calculate your cost floor. Include creation time, software, research, contractors, advertising, payment processing, platform fees and customer support. Estimate how many sales recover creation and maintenance costs." },
-    { "type": "paragraph", "text": "Choose a model that fits. One-time pricing suits a standalone resource. Tiers work when versions have meaningful differences. Bundles should solve related problems. Subscriptions require ongoing value or updates." },
-    { "type": "paragraph", "text": "Test a credible starting price. Make discounts intentional and time-limited. If testing prices, change one variable at a time and compare similar audiences." },
-    { "type": "paragraph", "text": "Review what you retain. Gross sales are not take-home earnings. Deduct payment-provider charges, platform fees and fixed plan costs; also consider refunds, discounts, business expenses and taxes on your own sales. CloverLoop's calculator estimates selected costs only." },
-    { "type": "heading", "text": "Frequently asked questions" },
-    { "type": "subheading", "text": "Should I launch cheaply?" },
-    { "type": "paragraph", "text": "Only if it is a deliberate, time-limited validation offer." },
-    { "type": "subheading", "text": "Should a bundle cost more?" },
-    { "type": "paragraph", "text": "It should deliver a coherent additional outcome." },
-    { "type": "subheading", "text": "How often should I change price?" },
-    { "type": "paragraph", "text": "When meaningful evidence from feedback, conversion or costs supports it." },
-    { "type": "subheading", "text": "Does the calculator show profit?" },
-    { "type": "paragraph", "text": "No. It excludes many business expenses and tax liabilities." }
-  ]
+    {
+      "type": "paragraph",
+      "text": "Pricing a digital product is not simply a matter of choosing ₹199 because it feels affordable or ₹999 because another creator charges that amount. A good price must make sense to the buyer, reflect the value of the result, fit the market and leave enough money after payment costs, platform charges, refunds and taxes."
+    },
+    {
+      "type": "heading",
+      "text": "Four ways creators commonly price digital products"
+    },
+    {
+      "type": "subheading",
+      "text": "1. Cost-plus pricing"
+    },
+    {
+      "type": "paragraph",
+      "text": "Add up the costs of creating and maintaining the product, estimate the number of sales over which those costs will be recovered, and add a margin. This is useful for understanding the minimum viable price, but it should not be the only method. A spreadsheet that saves a business owner five hours every month may be worth more than the few minutes it takes to download."
+    },
+    {
+      "type": "subheading",
+      "text": "2. Competitor-based pricing"
+    },
+    {
+      "type": "paragraph",
+      "text": "Compare products that solve a similar problem for a similar buyer. Do not compare only the file format. A 20-page checklist, a 200-page reference guide and a video course may all be PDFs or downloads, but they deliver different outcomes. Review the depth, support, updates, credibility of the creator and what is included."
+    },
+    {
+      "type": "subheading",
+      "text": "3. Value-based pricing"
+    },
+    {
+      "type": "paragraph",
+      "text": "Estimate the value of the outcome to the customer. A template that helps a freelancer prepare proposals faster may save time on every client project. A professional training resource may help someone prepare for an assessment. The price should reflect the importance and credibility of that outcome, while remaining realistic for the audience."
+    },
+    {
+      "type": "subheading",
+      "text": "4. Tiered pricing"
+    },
+    {
+      "type": "paragraph",
+      "text": "Offer different levels for customers with different needs. For example, a basic guide may include the core PDF; a bundle may add templates and examples; a premium option may include a live workshop or feedback. Each tier must have a real difference. Do not create three prices that contain almost the same thing."
+    },
+    {
+      "type": "table",
+      "text": "Table: Four ways creators commonly price digital products",
+      "headers": [
+        "**Tier**",
+        "**Illustrative offer**",
+        "**Illustrative price**"
+      ],
+      "rows": [
+        [
+          "**Basic**",
+          "**PDF guide and checklist**",
+          "**₹299**"
+        ],
+        [
+          "**Bundle**",
+          "**Guide, templates, examples and audio/video demonstrations**",
+          "**₹599**"
+        ],
+        [
+          "**Workshop bundle**",
+          "**Bundle plus a live group session and Q&A**",
+          "**₹1,499**"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "These prices are examples for explaining the structure, not market-rate recommendations. Test the offer with the audience and review conversion and support costs."
+    },
+    {
+      "type": "heading",
+      "text": "A practical pricing worksheet"
+    },
+    {
+      "type": "paragraph",
+      "text": "Before setting the price, answer these questions:"
+    },
+    {
+      "type": "unordered-list",
+      "text": "What specific result does the buyer get?\nHow urgent or valuable is that result?\nWhat alternatives does the buyer have, including free YouTube videos, blogs and spreadsheets?\nHow much work does the product save, and how reliable is the outcome?\nDoes the product include updates, support, community access or live interaction?\nWhat are the payment, platform, refund and tax costs at the proposed price?",
+      "items": [
+        "What specific result does the buyer get?",
+        "How urgent or valuable is that result?",
+        "What alternatives does the buyer have, including free YouTube videos, blogs and spreadsheets?",
+        "How much work does the product save, and how reliable is the outcome?",
+        "Does the product include updates, support, community access or live interaction?",
+        "What are the payment, platform, refund and tax costs at the proposed price?"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Worked example: pricing a ₹499 digital guide"
+    },
+    {
+      "type": "paragraph",
+      "text": "Assume a creator sells a downloadable guide for ₹499. The creator uses a payment gateway charging 2% plus 18% GST on that gateway fee. The creator also uses a platform that charges either 0%, 3% or 2% platform commission depending on the plan, with 18% GST applied to the platform commission. The illustration below assumes both percentages are calculated on the ₹499 order value."
+    },
+    {
+      "type": "table",
+      "text": "Table: Worked example: pricing a ₹499 digital guide",
+      "headers": [
+        "**Cost item**",
+        "**0% platform plan**",
+        "**3% platform plan**",
+        "**2% platform plan**"
+      ],
+      "rows": [
+        [
+          "**Customer payment**",
+          "**₹499.00**",
+          "**₹499.00**",
+          "**₹499.00**"
+        ],
+        [
+          "**Gateway fee: 2%**",
+          "**₹9.98**",
+          "**₹9.98**",
+          "**₹9.98**"
+        ],
+        [
+          "**GST on gateway fee: 18%**",
+          "**₹1.80**",
+          "**₹1.80**",
+          "**₹1.80**"
+        ],
+        [
+          "**Platform commission**",
+          "**₹0.00**",
+          "**₹14.97**",
+          "**₹9.98**"
+        ],
+        [
+          "**GST on platform commission**",
+          "**₹0.00**",
+          "**₹2.69**",
+          "**₹1.80**"
+        ],
+        [
+          "**Amount after these charges**",
+          "**₹487.22**",
+          "**₹469.56**",
+          "**₹475.44**"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This is a platform-cost illustration, not the creator’s final taxable profit. It excludes GST on the creator’s own sale, income tax, refunds, chargebacks, payout or settlement charges, advertising, software and other business expenses. If the creator is GST-registered and the product is taxable, the output GST collected from the customer must be accounted for separately. Eligible input tax credit on fee GST may also change the final economics."
+    },
+    {
+      "type": "heading",
+      "text": "Should you price at ₹99, ₹299, ₹499 or ₹999?"
+    },
+    {
+      "type": "paragraph",
+      "text": "There is no universal best price. Lower prices can reduce purchase friction, but they also require more sales to generate the same revenue. Higher prices can support deeper content and more support, but the sales page must establish why the product is worth it. A creator with a small but highly relevant audience may earn more from a focused ₹999 resource than from a ₹99 download that attracts casual buyers."
+    },
+    {
+      "type": "heading",
+      "text": "Use a price test, not a guess"
+    },
+    {
+      "type": "ordered-list",
+      "text": "Choose one initial price based on the value, alternatives and cost calculation.\nShow the product to a small group of likely buyers. Ask what they expected, what felt unclear and what would stop them buying.\nTrack product-page visits, checkout starts, completed purchases and refunds. Do not judge the price only by likes or poll responses.\nIf many people visit but few buy, investigate the offer, trust, preview, payment experience and audience fit before cutting the price.\nIf buyers purchase but repeatedly ask for features that were not included, improve the product description or create a genuinely different higher tier.",
+      "items": [
+        "Choose one initial price based on the value, alternatives and cost calculation.",
+        "Show the product to a small group of likely buyers. Ask what they expected, what felt unclear and what would stop them buying.",
+        "Track product-page visits, checkout starts, completed purchases and refunds. Do not judge the price only by likes or poll responses.",
+        "If many people visit but few buy, investigate the offer, trust, preview, payment experience and audience fit before cutting the price.",
+        "If buyers purchase but repeatedly ask for features that were not included, improve the product description or create a genuinely different higher tier."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Discounts and bundles"
+    },
+    {
+      "type": "paragraph",
+      "text": "A discount should have a reason: a launch period, a bundle, a limited workshop cohort or a returning-customer offer. Permanent discounting trains buyers to wait. Bundles work when the products solve related problems and the combined offer is easier to use than buying separate pieces. Make the normal price and discount terms transparent; do not invent a false original price."
+    },
+    {
+      "type": "heading",
+      "text": "Frequently asked questions"
+    },
+    {
+      "type": "subheading",
+      "text": "Should a first-time creator sell cheaply to get customers?"
+    },
+    {
+      "type": "paragraph",
+      "text": "A modest introductory price can reduce risk while you validate the offer, but “cheap” should not mean incomplete. A product that does not solve the promised problem creates refunds and damages trust. Start with a focused product, price it honestly and use early feedback to improve the next version."
+    },
+    {
+      "type": "subheading",
+      "text": "Should I include GST in the displayed price?"
+    },
+    {
+      "type": "paragraph",
+      "text": "For consumer-facing prices, showing the final amount payable is usually clearer. If you are registered and the supply is taxable, decide whether the displayed price is GST-inclusive or GST-exclusive and configure invoices and checkout consistently. For an inclusive price, the GST portion is calculated from the total rather than added on top. Have your accountant confirm the correct rate and invoice treatment for your product."
+    },
+    {
+      "type": "subheading",
+      "text": "How often should I change the price?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do not change it after every quiet day. Review after a meaningful sample of qualified visits and purchases, or after a real change in product scope, support or demand. Keep a record of the price, page version, traffic source and dates so you can interpret the result."
+    }
+  ],
+  "datePublished": "2026-11-05",
+  "dateModified": "2026-11-05",
+  "publishedDate": "5 November 2026",
+  "lastReviewed": "5 November 2026",
+  "authorName": "CloverLoop Editorial Team",
+  "authorBio": "The CloverLoop Editorial Team publishes practical, research-led guides for independent creators in India."
 }

@@ -1,28 +1,318 @@
 {
   "slug": "how-many-sales-to-hit-your-income-goal",
-  "title": "How Many Sales Do You Need to Hit Your Goal?",
-  "seoTitle": "How Many Sales Do You Need to Hit Your Goal?",
-  "description": "Calculate the sales needed for a monthly revenue target and understand the role of price, fees and conversion rate.",
-  "primaryKeyword": "how many sales to hit income goal",
+  "title": "Digital Product Earnings Calculator: Work Backwards from Your Income Goal",
+  "seoTitle": "Digital Product Earnings Calculator: Sales Goal Guide",
+  "description": "Calculate how many digital-product sales you need for an income goal, with INR examples, fee and GST assumptions, refunds and conversion rates.",
+  "primaryKeyword": "digital product earnings calculator",
   "category": "Guides",
   "canonicalUrl": "https://cloverloop.in/resources/how-many-sales-to-hit-your-income-goal",
   "indexable": true,
   "image": "/images/resources/content-creator.webp",
   "imageAlt": "Planning sales goals for a creator business",
-  "related": ["how-to-price-digital-products", "accept-upi-payments-digital-products-razorpay", "do-you-need-gst-registration-to-sell-online"],
+  "related": [
+    "how-to-price-digital-products",
+    "accept-upi-payments-digital-products-razorpay",
+    "digital-products"
+  ],
   "blocks": [
-    { "type": "paragraph", "text": "A monthly goal becomes easier to plan when translated into sales, visitors and repeatable actions. First distinguish gross revenue from take-home earnings. Payment processing, platform fees, refunds, discounts, taxes and operating expenses affect what remains." },
-    { "type": "paragraph", "text": "For a gross revenue target, divide the target by product price. A ₹30,000 target at ₹500 per sale requires 60 sales. For a target after fees, estimate the amount retained per sale first, then divide the target by that amount and round up." },
-    { "type": "paragraph", "text": "Estimate visitor requirements using a conversion assumption. If 2% of qualified visitors purchase, 60 sales would require about 3,000 qualified visits. This is a planning assumption, not a universal benchmark. Conversion varies with audience fit, trust, offer clarity, price and traffic source." },
-    { "type": "paragraph", "text": "Work backwards into weekly actions: publish useful content, demonstrate the product, build an email list, collaborate with relevant creators or improve search visibility. Improve controllable variables: clarify outcomes, use previews, reduce buying friction and answer delivery questions. Replace assumptions with actual data as soon as tracking is available." },
-    { "type": "heading", "text": "Frequently asked questions" },
-    { "type": "subheading", "text": "Is revenue the same as profit?" },
-    { "type": "paragraph", "text": "No. Profit requires subtracting selling costs and business expenses." },
-    { "type": "subheading", "text": "What conversion rate should I use?" },
-    { "type": "paragraph", "text": "Use your own data; before launch, model conservative, expected and optimistic scenarios." },
-    { "type": "subheading", "text": "Should I lower my price?" },
-    { "type": "paragraph", "text": "Not automatically; compare conversion and retained amount." },
-    { "type": "subheading", "text": "Can one product reach my goal?" },
-    { "type": "paragraph", "text": "Possibly, but validate demand before expanding." }
-  ]
+    {
+      "type": "paragraph",
+      "text": "An earnings calculator is useful only when it tells you what the number means. “Revenue” is not the same as “money you keep”. A creator may collect ₹50,000 in customer payments but retain less after GST on sales, gateway charges, platform commissions, refunds, advertising and other expenses."
+    },
+    {
+      "type": "heading",
+      "text": "Understand the five numbers"
+    },
+    {
+      "type": "table",
+      "text": "Table: Understand the five numbers",
+      "headers": [
+        "**Number**",
+        "**Meaning**",
+        "**Example**"
+      ],
+      "rows": [
+        [
+          "**Gross sales / GMV**",
+          "**Total value of completed customer orders before deductions.**",
+          "**100 orders × ₹499 = ₹49,900.**"
+        ],
+        [
+          "**GST collected on sales**",
+          "**Output GST included in or added to the customer price when the seller is registered and the supply is taxable.**",
+          "**Depends on product classification and whether the price is tax-inclusive.**"
+        ],
+        [
+          "**Payment processing cost**",
+          "**Gateway/platform charge for processing the payment, plus GST on that service fee.**",
+          "**At 2% + 18% GST on fee, cost on ₹49,900 is ₹1,177.64.**"
+        ],
+        [
+          "**Platform commission**",
+          "**Commission charged by the storefront/platform, plus GST on that platform service fee.**",
+          "**At 3% + 18% GST on fee, cost on ₹49,900 is ₹1,766.46.**"
+        ],
+        [
+          "**Net proceeds before business expenses**",
+          "**Amount left after the selected deductions, before marketing, software, refunds, income tax and other costs not included.**",
+          "**Must be calculated using the creator’s actual plan and tax status.**"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "A transparent example using a ₹499 product"
+    },
+    {
+      "type": "paragraph",
+      "text": "Assume 100 successful orders at ₹499 each. Gross customer collections are ₹49,900. For illustration, assume a payment gateway fee of 2% plus 18% GST on that fee. The gateway cost is ₹1,177.64, leaving ₹48,722.36 before platform charges and other costs."
+    },
+    {
+      "type": "table",
+      "text": "Table: A transparent example using a ₹499 product",
+      "headers": [
+        "**Platform plan assumption**",
+        "**Platform commission**",
+        "**GST on commission**",
+        "**Amount after gateway and platform charges**"
+      ],
+      "rows": [
+        [
+          "**0% platform commission**",
+          "**₹0.00**",
+          "**₹0.00**",
+          "**₹48,722.36**"
+        ],
+        [
+          "**3% platform commission**",
+          "**₹1,497.00**",
+          "**₹269.46**",
+          "**₹46,955.90**"
+        ],
+        [
+          "**2% platform commission**",
+          "**₹998.00**",
+          "**₹179.64**",
+          "**₹47,544.72**"
+        ]
+      ]
+    },
+    {
+      "type": "callout",
+      "text": "The 0%, 3% and 2% platform-commission cases in this worked example are illustrative assumptions, not CloverLoop’s current plan prices. For current plan terms, see the [CloverLoop pricing page](https://cloverloop.in/pricing)."
+    },
+    {
+      "type": "paragraph",
+      "text": "The calculation assumes commission is charged on gross customer order value and excludes output GST on the creator’s own product sale. It also excludes refunds, chargebacks, advertising, subscription fees, payout charges and income tax. If the creator is registered and must charge GST on the product, that output GST must be removed from the amount treated as the creator’s sales proceeds. Eligible input tax credit may be available on some business fees, subject to GST rules."
+    },
+    {
+      "type": "heading",
+      "text": "How many sales do you need to reach an income goal?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Work backwards from the amount you want to retain per sale. The simplest formula is:"
+    },
+    {
+      "type": "table",
+      "text": "Table: How many sales do you need to reach an income goal?",
+      "headers": [
+        "**Formula  **Required sales = Monthly income goal ÷ Net contribution per completed sale"
+      ],
+      "rows": []
+    },
+    {
+      "type": "paragraph",
+      "text": "Suppose the target is ₹50,000 per month and your estimated amount after payment and platform fees is ₹469.56 per ₹499 sale. The calculation is ₹50,000 ÷ ₹469.56 = 106.48. You would need at least 107 completed sales to cross ₹50,000 before other business expenses and taxes."
+    },
+    {
+      "type": "table",
+      "text": "Table: How many sales do you need to reach an income goal?",
+      "headers": [
+        "**Assumed amount retained per sale**",
+        "**Sales required for ₹25,000**",
+        "**Sales required for ₹50,000**",
+        "**Sales required for ₹1,00,000**"
+      ],
+      "rows": [
+        [
+          "**₹250**",
+          "**100**",
+          "**200**",
+          "**400**"
+        ],
+        [
+          "**₹350**",
+          "**72**",
+          "**143**",
+          "**286**"
+        ],
+        [
+          "**₹450**",
+          "**56**",
+          "**112**",
+          "**223**"
+        ],
+        [
+          "**₹469.56**",
+          "**54**",
+          "**107**",
+          "**213**"
+        ],
+        [
+          "**₹750**",
+          "**34**",
+          "**67**",
+          "**134**"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Round up to the next whole sale. These are mathematical targets, not sales forecasts. The number of visits required depends on the conversion rate of the product page."
+    },
+    {
+      "type": "heading",
+      "text": "Translate sales into traffic"
+    },
+    {
+      "type": "paragraph",
+      "text": "If 2% of qualified visitors purchase, 107 sales require approximately 5,350 qualified visits (107 ÷ 0.02). At a 1% conversion rate, the same target requires 10,700 visits. This is why creators should measure qualified product-page visits and completed purchases rather than rely only on follower count."
+    },
+    {
+      "type": "table",
+      "text": "Table: Translate sales into traffic",
+      "headers": [
+        "**Product-page conversion rate**",
+        "**Visits needed for 107 sales**"
+      ],
+      "rows": [
+        [
+          "**0.5%**",
+          "**21,400**"
+        ],
+        [
+          "**1.0%**",
+          "**10,700**"
+        ],
+        [
+          "**2.0%**",
+          "**5,350**"
+        ],
+        [
+          "**3.0%**",
+          "**3,567**"
+        ],
+        [
+          "**5.0%**",
+          "**2,140**"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Conversion rate is not fixed. A warm audience that already trusts the creator may convert differently from cold search traffic. Mobile checkout friction, payment failures, unclear product previews and weak product-market fit can all affect the result."
+    },
+    {
+      "type": "heading",
+      "text": "Build a complete forecast with the right inputs"
+    },
+    {
+      "type": "paragraph",
+      "text": "For a complete forecast in a spreadsheet, include these inputs:"
+    },
+    {
+      "type": "unordered-list",
+      "text": "Product price and expected number of monthly orders.\nWhether the displayed price includes GST, and the applicable GST rate if the creator is registered and the product is taxable.\nPayment gateway fee percentage and GST on that fee.\nPlatform commission percentage and GST on the platform fee.\nMonthly subscription fee, if any.\nExpected refunds/chargebacks as a percentage of orders or revenue.\nAdvertising and other variable cost per order.\nTarget monthly amount the creator wants to retain.",
+      "items": [
+        "Product price and expected number of monthly orders.",
+        "Whether the displayed price includes GST, and the applicable GST rate if the creator is registered and the product is taxable.",
+        "Payment gateway fee percentage and GST on that fee.",
+        "Platform commission percentage and GST on the platform fee.",
+        "Monthly subscription fee, if any.",
+        "Expected refunds/chargebacks as a percentage of orders or revenue.",
+        "Advertising and other variable cost per order.",
+        "Target monthly amount the creator wants to retain."
+      ]
+    },
+    {
+      "type": "callout",
+      "text": "CloverLoop’s existing earnings calculator on the [pricing page](https://cloverloop.in/pricing#earnings-calculator) is narrower than this full forecast checklist. It estimates gross sales after the payment-provider percentage you enter, the current plan commission and any monthly plan fee. It does not separately calculate GST on your product sale or provider/platform invoices, and it does not model refunds, chargebacks, advertising or other operating costs. Use the worked method above for a fuller estimate; enter the provider’s effective fee from your own agreement."
+    },
+    {
+      "type": "heading",
+      "text": "Recommended calculation sequence"
+    },
+    {
+      "type": "ordered-list",
+      "text": "Calculate gross sales: product price × successful orders.\nIf applicable, separate output GST from the customer price. For an inclusive price, taxable value = price ÷ (1 + GST rate); GST = price − taxable value.\nCalculate payment processing fee on the provider’s applicable fee base, then calculate GST on that fee.\nCalculate platform commission on the fee base stated in the platform contract, then calculate GST on the platform commission.\nSubtract monthly subscription fees, refunds, chargebacks and other included costs.\nDivide the creator’s target by net contribution per sale to estimate the required order count.\nDivide required orders by the assumed conversion rate to estimate required qualified traffic.",
+      "items": [
+        "Calculate gross sales: product price × successful orders.",
+        "If applicable, separate output GST from the customer price. For an inclusive price, taxable value = price ÷ (1 + GST rate); GST = price − taxable value.",
+        "Calculate payment processing fee on the provider’s applicable fee base, then calculate GST on that fee.",
+        "Calculate platform commission on the fee base stated in the platform contract, then calculate GST on the platform commission.",
+        "Subtract monthly subscription fees, refunds, chargebacks and other included costs.",
+        "Divide the creator’s target by net contribution per sale to estimate the required order count.",
+        "Divide required orders by the assumed conversion rate to estimate required qualified traffic."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Do not mix up GST-inclusive and GST-exclusive pricing"
+    },
+    {
+      "type": "paragraph",
+      "text": "If a registered creator sells a taxable service at a GST-inclusive consumer price of ₹1,180 and the applicable rate is 18%, the taxable value is ₹1,000 and the GST component is ₹180. It is incorrect to treat the entire ₹1,180 as the creator’s pre-tax revenue. If the creator instead advertises ₹1,000 plus GST, the customer pays ₹1,180. The customer-facing price may be the same, but the way the checkout and invoice display it differs."
+    },
+    {
+      "type": "heading",
+      "text": "What the calculator cannot tell you"
+    },
+    {
+      "type": "paragraph",
+      "text": "A calculator cannot decide whether you are required to register for GST, classify an ebook or course, determine whether an export qualifies as a zero-rated supply, decide whether an input tax credit is eligible, or calculate income tax without the full facts. It should show assumptions and exclusions beside the result, not hide them in a footnote."
+    },
+    {
+      "type": "heading",
+      "text": "Frequently asked questions"
+    },
+    {
+      "type": "subheading",
+      "text": "Does the calculator’s net amount equal my take-home income?"
+    },
+    {
+      "type": "paragraph",
+      "text": "No. It is an estimate after the costs entered into the calculator. Personal take-home income may be lower after advertising, software, contractor costs, refunds, accounting, taxes and other expenses. Income tax is based on taxable income under the applicable tax rules, not simply the amount deposited by the payment gateway."
+    },
+    {
+      "type": "subheading",
+      "text": "Should gateway fees be calculated before or after GST?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Use the fee base in the payment provider’s pricing terms. If the provider charges 2% on the full customer payment, calculate 2% on that amount and then add 18% GST to the fee. Do not subtract the product’s output GST first unless the provider’s contract explicitly uses a different base."
+    },
+    {
+      "type": "subheading",
+      "text": "How many sales do I need if my price changes?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Recalculate the net contribution per sale at each price because gateway and platform fees may be percentage-based, while some costs are fixed. Then divide your income goal by the new per-sale contribution and round up. A higher price reduces the required order count only if it does not reduce conversion enough to offset the increase."
+    },
+    {
+      "type": "subheading",
+      "text": "Should I include refunds in the calculator?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Yes. Use an expected refund rate based on your own order history once you have data. Before that, show a separate sensitivity case—for example, 0%, 2% and 5% refunds—rather than pretending you know the future rate. Also check whether the gateway returns its processing fee when a payment is refunded."
+    }
+  ],
+  "datePublished": "2026-11-05",
+  "dateModified": "2026-11-05",
+  "publishedDate": "5 November 2026",
+  "lastReviewed": "5 November 2026",
+  "authorName": "CloverLoop Editorial Team",
+  "authorBio": "The CloverLoop Editorial Team publishes practical, research-led guides for independent creators in India."
 }

@@ -1,28 +1,221 @@
 {
   "slug": "accept-upi-payments-digital-products-razorpay",
-  "title": "Accept UPI Payments for Digital Products with Razorpay",
-  "seoTitle": "Accept UPI Payments for Digital Products with Razorpay",
-  "description": "Understand the steps involved in setting up Razorpay to accept UPI and other online payments in India.",
-  "primaryKeyword": "accept UPI payments for digital products",
+  "title": "UPI, Razorpay and Payment Fees: What Creators Really Pay",
+  "seoTitle": "UPI, Razorpay and Payment Gateway Fees in India",
+  "description": "See how UPI MDR, Razorpay’s gateway fee, GST on fees and settlement differ, with an INR 1,000 worked example and current official sources.",
+  "primaryKeyword": "UPI and payment gateway fees India",
   "category": "Guides",
   "canonicalUrl": "https://cloverloop.in/resources/accept-upi-payments-digital-products-razorpay",
   "indexable": true,
   "image": "/images/resources/how-to-sell-ebooks.webp",
   "imageAlt": "A digital product and online payment guide",
-  "related": ["how-to-sell-digital-products-online", "do-you-need-gst-registration-to-sell-online", "how-to-price-digital-products"],
+  "related": [
+    "do-you-need-gst-registration-to-sell-online",
+    "how-many-sales-to-hit-your-income-goal",
+    "how-to-price-digital-products"
+  ],
   "blocks": [
-    { "type": "paragraph", "text": "A payment gateway can help digital-product sellers collect payments through supported methods and reconcile transactions. Razorpay is one provider businesses may consider. Availability, eligibility and charges depend on the merchant account and current provider terms." },
-    { "type": "paragraph", "text": "A gateway connects checkout to methods such as UPI, cards and netbanking, reports transaction status and supports settlement to a registered bank account. It does not guarantee approval or remove refund and support responsibilities." },
-    { "type": "paragraph", "text": "Prepare business information and review Razorpay's current onboarding requirements. Merchants may be asked for identity, business, PAN, bank-account and website or product information. Submit details only through the official dashboard. Never share passwords, OTPs or secret keys." },
-    { "type": "paragraph", "text": "Understand fees. Charges may include a percentage of successful transactions and GST on the provider fee. Rates and promotions change. For illustration, a 2% fee plus 18% GST on that fee has an effective cost of 2.36% of transaction value; this is not a guaranteed rate." },
-    { "type": "paragraph", "text": "When choosing a platform with a documented gateway connection process, review its security guidance. Keep API secrets server-side, verify payment status on the server and use authenticated webhooks where required. Never grant access based only on a browser success screen. Test failed, pending, duplicate and refunded payments." },
-    { "type": "paragraph", "text": "Payment processing and digital delivery are separate systems. Deliver paid files only after payment verification, use appropriate access controls and reconcile order records with provider reports. Review official pricing, prohibited-business rules, settlement timelines and refund procedures before launch." },
-    { "type": "heading", "text": "Frequently asked questions" },
-    { "type": "subheading", "text": "Is UPI always free for merchants?" },
-    { "type": "paragraph", "text": "Do not assume every gateway service is free; check provider terms." },
-    { "type": "subheading", "text": "Is 2.36% always the Razorpay fee?" },
-    { "type": "paragraph", "text": "No. It is an illustration; actual pricing can differ." },
-    { "type": "subheading", "text": "Does connecting Razorpay deliver files automatically?" },
-    { "type": "paragraph", "text": "No. Payment verification and digital delivery are separate systems." }
-  ]
+    {
+      "type": "paragraph",
+      "text": "A creator can receive money through a UPI QR code, a bank transfer, a payment link or a payment gateway integrated into a storefront. These options may all look like “UPI payments” to the customer, but the merchant’s costs and workflow can be very different."
+    },
+    {
+      "type": "heading",
+      "text": "First, distinguish the payment methods"
+    },
+    {
+      "type": "table",
+      "text": "Table: First, distinguish the payment methods",
+      "headers": [
+        "**Method**",
+        "**How it works**",
+        "**What the creator must manage**"
+      ],
+      "rows": [
+        [
+          "**Direct UPI QR / UPI ID**",
+          "**Customer pays the creator’s bank-linked UPI ID or QR code.**",
+          "**Match the payment to the order, verify the credit and deliver the product. A screenshot is not proof of settlement.**"
+        ],
+        [
+          "**Payment link**",
+          "**Creator creates a payment page or link through a provider and shares it.**",
+          "**Check provider charges, payment status, settlement timing and refund process.**"
+        ],
+        [
+          "**Payment gateway on a website**",
+          "**Checkout connects to a provider that processes UPI, cards, netbanking and other methods.**",
+          "**Integration, order status, webhooks, reconciliation, disputes, refunds and settlement reporting.**"
+        ],
+        [
+          "**Marketplace / creator platform checkout**",
+          "**The platform provides checkout and may collect or route funds according to its contract.**",
+          "**Understand who is merchant of record, who receives the funds, who issues the invoice and how fees/payouts work.**"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Is UPI free for merchants?"
+    },
+    {
+      "type": "paragraph",
+      "text": "The answer depends on what you mean by UPI. A customer paying a merchant by a standard bank-account UPI transaction is not necessarily the same as a creator using a payment gateway to accept that transaction. The payment rail, merchant discount rate (MDR), gateway’s technology/platform fee and any value-added service are separate components."
+    },
+    {
+      "type": "paragraph",
+      "text": "The Government’s 15 September 2026 explainer says UPI remains free for person-to-person transfers and that merchant payments up to ₹2,000, along with transactions covered by the zero-MDR framework for small merchants, remain free of MDR. It describes a 0.4% MDR for specified merchant transactions above ₹2,000, with a cap of ₹300 for transactions of ₹75,000 and above, and a separate flat treatment for specified essential sectors. This is an MDR framework, not a promise that every payment service or gateway is free. Check whether the merchant category, transaction and acquiring arrangement fall within the framework. [PIB UPI MDR release](https://pib.gov.in/PressReleaseDetail.aspx?PRID=2310586&reg=48&lang=1), [DFS UPI MDR FAQ](https://financialservices.gov.in/sites/default/files/2026-09/FAQs---Merchant-Discount-Rate--MDR--on-Select-UPI--P2M--Transactions_0.pdf)"
+    },
+    {
+      "type": "callout",
+      "text": "The Department of Financial Services FAQ describes a P2PM micro-merchant as a small vendor receiving up to ₹1 lakh per month through a UPI QR directly into the vendor’s account. Do not assume an online-store gateway account is classified this way; check the merchant category and acquiring arrangement against the official terms. [DFS UPI MDR FAQ](https://financialservices.gov.in/sites/default/files/2026-09/FAQs---Merchant-Discount-Rate--MDR--on-Select-UPI--P2M--Transactions_0.pdf)"
+    },
+    {
+      "type": "paragraph",
+      "text": "A payment gateway can charge a technology or platform fee separately from MDR. Razorpay’s published standard pricing states a 2% platform fee plus applicable GST for standard domestic payment-gateway transactions. Razorpay’s pricing materials distinguish the platform fee from MDR, but the Government’s September 2026 framework sets MDR for specified UPI P2M transactions above ₹2,000. For your own transactions, use the provider’s account-specific fee schedule and check whether any applicable MDR is included in or added to the quoted charge; do not infer the total cost from the phrase “UPI is free.” [Razorpay pricing](https://razorpay.com/pricing/), [DFS UPI MDR FAQ](https://financialservices.gov.in/sites/default/files/2026-09/FAQs---Merchant-Discount-Rate--MDR--on-Select-UPI--P2M--Transactions_0.pdf)"
+    },
+    {
+      "type": "callout",
+      "text": "Razorpay also publishes a temporary 0% platform-fee welcome offer for eligible new merchants, subject to a ₹5,00,000 cumulative transaction-value limit or 90 days from activation, whichever comes first. This is a promotion, not the standard price; exclusions and eligibility apply. Read the [offer terms](https://razorpay.com/terms/90-day-free-pg-offer/) before using it in a forecast. [Razorpay offer terms](https://razorpay.com/terms/90-day-free-pg-offer/)"
+    },
+    {
+      "type": "heading",
+      "text": "Razorpay fee example"
+    },
+    {
+      "type": "paragraph",
+      "text": "Using the published 2% standard platform fee as an illustration, assume a customer pays ₹1,000 and the payment succeeds. The gateway fee is ₹20. GST at 18% on that service fee is ₹3.60. The total gateway deduction is ₹23.60, leaving ₹976.40 before any platform commission, refunds, payout charges or the creator’s own tax obligations."
+    },
+    {
+      "type": "table",
+      "text": "Table: Razorpay fee example",
+      "headers": [
+        "**Calculation**",
+        "**Amount**"
+      ],
+      "rows": [
+        [
+          "**Customer payment**",
+          "**₹1,000.00**"
+        ],
+        [
+          "**Gateway platform fee (2%)**",
+          "**₹20.00**"
+        ],
+        [
+          "**GST on gateway fee (18% of ₹20)**",
+          "**₹3.60**"
+        ],
+        [
+          "**Total gateway cost**",
+          "**₹23.60**"
+        ],
+        [
+          "**Amount after gateway fee**",
+          "**₹976.40**"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "This illustration includes only the 2% platform fee and 18% GST on that fee; it does not add a separate MDR, optional-service charge or account-specific adjustment. Whether a separate MDR applies depends on the merchant category, transaction and agreement. Check the current fee schedule and settlement report before using the example as a forecast. [Razorpay pricing](https://razorpay.com/pricing/), [DFS UPI MDR FAQ](https://financialservices.gov.in/sites/default/files/2026-09/FAQs---Merchant-Discount-Rate--MDR--on-Select-UPI--P2M--Transactions_0.pdf)"
+    },
+    {
+      "type": "heading",
+      "text": "Why a payment screenshot is not enough"
+    },
+    {
+      "type": "paragraph",
+      "text": "A customer can send a screenshot of a pending, failed, reversed or even unrelated payment. A creator should confirm the credit in the bank account or provider dashboard and match the amount, timestamp and transaction reference to the order. For automated checkout, the system should mark an order paid only after a verified server-side payment confirmation or provider webhook—not because the browser returned to a success page."
+    },
+    {
+      "type": "heading",
+      "text": "Settlement is not the same as payment success"
+    },
+    {
+      "type": "paragraph",
+      "text": "A payment may be successful at checkout but settle to the bank account later. Providers may use a settlement cycle, hold funds for risk checks or apply reserves under their terms. Before launching, find the settlement schedule, holidays policy, refund timing and how failed or disputed payments are shown. Keep enough cash available to handle refunds even after the original sale has been settled."
+    },
+    {
+      "type": "heading",
+      "text": "What to compare before choosing a provider"
+    },
+    {
+      "type": "unordered-list",
+      "text": "Fee by payment instrument: standard UPI, credit card, debit card, netbanking, wallet and international payment.\nGST on the provider’s fee, and whether a proper tax invoice is available.\nSettlement timeline and whether faster settlement costs extra.\nRefund and chargeback charges, including whether the original processing fee is returned.\nPayment success reporting, webhook reliability and reconciliation exports.\nSupport response and dispute documentation requirements.\nWhether the provider supports your business category, website, product type and legal entity.",
+      "items": [
+        "Fee by payment instrument: standard UPI, credit card, debit card, netbanking, wallet and international payment.",
+        "GST on the provider’s fee, and whether a proper tax invoice is available.",
+        "Settlement timeline and whether faster settlement costs extra.",
+        "Refund and chargeback charges, including whether the original processing fee is returned.",
+        "Payment success reporting, webhook reliability and reconciliation exports.",
+        "Support response and dispute documentation requirements.",
+        "Whether the provider supports your business category, website, product type and legal entity."
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "A simple monthly payment-cost example"
+    },
+    {
+      "type": "paragraph",
+      "text": "Suppose a creator sells 40 products at ₹499 each in one month. Gross collections are ₹19,960. At an illustrative 2% gateway fee plus 18% GST on that fee, the gateway cost is ₹471.06 (₹399.20 fee plus ₹71.86 GST). The creator has ₹19,488.94 after this gateway cost, before platform commission, seller GST, refunds, advertising and income tax. This is why a creator should calculate fees using actual order value and not only compare the headline percentage."
+    },
+    {
+      "type": "heading",
+      "text": "Frequently asked questions"
+    },
+    {
+      "type": "subheading",
+      "text": "If direct UPI is free, why does a payment gateway deduct a fee?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Direct UPI transfer and gateway checkout are different services. With direct UPI, the creator may receive funds into the bank account without a gateway platform fee, but must identify the payment and deliver the product. A gateway provides checkout infrastructure, payment status, multiple payment methods, reporting and integration. Its platform fee is separate from MDR. Some P2M transactions above ₹2,000 fall under the 2026 MDR framework, and an account-specific agreement determines how the applicable charge appears. [DFS UPI MDR FAQ](https://financialservices.gov.in/sites/default/files/2026-09/FAQs---Merchant-Discount-Rate--MDR--on-Select-UPI--P2M--Transactions_0.pdf)"
+    },
+    {
+      "type": "subheading",
+      "text": "Does Razorpay charge 2% on every UPI payment?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Razorpay’s published standard pricing describes a 2% platform fee plus GST. The government’s 2026 UPI MDR rules may also apply to specified merchant transactions above ₹2,000, so a zero-MDR statement must be read with the current merchant category, transaction and account terms. Check the provider’s fee schedule and settlement report to see whether applicable MDR is included in or added to the platform charge. The 2% example here is standard-list pricing, not a guarantee of your account-specific cost. [Razorpay pricing](https://razorpay.com/pricing/), [DFS UPI MDR FAQ](https://financialservices.gov.in/sites/default/files/2026-09/FAQs---Merchant-Discount-Rate--MDR--on-Select-UPI--P2M--Transactions_0.pdf)"
+    },
+    {
+      "type": "subheading",
+      "text": "Should I accept payments manually when I am starting?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Manual UPI can be workable for a very small pilot if you reconcile every payment and deliver manually. It becomes risky when orders arrive while you are offline or when several customers pay similar amounts. Before volume grows, use an order reference and a payment confirmation process that links each successful payment to the right buyer and product."
+    },
+    {
+      "type": "subheading",
+      "text": "Can I add the gateway fee on top of the product price?"
+    },
+    {
+      "type": "paragraph",
+      "text": "You can design your price to cover operating costs, but how a payment surcharge may be displayed or passed to a customer depends on applicable law, provider rules and the payment instrument. Do not add a surprise charge at the final step. Review the provider agreement and applicable consumer/payment rules; a cleaner approach is often to set a transparent product price that already accounts for expected costs."
+    },
+    {
+      "type": "heading",
+      "text": "Sources and current official information"
+    },
+    {
+      "type": "unordered-list",
+      "text": "[Press Information Bureau, Ministry of Finance - UPI MDR release (15 September 2026)](https://pib.gov.in/PressReleaseDetail.aspx?PRID=2310586&reg=48&lang=1).\n[Razorpay - Payment Gateway Pricing and Fees](https://razorpay.com/pricing/).\n[Department of Financial Services - FAQs on MDR for select UPI P2M transactions (15 September 2026)](https://financialservices.gov.in/sites/default/files/2026-09/FAQs---Merchant-Discount-Rate--MDR--on-Select-UPI--P2M--Transactions_0.pdf).\n[Razorpay - 90-Day 0% Platform Fee Offer: Terms and Conditions](https://razorpay.com/terms/90-day-free-pg-offer/).",
+      "items": [
+        "[Press Information Bureau, Ministry of Finance - UPI MDR release (15 September 2026)](https://pib.gov.in/PressReleaseDetail.aspx?PRID=2310586&reg=48&lang=1).",
+        "[Razorpay - Payment Gateway Pricing and Fees](https://razorpay.com/pricing/).",
+        "[Department of Financial Services - FAQs on MDR for select UPI P2M transactions (15 September 2026)](https://financialservices.gov.in/sites/default/files/2026-09/FAQs---Merchant-Discount-Rate--MDR--on-Select-UPI--P2M--Transactions_0.pdf).",
+        "[Razorpay - 90-Day 0% Platform Fee Offer: Terms and Conditions](https://razorpay.com/terms/90-day-free-pg-offer/)."
+      ]
+    }
+  ],
+  "datePublished": "2026-11-05",
+  "dateModified": "2026-11-05",
+  "publishedDate": "5 November 2026",
+  "lastReviewed": "5 November 2026",
+  "authorName": "CloverLoop Editorial Team",
+  "authorBio": "The CloverLoop Editorial Team publishes practical, research-led guides for independent creators in India."
 }

@@ -24,8 +24,8 @@
                        "type":  "heading"
                    },
                    {
-                       "text":  "1. Beginner guitar fundamentals. 2. Bollywood guitar accompaniment. 3. Lead guitar techniques. 4. Music theory for guitarists. 5. Guitar improvisation. 6. Home guitar recording. 7. Guitar tone creation. 8. Music production fundamentals. 9. DAW workflow for beginners. 10. Building a home recording setup.",
-                       "type":  "paragraph"
+                       "text":  "1. Beginner guitar fundamentals.\n2. Bollywood guitar accompaniment.\n3. Lead guitar techniques.\n4. Music theory for guitarists.\n5. Guitar improvisation.\n6. Home guitar recording.\n7. Guitar tone creation.\n8. Music production fundamentals.\n9. DAW workflow for beginners.\n10. Building a home recording setup.",
+                       "type":  "ordered-list"
                    },
                    {
                        "text":  "These topics can be narrowed further. “Guitar improvisation” might become a practical programme on creating melodic phrases over common chord progressions. “Home recording” might focus on recording a clean electric guitar using an affordable interface and free software. Specific outcomes help learners understand what they will be able to do.",
@@ -36,8 +36,8 @@
                        "type":  "heading"
                    },
                    {
-                       "text":  "11. Starting a small online business. 12. Digital product creation. 13. Personal branding for creators. 14. Social media content planning. 15. Freelancing fundamentals. 16. Client communication. 17. Small business financial planning. 18. Product photography. 19. Building an online portfolio. 20. Marketing for independent creators.",
-                       "type":  "paragraph"
+                       "text":  "11. Starting a small online business.\n12. Digital product creation.\n13. Personal branding for creators.\n14. Social media content planning.\n15. Freelancing fundamentals.\n16. Client communication.\n17. Small business financial planning.\n18. Product photography.\n19. Building an online portfolio.\n20. Marketing for independent creators.",
+                       "type":  "ordered-list"
                    },
                    {
                        "text":  "Business topics benefit from examples, templates and realistic scenarios. A course on freelancing could teach how to define a service, prepare a proposal, set expectations and manage a client project. A digital product course could take learners from idea validation to a first product listing. Avoid promising business results that depend on market conditions or individual execution.",
@@ -48,8 +48,8 @@
                        "type":  "heading"
                    },
                    {
-                       "text":  "21. Personal budgeting. 22. Understanding mutual funds. 23. Excel for finance professionals. 24. Financial modelling fundamentals. 25. Risk management basics. 26. Investment research fundamentals. 27. Data analysis with Excel. 28. PowerPoint for business presentations. 29. Business writing. 30. Interview preparation.",
-                       "type":  "paragraph"
+                       "text":  "21. Personal budgeting.\n22. Understanding mutual funds.\n23. Excel for finance professionals.\n24. Financial modelling fundamentals.\n25. Risk management basics.\n26. Investment research fundamentals.\n27. Data analysis with Excel.\n28. PowerPoint for business presentations.\n29. Business writing.\n30. Interview preparation.",
+                       "type":  "ordered-list"
                    },
                    {
                        "text":  "These subjects require careful accuracy and clear boundaries. Financial education should distinguish general information from personalised financial advice. Professional skills courses should state the assumed experience level and software versions. Use worked examples, downloadable exercises and practice tasks to help learners apply concepts.",
@@ -60,8 +60,8 @@
                        "type":  "heading"
                    },
                    {
-                       "text":  "31. Canva for beginners. 32. Social media graphic design. 33. Presentation design. 34. Brand identity fundamentals. 35. Product photography. 36. Video editing basics. 37. Short-form video creation. 38. Digital illustration. 39. Typography fundamentals. 40. Design systems for beginners.",
-                       "type":  "paragraph"
+                       "text":  "31. Canva for beginners.\n32. Social media graphic design.\n33. Presentation design.\n34. Brand identity fundamentals.\n35. Product photography.\n36. Video editing basics.\n37. Short-form video creation.\n38. Digital illustration.\n39. Typography fundamentals.\n40. Design systems for beginners.",
+                       "type":  "ordered-list"
                    },
                    {
                        "text":  "Creative courses work well when learners can see progress. Include demonstrations, source files where you have the right to distribute them, exercises and before-and-after examples. Explain the tools required and whether the lessons use free or paid software. Make sure third-party assets and fonts are licensed for the intended use.",
@@ -72,8 +72,8 @@
                        "type":  "heading"
                    },
                    {
-                       "text":  "41. Introduction to Python. 42. Spreadsheet automation. 43. No-code website creation. 44. Introduction to artificial intelligence tools. 45. Prompt engineering fundamentals. 46. Personal productivity systems. 47. Notion for project management. 48. Workflow automation. 49. Building a personal website. 50. Using data to make business decisions.",
-                       "type":  "paragraph"
+                       "text":  "41. Introduction to Python.\n42. Spreadsheet automation.\n43. No-code website creation.\n44. Introduction to artificial intelligence tools.\n45. Prompt engineering fundamentals.\n46. Personal productivity systems.\n47. Notion for project management.\n48. Workflow automation.\n49. Building a personal website.\n50. Using data to make business decisions.",
+                       "type":  "ordered-list"
                    },
                    {
                        "text":  "Technology changes quickly, so include software versions and a review date. Teach transferable concepts rather than relying entirely on a sequence of interface screenshots. For AI-related material, explain limitations, privacy considerations and the need to verify outputs. A practical project can help learners understand how individual tools fit into a broader workflow.",

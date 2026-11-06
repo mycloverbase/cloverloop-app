@@ -1,10 +1,33 @@
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
-export type ResourceBlock = {
-  type: "paragraph" | "heading" | "subheading" | "takeaway" | "disclaimer";
+type TextBlock = {
+  type: "paragraph" | "heading" | "subheading" | "takeaway" | "disclaimer" | "callout";
   text: string;
 };
+
+type ListBlock = {
+  type: "ordered-list" | "unordered-list";
+  text: string;
+  items?: string[];
+  start?: number;
+};
+
+type TableBlock = {
+  type: "table";
+  text: string;
+  headers: string[];
+  rows: string[][];
+};
+
+export type CtaBlock = {
+  type: "cta";
+  text: string;
+  label: string;
+  href: string;
+};
+
+export type ResourceBlock = TextBlock | ListBlock | TableBlock | CtaBlock;
 
 export type ResourceArticle = {
   slug: string;
@@ -18,6 +41,12 @@ export type ResourceArticle = {
   image: string;
   imageAlt: string;
   related: string[];
+  datePublished?: string;
+  dateModified?: string;
+  publishedDate?: string;
+  lastReviewed?: string;
+  authorName?: string;
+  authorBio?: string;
   blocks: ResourceBlock[];
 };
 
@@ -36,7 +65,15 @@ export function getArticle(slug: string): ResourceArticle | null {
 }
 
 export function getArticleReadingTime(article: ResourceArticle) {
-  const text = article.blocks.map((block) => block.text).join(" ");
+  const text = article.blocks.map((block) => {
+    if (block.type === "table") {
+      return [block.text, ...block.headers, ...block.rows.flat()].join(" ");
+    }
+    if (block.type === "ordered-list" || block.type === "unordered-list") {
+      return (block.items ?? block.text.split(/\r?\n/)).join(" ");
+    }
+    return block.text;
+  }).join(" ");
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
   return { wordCount, minutes: Math.max(1, Math.ceil(wordCount / 200)) };
 }

@@ -47,9 +47,9 @@ export default function CompareHubPage() {
           <h1>Choose the right platform for your digital products</h1>
           <p>
             Compare plans, platform commissions, payment processing and product features. CloverLoop
-            pricing includes the Free plan&apos;s monthly Gross Sales allowance and the fees on its
-            other plans. Competitor prices are linked to official sources and identify their stated
-            fee basis.
+            Free has a 0% platform fee and a lifetime product-listing limit; its other plan fees are
+            listed separately. Competitor prices are linked to official sources and identify their
+            stated fee basis.
           </p>
         </header>
         <div className="comparison-hub-grid">

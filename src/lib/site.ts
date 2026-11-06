@@ -36,11 +36,12 @@ export const publicLinks = {
   resources: [
     { label: "Marketing ideas tool", href: "/resources/marketing-ideas-tool" },
     { label: "How to sell digital products online", href: "/resources/how-to-sell-digital-products-online" },
+    { label: "Best platform to sell digital products in India", href: "/resources/best-platform-to-sell-digital-products-india-2026" },
     { label: "How to price digital products", href: "/resources/how-to-price-digital-products" },
-    { label: "How to sell templates online", href: "/resources/how-to-sell-templates-online" },
-    { label: "Accept UPI payments with Razorpay", href: "/resources/accept-upi-payments-digital-products-razorpay" },
-    { label: "GST registration for online sellers", href: "/resources/do-you-need-gst-registration-to-sell-online" },
-    { label: "Sales needed to reach your goal", href: "/resources/how-many-sales-to-hit-your-income-goal" },
+    { label: "Digital product ideas and templates", href: "/resources/how-to-sell-templates-online" },
+    { label: "UPI, Razorpay and payment fees", href: "/resources/accept-upi-payments-digital-products-razorpay" },
+    { label: "GST registration for digital product sellers", href: "/resources/do-you-need-gst-registration-to-sell-online" },
+    { label: "Digital product earnings calculator", href: "/resources/how-many-sales-to-hit-your-income-goal" },
     { label: "Create and sell an online course", href: "/resources/how-to-create-and-sell-online-course-india" },
     { label: "GST on ebooks and online courses", href: "/resources/gst-on-ebooks-and-online-courses-india" },
     { label: "How to write an ebook", href: "/resources/how-to-write-an-ebook" },
@@ -167,7 +168,7 @@ export const featurePages = [
       },
       {
         heading: "CloverLoop plan fees",
-        body: "Free is ₹0/month with 0% commission on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that amount. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is ₹0/month with a 4% platform fee; Pro Creator is ₹1,499/month with a 2.5% platform fee.",
+        body: "Free is ₹0/month with a 0% platform fee. Creator is ₹0/month with a 4% platform fee; Pro Creator is ₹2,999/month with a 0% platform fee. Payment-provider processing charges are separate.",
       },
     ],
   },
@@ -178,6 +179,10 @@ export type AboutBlock =
   | { type: "ul"; items: { label?: string; text: string }[] }
   | { type: "cta"; text: string; href: string };
 
+type CompanyPageContentBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "list"; ordered: boolean; items: string[] };
+
 export const companyPages: Record<
   string,
   {
@@ -187,6 +192,7 @@ export const companyPages: Record<
     paragraphs: string[];
     keywords?: string[];
     blocks?: AboutBlock[];
+    sections?: { heading: string; blocks: CompanyPageContentBlock[] }[];
   }
 > = {
   about: {
@@ -294,20 +300,173 @@ export const companyPages: Record<
     ],
   },
   reviews: {
-    title: "Creator Reviews | CloverLoop",
-    description: "Creator feedback for CloverLoop.",
-    heading: "Creator feedback",
-    paragraphs: [
-      "Creator feedback will be published here as it becomes available. We do not publish fabricated reviews or testimonials.",
+    title: "CloverLoop Reviews | Creator Feedback and Experiences",
+    description:
+      "Explore creator feedback about CloverLoop and learn what to consider when choosing a platform to present and sell digital products.",
+    heading: "What Creators Look for in a Digital Product Platform",
+    paragraphs: [],
+    sections: [
+      {
+        heading: "Introduction",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Choosing a platform to sell digital products is an important decision for any creator. The right setup should make it clear how products are presented, how customers access their purchases and how the creator manages their digital offerings.",
+          },
+          {
+            type: "paragraph",
+            text: "This page is intended to bring creator feedback and experiences together as they become available. Reviews can help other creators understand how a platform fits into real workflows, what they find useful and what they think could be improved.",
+          },
+        ],
+      },
+      {
+        heading: "What creator feedback can help explain",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "A useful review goes beyond a star rating. It describes the creator's context and the task they wanted to complete. For example, feedback may discuss:",
+          },
+          {
+            type: "list",
+            ordered: false,
+            items: [
+              "How easy it is to understand the storefront setup process.",
+              "The experience of adding and managing digital products.",
+              "How product information and previews are presented.",
+              "The usefulness of the platform for different types of digital downloads.",
+              "The clarity of payment and settlement information.",
+              "The overall experience of managing a digital-product offering.",
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Different creators have different requirements. Someone selling templates may evaluate a platform differently from someone distributing ebooks, audio files or educational resources. Reading feedback in context is therefore more useful than relying on a rating alone.",
+          },
+        ],
+      },
+      {
+        heading: "CloverLoop and digital creators",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "CloverLoop is focused on helping creators present and sell digital products through a dedicated online storefront. Digital products can include ebooks, PDFs, templates, learning materials and audio downloads.",
+          },
+          {
+            type: "paragraph",
+            text: "When evaluating CloverLoop, consider the product formats you plan to offer, the storefront experience you need and the payment and account information relevant to your situation. Review the platform information and applicable terms before making a decision.",
+          },
+        ],
+      },
+      {
+        heading: "Share your experience",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Creator feedback is most useful when it is genuine, specific and based on direct experience. If you have used CloverLoop, use the review or feedback option provided on this page, if available, to share what worked for you and what could be better.",
+          },
+          {
+            type: "paragraph",
+            text: "Please keep feedback relevant and respectful. Do not include passwords, payment details, private customer information or other sensitive personal data in a review.",
+          },
+        ],
+      },
+      {
+        heading: "Reviews and transparency",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Only genuine feedback should be presented as a creator review. Reviews, ratings, names, profile details and other endorsements must not be fabricated or implied. Where reviews are displayed, they should accurately reflect the feedback received and be presented in a way that does not mislead visitors.",
+          },
+          {
+            type: "paragraph",
+            text: "As creator feedback becomes available, this page can help visitors learn from the experiences of people using CloverLoop for their digital-product work.",
+          },
+        ],
+      },
     ],
   },
   "partner-program": {
-    title: "Partner Program | CloverLoop",
+    title: "CloverLoop Partner Program | Connect Creators with Digital Commerce",
     description:
-      "Explore potential collaborations with communities, educators and organisations that support independent creators.",
-    heading: "Partner with CloverLoop",
-    paragraphs: [
-      "We are interested in exploring collaborations with communities, educators and organisations that support independent creators. Contact CloverLoop to discuss a potential partnership.",
+      "Explore the CloverLoop Partner Program and learn how to introduce creators to a platform built for selling digital products online.",
+    heading: "Build Connections with the CloverLoop Partner Program",
+    paragraphs: [],
+    sections: [
+      {
+        heading: "Introduction",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "The CloverLoop Partner Program is intended for people and organisations interested in introducing digital creators to CloverLoop. Creators need practical ways to present and sell their digital work online. Partners can help make those tools easier to discover by sharing relevant information with the audiences and communities they already serve.",
+          },
+          {
+            type: "paragraph",
+            text: "CloverLoop focuses on digital products such as ebooks, PDFs, templates, learning resources and audio downloads. The platform is designed around the needs of creators who want a dedicated storefront for their digital offerings.",
+          },
+        ],
+      },
+      {
+        heading: "Who may find the program relevant?",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "The program may be relevant to people whose work brings them into contact with creators, independent professionals or digital-product businesses. This can include creator communities, educators, consultants, agencies, service providers and people who publish useful resources for creators.",
+          },
+          {
+            type: "paragraph",
+            text: "The most relevant partnerships are based on a genuine connection with the creator audience. A useful introduction explains what CloverLoop does, who it is designed for and where someone can learn more. Partners should describe the platform accurately and avoid making promises about earnings, sales results or business outcomes.",
+          },
+        ],
+      },
+      {
+        heading: "Why introduce creators to CloverLoop?",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Many creators build an audience through social platforms, newsletters, communities or other channels. A dedicated digital-product storefront can give them another way to present their work and make their products available to customers.",
+          },
+          {
+            type: "paragraph",
+            text: "CloverLoop brings the digital-product storefront proposition into one place. Partners can help creators discover this option and direct interested people to CloverLoop's website for further information.",
+          },
+        ],
+      },
+      {
+        heading: "A straightforward partnership approach",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "A useful partnership starts with audience relevance. Consider whether the creators you reach are likely to offer digital downloads, educational resources, templates or other digital products.",
+          },
+          {
+            type: "list",
+            ordered: true,
+            items: [
+              "Explain the platform in clear and accurate terms.",
+              "Share the official CloverLoop website or relevant product information.",
+              "Let interested creators review the platform and decide whether it suits their needs.",
+              "Use the existing CloverLoop partnership contact or application route for partnership-related enquiries.",
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Any specific commercial terms, approval requirements, tracking arrangements or partner benefits should be confirmed directly through the official program process. Do not assume that an introduction automatically qualifies for a payment or other reward.",
+          },
+        ],
+      },
+      {
+        heading: "Interested in partnering with CloverLoop?",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "If you work with creators and think CloverLoop may be relevant to your audience, explore the existing partnership enquiry or application option on this page. Review the information provided there and submit an enquiry through the available official route.",
+          },
+          {
+            type: "paragraph",
+            text: "We aim to make it easier for creators to discover tools that support their digital-product businesses. Relevant partnerships can help connect those creators with CloverLoop.",
+          },
+        ],
+      },
     ],
   },
 };
@@ -401,9 +560,9 @@ export const resourceCards = [
   },
   {
     slug: "digital-products",
-    title: "Digital Products: A Guide to Creating and Selling",
+    title: "Digital Products: A Practical Beginner's Guide",
     description:
-      "Explore product types and learn how to move from an idea to a clear, useful offer.",
+      "Understand digital product formats, validate an idea, prepare payment and delivery, and plan a practical first-month launch.",
     image: "/images/resources/digital-products.webp",
     category: "Creating",
   },
@@ -416,58 +575,66 @@ export const resourceCards = [
     category: "Guides",
   },
   {
-    slug: "how-to-price-digital-products",
-    title: "How to Price Digital Products: A Simple Framework",
+    slug: "best-platform-to-sell-digital-products-india-2026",
+    title: "Best Platform to Sell Digital Products in India (2026)",
     description:
-      "A practical framework for pricing ebooks, templates and planners using value, costs and customer feedback.",
+      "Compare pricing, fees and features across nine platforms for selling digital products in India.",
+    image: "/images/resources/digital-products.webp",
+    category: "Guides",
+  },
+  {
+    slug: "how-to-price-digital-products",
+    title: "How to Price Digital Products: A Creator's Working Method",
+    description:
+      "Compare pricing methods, calculate fees on a ₹499 product, test a price and plan useful tiers or bundles.",
     image: "/images/resources/how-to-sell-ebooks.webp",
     category: "Guides",
   },
   {
     slug: "how-to-sell-templates-online",
-    title: "How to Sell Templates Online (Notion, Canva and Spreadsheets)",
+    title: "Digital Product Ideas and Templates: What Can You Actually Sell?",
     description:
-      "Learn how to package, document, price and promote Notion, Canva and spreadsheet templates.",
+      "Explore practical digital-product ideas by profession and choose a format, licence and packaging that solves a real buyer problem.",
     image: "/images/resources/how-to-sell-canva-templates.webp",
     category: "Guides",
   },
   {
     slug: "accept-upi-payments-digital-products-razorpay",
-    title: "Accept UPI Payments for Digital Products with Razorpay",
+    title: "UPI, Razorpay and Payment Fees: What Creators Really Pay",
     description:
-      "Understand the steps involved in setting up Razorpay to accept UPI and other online payments in India.",
+      "Understand merchant UPI, gateway fees, settlement and the practical payment checks digital-product sellers need in India.",
     image: "/images/resources/how-to-sell-ebooks.webp",
     category: "Guides",
   },
   {
     slug: "do-you-need-gst-registration-to-sell-online",
-    title: "Do You Need GST Registration to Sell Online?",
+    title: "GST Registration for Digital Product Sellers in India",
     description:
-      "A practical introduction to GST registration considerations for creators and small businesses selling online in India.",
+      "Understand the ₹20 lakh Maharashtra services threshold, aggregate turnover, inter-State services, e-commerce rules and creator records.",
     image: "/images/resources/digital-products.webp",
     category: "Guides",
   },
   {
     slug: "how-many-sales-to-hit-your-income-goal",
-    title: "How Many Sales Do You Need to Hit Your Goal?",
+    title: "Digital Product Earnings Calculator: Work Backwards from Your Income Goal",
     description:
-      "Calculate the sales needed for a monthly revenue target and understand the role of price, fees and conversion rate.",
+      "Work backwards from a monthly income goal using per-sale fees, GST assumptions, refunds, sales targets and conversion-rate examples.",
     image: "/images/resources/content-creator.webp",
     category: "Guides",
   },
   {
     slug: "how-to-create-and-sell-online-course-india",
-    title: "How to Create and Sell an Online Course in India (2026)",
+    title: "How to Create and Sell an Online Course in India",
     description:
-      "Plan an online course in India: choose a learning outcome, structure lessons, price the offer and prepare a launch.",
+      "Validate a course idea, design lessons around learner progress, compare delivery models, plan pricing and prepare a launch.",
     image: "/images/resources/online-course-ideas.webp",
     category: "Courses",
   },
   {
     slug: "gst-on-ebooks-and-online-courses-india",
-    title: "GST on Ebooks and Online Courses in India (2026)",
+    title: "GST on Ebooks and Online Courses in India",
     description:
-      "Understand GST questions creators should review before selling ebooks, downloadable resources or online courses in India.",
+      "Understand ebook classification, course exemptions, bundled supplies and export-of-service conditions before setting GST at checkout.",
     image: "/images/resources/online-course-ideas.webp",
     category: "Courses",
   },
@@ -502,7 +669,7 @@ export const faqItems = [
   {
     question: "What are CloverLoop's platform transaction fees?",
     answer:
-      "Free is 0% on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance. Creator is 4%, and Pro Creator is 2.5%. Payment-provider processing charges are separate.",
+      "Free has a 0% platform fee, Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
   },
   {
     question: "Are payment gateway processing fees included in CloverLoop pricing?",
@@ -512,12 +679,12 @@ export const faqItems = [
   {
     question: "What are the available plans?",
     answer:
-      "Free is ₹0/month, with a published allowance of 1 paid and 5 free product listings per account lifetime. Its platform fee is 0% on the first ₹10,000 of Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator is ₹1,499/month with a 2.5% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Provider processing charges are separate.",
+      "Free is ₹0/month with a 0% platform fee and includes one paid and five free product listings per account lifetime. Creator is ₹0/month with a 4% platform fee and unlimited paid and free listings. Pro Creator is ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
   },
   {
     question: "How is the platform transaction fee calculated?",
     answer:
-      "For the Free plan, 0% applies to the first ₹10,000 of Gross Sales in each calendar month and 4% only to incremental Gross Sales above ₹10,000. The allowance resets on the first day of the month (IST), and sales continue after it is used. Creator is 4% and Pro Creator is 2.5%, with no monthly Gross Sales limits.",
+      "The Free plan has a 0% platform fee. Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
   },
   {
     question: "Does the Free plan have a limit on free products?",

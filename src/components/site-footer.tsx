@@ -34,7 +34,7 @@ export function SiteFooter() {
         </div>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} CloverLoop. All rights reserved.</span>
-          <span>Made for independent creators.</span>
+          <span>Made with love in India.</span>
         </div>
       </div>
     </footer>

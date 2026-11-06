@@ -263,6 +263,21 @@ export async function deleteCreatorAccountAction(confirmation: string): Promise<
   }
   const auth = await getAuthenticatedClient();
   if (!auth.ok) return auth.result;
+  const { data: storefront, error: storefrontError } = await auth.supabase
+    .from("creator_storefronts")
+    .select("status")
+    .eq("user_id", auth.userId)
+    .maybeSingle();
+  if (storefrontError) {
+    console.error("Could not check the storefront before account deletion.", storefrontError);
+    return { ok: false, message: "Your storefront status could not be checked. Please try again." };
+  }
+  if (storefront) {
+    return {
+      ok: false,
+      message: "Schedule storefront deletion and wait until its 30-day deletion period is complete before deleting your account.",
+    };
+  }
   const { data: profile, error: profileError } = await auth.supabase
     .from("creator_profiles")
     .select("avatar_path")

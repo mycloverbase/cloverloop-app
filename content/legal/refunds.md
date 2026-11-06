@@ -2,7 +2,7 @@ This policy explains the published plan fees and general refund responsibilities
 
 ## 1. CloverLoop plans and platform fees (creators)
 
-Free is ₹0/month and allows one paid and five free product listings per account lifetime. Its platform fee is 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that amount. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator is ₹1,499/month with a 2.5% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit.
+Free is ₹0/month with a 0% platform fee and allows one paid and five free product listings per account lifetime. Creator is ₹0/month with a 4% platform fee and unlimited paid and free listings. Pro Creator is ₹2,999/month with a 0% platform fee and unlimited paid and free listings.
 
 Razorpay or other payment-provider processing charges, if applicable, are separate, payable by creators to the provider, and not included in CloverLoop's platform commission.
 

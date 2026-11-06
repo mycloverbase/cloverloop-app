@@ -1,30 +1,245 @@
 {
   "slug": "gst-on-ebooks-and-online-courses-india",
-  "title": "GST on Ebooks and Online Courses in India (2026)",
-  "seoTitle": "GST on Ebooks and Online Courses in India (2026)",
-  "description": "Understand GST questions creators should review before selling ebooks, downloadable resources or online courses in India.",
-  "primaryKeyword": "GST on ebooks and online courses in India",
+  "title": "GST on Ebooks and Online Courses in India",
+  "seoTitle": "GST on Ebooks and Online Courses in India | CloverLoop",
+  "description": "Learn how GST classification affects ebooks, online courses, bundles and exports, and why education alone does not make a course exempt.",
+  "primaryKeyword": "GST on ebooks and online courses India",
   "category": "Courses",
   "canonicalUrl": "https://cloverloop.in/resources/gst-on-ebooks-and-online-courses-india",
   "indexable": true,
   "image": "/images/resources/online-course-ideas.webp",
   "imageAlt": "Educational resources and online course materials",
-  "related": ["do-you-need-gst-registration-to-sell-online", "how-to-create-and-sell-online-course-india", "accept-upi-payments-digital-products-razorpay"],
+  "related": [
+    "do-you-need-gst-registration-to-sell-online",
+    "how-to-create-and-sell-online-course-india",
+    "digital-products"
+  ],
   "blocks": [
-    { "type": "paragraph", "text": "There is no safe one-line GST answer for every ebook, template or course. Treatment can depend on classification, delivery method, customer location, registration status and applicable rate notifications." },
-    { "type": "paragraph", "text": "Do not assume every digital product has the same classification. A downloadable publication, design file, recorded course, live class and bundle may be treated differently. Separate registration from rate: whether a seller must register and what rate applies to a particular supply are different questions." },
-    { "type": "paragraph", "text": "For many service providers, the commonly referenced registration threshold is ₹20 lakh, with a lower threshold in certain states, subject to notifications and exceptions. Aggregate turnover is generally computed across India for the same PAN. Specific inter-state and e-commerce provisions may affect the analysis." },
-    { "type": "paragraph", "text": "A pre-recorded self-paced course may raise different questions from live teaching. Educational exemptions do not automatically apply to every private online course; provider, content and recognition may matter. Cross-border sales can raise place-of-supply, export-of-service, foreign-exchange and documentation questions. A foreign customer alone does not automatically make a transaction an export of services." },
-    { "type": "paragraph", "text": "Keep product descriptions, customer and location records where relevant, invoices, payment statements, refunds, contracts and delivery evidence. Ask a qualified professional to review classification, registration, rate and invoicing." },
-    { "type": "heading", "text": "Frequently asked questions" },
-    { "type": "subheading", "text": "Are ebooks exempt?" },
-    { "type": "paragraph", "text": "Do not assume all ebooks or downloads are exempt; check classification and notifications." },
-    { "type": "subheading", "text": "Are recorded and live courses treated the same?" },
-    { "type": "paragraph", "text": "Not necessarily." },
-    { "type": "subheading", "text": "Does ₹20 lakh apply to everyone?" },
-    { "type": "paragraph", "text": "No; state, supply type and exceptions matter." },
-    { "type": "subheading", "text": "Does a payment gateway calculate GST on my sales?" },
-    { "type": "paragraph", "text": "No. It may charge GST on its own fees but does not determine your sales-tax liability." },
-    { "type": "disclaimer", "text": "Tax disclaimer: General educational information, not tax, legal or accounting advice. Have a qualified professional review your specific product and sales model." }
-  ]
+    {
+      "type": "paragraph",
+      "text": "Creators often treat every digital download as an ebook and every learning product as an education service. GST classification is more specific. The law distinguishes a narrowly defined e-book from other online information services, and it separately lists education services. The content, format and nature of the supply matter."
+    },
+    {
+      "type": "heading",
+      "text": "Ebooks: why the definition matters"
+    },
+    {
+      "type": "paragraph",
+      "text": "The CBIC rate schedule provides a 5% GST rate for a supply consisting only of an e-book. It defines an e-book as an electronic version of a printed book falling under tariff item 4901, supplied online and readable on a computer or handheld device. The same rate schedule lists other telecommunications, broadcasting and information supply services under heading 9984 at 18%. [Notification 13/2018-Central Tax (Rate)](https://gstcouncil.gov.in/sites/default/files/2024-05/download_2024-05-17t160210.063.pdf)"
+    },
+    {
+      "type": "paragraph",
+      "text": "This means a PDF file is not automatically a 5% e-book. A PDF version of a book that corresponds to a printed book may fit the defined category. A spreadsheet calculator, editable business template, collection of design assets, paid database, video tutorial or interactive tool is not automatically an e-book merely because the buyer downloads it."
+    },
+    {
+      "type": "table",
+      "text": "Table: Ebooks: why the definition matters",
+      "headers": [
+        "**Product sold**",
+        "**What to examine**"
+      ],
+      "rows": [
+        [
+          "**A digital version of a printed book**",
+          "**Does it meet the notification’s definition of an e-book and the relevant tariff classification?**"
+        ],
+        [
+          "**A short PDF checklist or worksheet**",
+          "**Is it truly an electronic version of a printed book, or is it a different digital resource/service? Do not assume 5%.**"
+        ],
+        [
+          "**An editable spreadsheet or calculator**",
+          "**The customer is buying an interactive tool or template, not necessarily an e-book. Classification needs separate review.**"
+        ],
+        [
+          "**A PDF plus videos, audio or live support**",
+          "**The supply may include more than the e-book. Determine whether there are separate supplies or a composite/mixed supply and identify the principal supply where relevant.**"
+        ],
+        [
+          "**A subscription to a digital resource library**",
+          "**Consider the ongoing access and content service, not just the fact that files can be downloaded.**"
+        ]
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Online courses: education does not automatically mean exempt"
+    },
+    {
+      "type": "paragraph",
+      "text": "The GST rate schedule lists education services under heading 9992 at 18% as the general rate entry. Separately, the exemption notification covers specified services provided by an educational institution to its students, faculty and staff. The definition of “educational institution” is tied to recognised categories, including pre-school and education up to higher secondary, education as part of a curriculum for obtaining a qualification recognised by law, and approved vocational education courses. [CBIC education exemptions and service rates](https://cbic-gst.gov.in/hindi/pdf/central-tax-rate/Notification11-CGST.pdf)"
+    },
+    {
+      "type": "paragraph",
+      "text": "A private creator selling a recorded course, a coaching programme or a paid workshop is not automatically an exempt educational institution. A course can teach a genuine skill and still fall outside the specific exemption. Equally, a course offered by a qualifying institution may be treated differently. The seller’s legal status, the course’s structure and the exact exemption conditions must be examined."
+    },
+    {
+      "type": "heading",
+      "text": "Recorded course versus live class"
+    },
+    {
+      "type": "paragraph",
+      "text": "The fact that a course is recorded or live is relevant to understanding the supply, but it does not by itself settle the GST rate. A self-paced library of pre-recorded content may involve online information or education services. A live instructor-led class may be a teaching service. A bundle could include recorded lessons, live sessions, personal mentoring, downloadable notes and assessment. These elements may need to be analysed together under the composite or mixed supply rules."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do not copy a competitor’s GST rate onto your own product. Two products called “online course” can have different structures and contractual terms."
+    },
+    {
+      "type": "heading",
+      "text": "Examples to help you identify the question"
+    },
+    {
+      "type": "subheading",
+      "text": "Example 1: A downloadable book"
+    },
+    {
+      "type": "paragraph",
+      "text": "A creator writes a complete book on personal finance and sells an electronic version that corresponds to a printed book. This is the type of product the specific e-book entry is designed to address. The creator should retain the book’s contents, description and classification rationale, and confirm that it fits the tariff definition rather than relying on the .pdf extension."
+    },
+    {
+      "type": "subheading",
+      "text": "Example 2: A workbook of editable business templates"
+    },
+    {
+      "type": "paragraph",
+      "text": "A creator sells a set of editable invoice templates, budget spreadsheets and client forms. The buyer is purchasing practical tools, not necessarily an electronic version of a printed book. It would be unsafe to apply the 5% e-book rate merely because the files are downloadable. The classification and rate need to be reviewed under the relevant service/goods provisions."
+    },
+    {
+      "type": "subheading",
+      "text": "Example 3: A self-paced video course"
+    },
+    {
+      "type": "paragraph",
+      "text": "A creator sells 20 recorded lessons with downloadable worksheets. The product is not automatically exempt because it teaches a subject. The seller should examine whether an education exemption applies and how the supply is classified. If no exemption or special rate applies, the general rate for the relevant taxable service may be 18%, but the exact classification must be confirmed."
+    },
+    {
+      "type": "subheading",
+      "text": "Example 4: A live cohort with mentoring"
+    },
+    {
+      "type": "paragraph",
+      "text": "A creator sells eight live classes, feedback on assignments and two individual mentoring calls. This is materially different from selling a book. The contract promises instruction and personal interaction. The creator should assess the principal supply, any bundled elements, the applicable service classification and whether an exemption is available."
+    },
+    {
+      "type": "heading",
+      "text": "What if your customer is outside India?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Exports of services can be zero-rated under GST when the statutory export-of-services conditions are met. Broadly, the supplier must be in India, the recipient must be outside India, the place of supply must be outside India, payment must be received in convertible foreign exchange or in Indian rupees wherever permitted by the RBI, and the supplier and recipient must not merely be establishments of the same person. The exact place-of-supply rule can depend on the nature of the service."
+    },
+    {
+      "type": "paragraph",
+      "text": "A customer using a foreign card or paying in a foreign currency does not, by itself, prove that a transaction is an export of service. Record the customer’s location, contract, invoice, payment and remittance evidence. If you are registered and making qualifying exports, understand the LUT/refund route and reporting requirements with your accountant. CBIC’s sectoral FAQ describes exports as zero-rated and explains the available route for export treatment. [CBIC export FAQ](https://cbic-gst.gov.in/hindi/sectoral-faq.html)"
+    },
+    {
+      "type": "heading",
+      "text": "How should a creator display GST at checkout?"
+    },
+    {
+      "type": "paragraph",
+      "text": "First determine whether registration is required and whether the product is taxable. If you are not registered, you should not collect GST as though you were registered. If you are registered, the invoice and checkout must use the correct classification and rate. Decide whether the displayed consumer price is inclusive of GST or exclusive of GST, and ensure the invoice shows the taxable value and tax components correctly."
+    },
+    {
+      "type": "heading",
+      "text": "A tax classification file worth keeping"
+    },
+    {
+      "type": "paragraph",
+      "text": "For every product, keep a short internal note that answers:"
+    },
+    {
+      "type": "unordered-list",
+      "text": "What exactly does the customer receive: book, file, template, video access, live teaching, mentoring or a bundle?\nIs the product a digital version of a printed book, and can you substantiate the relevant classification?\nIs the supplier an educational institution within the exemption definition, and what evidence supports that status?\nAre multiple elements supplied together? If so, are they naturally bundled and what is the principal supply?\nWhere is the supplier located, where is the customer located and what place-of-supply rule applies?\nWhich notification, rate entry or exemption supports the position, and when was it last reviewed?",
+      "items": [
+        "What exactly does the customer receive: book, file, template, video access, live teaching, mentoring or a bundle?",
+        "Is the product a digital version of a printed book, and can you substantiate the relevant classification?",
+        "Is the supplier an educational institution within the exemption definition, and what evidence supports that status?",
+        "Are multiple elements supplied together? If so, are they naturally bundled and what is the principal supply?",
+        "Where is the supplier located, where is the customer located and what place-of-supply rule applies?",
+        "Which notification, rate entry or exemption supports the position, and when was it last reviewed?"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Frequently asked questions"
+    },
+    {
+      "type": "subheading",
+      "text": "Are all ebooks taxed at 5% GST?"
+    },
+    {
+      "type": "paragraph",
+      "text": "No. The 5% entry is for a supply consisting only of an e-book, defined as an electronic version of a printed book falling under tariff item 4901 and supplied online for reading on a computer or handheld device. A PDF checklist, template, spreadsheet or video bundle does not automatically meet that definition. Check the content and classification, not just the file extension. [Notification 13/2018-Central Tax (Rate)](https://gstcouncil.gov.in/sites/default/files/2024-05/download_2024-05-17t160210.063.pdf)"
+    },
+    {
+      "type": "subheading",
+      "text": "Are online courses exempt because they provide education?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Not automatically. The exemption is tied to specified services supplied by an educational institution as defined in GST law. The definition includes recognised categories such as education up to higher secondary, education leading to a qualification recognised by law, and approved vocational education courses. A private creator or coaching business should not assume it qualifies merely because the subject is educational. [CBIC education exemptions and service rates](https://cbic-gst.gov.in/hindi/pdf/central-tax-rate/Notification11-CGST.pdf)"
+    },
+    {
+      "type": "subheading",
+      "text": "Is 18% GST charged on every course?"
+    },
+    {
+      "type": "paragraph",
+      "text": "The rate schedule lists education services under heading 9992 at 18% as the general rate entry, but a particular course may qualify for a specific exemption or have a different classification based on its actual supply. The correct answer requires the course structure, supplier status and applicable notification to be checked. Do not treat 18% as a substitute for classification analysis. [CBIC education exemptions and service rates](https://cbic-gst.gov.in/hindi/pdf/central-tax-rate/Notification11-CGST.pdf)"
+    },
+    {
+      "type": "subheading",
+      "text": "If I sell an ebook and a video course together, which rate applies?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do not automatically apply the ebook rate to the entire bundle. Determine whether the customer is buying separate independent products or one naturally bundled supply, and identify the principal supply where the composite-supply rules apply. If it is a mixed supply, different rules may apply. The bundle description, pricing, contract and how the products are marketed all matter."
+    },
+    {
+      "type": "subheading",
+      "text": "If I sell to customers abroad, is the sale GST-free?"
+    },
+    {
+      "type": "paragraph",
+      "text": "A qualifying export of services is zero-rated, but a foreign customer or foreign-card payment alone is not enough. The statutory export conditions include the supplier and recipient locations, place of supply, payment realisation and establishment relationship. Keep evidence and ask your accountant to confirm whether the transaction qualifies. [CBIC export FAQ](https://cbic-gst.gov.in/hindi/sectoral-faq.html)"
+    },
+    {
+      "type": "subheading",
+      "text": "Can I claim GST on Razorpay or software fees?"
+    },
+    {
+      "type": "paragraph",
+      "text": "A GST-registered creator may be able to claim input tax credit on eligible business services used for taxable business supplies, provided the statutory conditions are met and the required tax invoice and reporting conditions are satisfied. Credits can be blocked or restricted in some cases, and exempt supplies can affect eligibility. An unregistered creator cannot claim input tax credit merely because a provider invoice shows GST."
+    },
+    {
+      "type": "subheading",
+      "text": "Does the ₹20 lakh threshold mean I do not need to think about GST rates yet?"
+    },
+    {
+      "type": "paragraph",
+      "text": "The threshold is a registration test, not a product-classification test. It is still useful to understand the likely classification before launch because the product design, price, invoice process and future registration may depend on it. Keep the product description and supporting classification notes from the beginning."
+    },
+    {
+      "type": "heading",
+      "text": "Sources and current official information"
+    },
+    {
+      "type": "unordered-list",
+      "text": "[GST Council - Notification No. 13/2018-Central Tax (Rate), e-book definition and service rates](https://gstcouncil.gov.in/sites/default/files/2024-05/download_2024-05-17t160210.063.pdf).\n[CBIC - Notification No. 12/2017-Central Tax (Rate), Entry 66 educational exemptions](https://cbic-gst.gov.in/hindi/pdf/central-tax-rate/Notification12-CGST.pdf); [Notification No. 11/2017-Central Tax (Rate), service-rate schedule including Heading 9992](https://cbic-gst.gov.in/hindi/pdf/central-tax-rate/Notification11-CGST.pdf).\n[CBIC - Sectoral FAQs on exports and zero-rated supplies](https://cbic-gst.gov.in/hindi/sectoral-faq.html).\n[CBIC - Notification No. 15/2025-Central Tax (Rate), service-rate amendments effective 22 September 2025](https://taxinformation.cbic.gov.in/view-pdf/1010453/ENG/Notifications).",
+      "items": [
+        "[GST Council - Notification No. 13/2018-Central Tax (Rate), e-book definition and service rates](https://gstcouncil.gov.in/sites/default/files/2024-05/download_2024-05-17t160210.063.pdf).",
+        "[CBIC - Notification No. 12/2017-Central Tax (Rate), Entry 66 educational exemptions](https://cbic-gst.gov.in/hindi/pdf/central-tax-rate/Notification12-CGST.pdf); [Notification No. 11/2017-Central Tax (Rate), service-rate schedule including Heading 9992](https://cbic-gst.gov.in/hindi/pdf/central-tax-rate/Notification11-CGST.pdf).",
+        "[CBIC - Sectoral FAQs on exports and zero-rated supplies](https://cbic-gst.gov.in/hindi/sectoral-faq.html).",
+        "[CBIC - Notification No. 15/2025-Central Tax (Rate), service-rate amendments effective 22 September 2025](https://taxinformation.cbic.gov.in/view-pdf/1010453/ENG/Notifications)."
+      ]
+    }
+  ],
+  "datePublished": "2026-11-05",
+  "dateModified": "2026-11-05",
+  "publishedDate": "5 November 2026",
+  "lastReviewed": "5 November 2026",
+  "authorName": "CloverLoop Editorial Team",
+  "authorBio": "The CloverLoop Editorial Team publishes practical, research-led guides for independent creators in India."
 }

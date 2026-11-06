@@ -126,7 +126,7 @@ export function CreatorEarningsCalculator() {
             </dl>
             {calculation.selectedPlan.id === "free" && (
               <p className="field-hint">
-                The published Free plan rate is 0% on the first ₹10,000 of monthly Gross Sales and 4% only on the amount above it. The allowance resets each calendar month (IST).
+                The Free plan has no monthly subscription or CloverLoop platform fee. Payment-provider charges are separate.
               </p>
             )}
           </>

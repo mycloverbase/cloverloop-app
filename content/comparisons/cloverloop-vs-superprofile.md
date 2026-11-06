@@ -1,19 +1,19 @@
 ## The short answer
 
-CloverLoop is designed around creator storefronts for digital products. Its published plans are Free at ₹0/month with 0% on the first ₹10,000 Gross Sales per calendar month and 4% only on incremental Gross Sales above that allowance; Creator is ₹0/month at 4%; Pro Creator is ₹1,499/month at 2.5%. Payment-provider charges are separate from CloverLoop's platform commission. SuperProfile offers a broader creator toolkit with Instagram automation and other monetisation features.
+CloverLoop is designed around creator storefronts for digital products. Its published plans are Free at ₹0/month with a 0% platform fee; Creator is ₹0/month at 4%; Pro Creator is ₹2,999/month at 0%. Payment-provider charges are separate from CloverLoop's platform commission. SuperProfile offers a broader creator toolkit with Instagram automation and other monetisation features.
 
-The [current SuperProfile pricing page](https://superprofile.bio/pricing), reviewed on 2 November 2026, lists its Creator plan at US$4.99 for the first month and US$29 per month after that, and states there is no platform fee. It lists Starter as free and Pro as custom-priced. The page shows USD pricing rather than an India-specific INR schedule. Older claims of ₹99/₹499 and a 5% + GST India commission could not be verified against the current official pricing page, so they are not used as current prices here.
+SuperProfile's [India pricing page](https://superprofile.bio/in/pricing), reviewed on 6 November 2026, lists Creator at ₹99 for the first month and ₹499 per month after that. Its [help centre](https://support.superprofile.bio/en/articles/12129608-creating-a-superprofile-account) lists a 5% platform fee for Indian accounts on a subscription, and its [About page](https://superprofile.bio/about) also states 5% per sale in India. The global pricing page's 0% fee statement applies to global accounts, not Indian accounts. See the [India-specific cost comparison](https://cloverloop.in/compare/superprofile-alternative-india-2026) for assumptions and estimates.
 
-For a creator focused on digital downloads, compare CloverLoop's published plan rates, Free-plan monthly Gross Sales allowance and monthly costs with SuperProfile's subscription and the toolset you actually need. See [CloverLoop pricing](/pricing), the [pricing and platform-fee guide](/help-center/pricing-and-platform-fees/understanding-cloverloop-pricing), and [frequently asked questions](/faq).
+For a creator focused on digital downloads, compare CloverLoop's published plan rates, product-listing limits and monthly costs with SuperProfile's subscription and the toolset you actually need. See [CloverLoop pricing](/pricing), the [pricing and platform-fee guide](/help-center/pricing-and-platform-fees/understanding-cloverloop-pricing), and [frequently asked questions](/faq).
 
 ## At a glance
 
 | Pricing item | CloverLoop | SuperProfile official pricing page |
 | --- | --- | --- |
-| Free entry | Free: ₹0/month; 0% on first ₹10,000 monthly Gross Sales, then 4% only on excess; 1 paid and 5 free product listings per account lifetime | Starter: free |
-| Creator tier | Creator: ₹0/month + 4%; unlimited listings and no monthly Gross Sales limit | Creator: US$4.99 first month, then US$29/month; page states 0% platform fee |
-| Higher tier | Pro Creator: ₹1,499/month + 2.5%; unlimited listings and no monthly Gross Sales limit | Pro: custom price |
-| Country and currency shown | INR pricing | USD pricing; no India-specific INR schedule was visible on the reviewed page |
+| Free entry | Free: ₹0/month; 0% platform fee; 1 paid and 5 free product listings per account lifetime | Starter: free; digital-product selling requires a paid plan |
+| Creator tier | Creator: ₹0/month + 4%; unlimited listings and no monthly Gross Sales limit | Creator: ₹99 first month, then ₹499/month; 5% platform fee for Indian subscribers |
+| Higher tier | Pro Creator: ₹2,999/month + 0%; unlimited listings | Pro: custom price |
+| Country and currency shown | INR pricing | India page shows INR pricing; global pricing and fee terms differ |
 | Payment processing | Provider charges are additional and payable separately by the creator | Check the current plan and payment terms for your account and country |
 | Main focus | Digital-product creator storefronts | Creator marketing and monetisation tools, including Instagram automation |
 
@@ -21,31 +21,31 @@ SuperProfile pricing and product terms can vary by account or country. Confirm t
 
 ## Pricing and platform fees
 
-CloverLoop Creator and Pro Creator have published rates of 4% and 2.5%; applicable GST may apply. Free has a ₹10,000 monthly allowance at 0%, then a 4% fee only on incremental Gross Sales above the allowance. The allowance resets on the first day of each calendar month (IST), and sales are not stopped after it is used. Pro Creator is ₹1,499/month.
+CloverLoop Free and Pro Creator have a 0% platform fee, while Creator charges 4% of Gross Sales. Pro Creator costs ₹2,999/month. Applicable GST may apply; provider processing charges are separate.
 
-The official SuperProfile pricing page currently shows a free Starter tier, Creator at US$4.99 for the first month and US$29/month thereafter, and a custom-priced Pro tier. It states that SuperProfile has no platform fees. Its public page does not show the previously quoted India-specific ₹99/₹499 subscription or 5% + GST platform commission. Treat those older figures as unverified, not as the current India price.
+SuperProfile's India pricing page lists a free Starter tier, Creator at ₹99 for the first month and ₹499/month thereafter, and a custom-priced Pro tier. Its help centre lists 5% for Indian subscribers and 10% for Indian Free accounts, while its About page states 5% per sale in India. Because the help centre says a paid plan is required to sell digital products, the use of the Free-account fee is unclear. The 0% commission statement on the global page applies to global accounts. Confirm the price, fee and tax treatment shown for your account before purchasing.
 
 | Plan | Monthly subscription shown | Platform commission shown | Tax basis |
 | --- | --- | --- | --- |
-| CloverLoop Free | ₹0 | 0% on first ₹10,000 monthly Gross Sales; 4% only on incremental excess | Applicable GST may apply |
+| CloverLoop Free | ₹0 | 0% | Applicable GST may apply |
 | CloverLoop Creator | ₹0 | 4% | Applicable GST may apply |
-| CloverLoop Pro Creator | ₹1,499 | 2.5% | Applicable GST may apply; monthly price is additional |
-| SuperProfile Starter | Free | No selling-fee rate stated for this tier on the pricing page | Not stated |
-| SuperProfile Creator | US$4.99 first month, then US$29/month | 0% platform fee, according to the pricing page | The page does not specify a separate GST-inclusive rate |
+| CloverLoop Pro Creator | ₹2,999 | 0% | Applicable GST may apply; monthly price is additional |
+| SuperProfile Starter | Free | 10% listed for Indian Free accounts in the help centre; application to sales is unclear | Not stated |
+| SuperProfile Creator | ₹99 first month, then ₹499/month | 5% for Indian subscribers, according to the help centre and About page | The India pricing page does not state whether GST is included |
 | SuperProfile Pro | Custom | Not stated | Not stated |
 
 ### Platform-fee example on ₹1,000
 
-This ₹1,000 example assumes the Free-plan allowance has not already been used. It illustrates platform fees only; payment-provider charges are separate. The SuperProfile page lists a 0% platform fee for Creator, but its subscription is in USD and payment-processing terms should be confirmed for the seller's country.
+This ₹1,000 example illustrates platform fees only; payment-provider charges are separate. For SuperProfile's Indian Creator account, the 5% rate is ₹50 before any applicable tax; the plan subscription is additional, and processing and tax treatment should be confirmed for your account.
 
 | Plan | Platform commission before GST | GST at 18% on CloverLoop commission | Platform commission including GST |
 | --- | ---: | ---: | ---: |
-| CloverLoop Free (within monthly allowance) | ₹0.00 | ₹0.00 | ₹0.00 |
+| CloverLoop Free | ₹0.00 | ₹0.00 | ₹0.00 |
 | CloverLoop Creator | ₹40.00 | ₹7.20 | ₹47.20 |
-| CloverLoop Pro Creator | ₹25.00 | ₹4.50 | ₹29.50 |
-| SuperProfile Creator | 0% platform fee shown | Not stated | 0% platform fee shown; US$29/month subscription after the first month |
+| CloverLoop Pro Creator | ₹0.00 | ₹0.00 | ₹0.00 + ₹2,999/month |
+| SuperProfile Creator | ₹50 at the 5% India rate | Not stated | ₹50 before any applicable tax; ₹499/month subscription after the first month |
 
-The table does not convert SuperProfile's USD subscription to INR because the final amount depends on billing currency and exchange rate. It also does not treat the USD price as an India-specific offer.
+The table does not include SuperProfile's monthly subscription in the per-sale platform-fee totals. Its India pricing page does not specify whether the subscription price includes GST.
 
 ## Feature and workflow comparison
 
@@ -54,12 +54,12 @@ The table does not convert SuperProfile's USD subscription to INR because the fi
 | Product focus | Creator storefronts for digital products | Broader creator marketing and monetisation toolkit |
 | Audience tools | Direct storefront positioning | Instagram automation and lead-generation tools are listed in SuperProfile product materials |
 | Other monetisation formats | Digital-product plans and product-listing limits are described on CloverLoop's pricing page | Courses, bookings, events and communities are included in SuperProfile's product materials |
-| Fee structure | Free has a monthly Gross Sales allowance; Creator 4%; Pro Creator 2.5%; provider charges separate | Current pricing page states 0% platform fee for Creator and charges a monthly subscription |
+| Fee structure | Free 0%; Creator 4%; Pro Creator 0% with a ₹2,999 monthly subscription; provider charges separate | India help centre lists 5% for subscribers; the global page's 0% statement is for global accounts |
 | Country-specific terms | CloverLoop pricing is displayed in INR | The reviewed SuperProfile page displayed USD; confirm regional checkout and payment terms |
 
 ## Who should choose which platform?
 
-Choose CloverLoop if your catalogue is mainly ebooks, PDFs, study notes, templates, music downloads, presets or other digital files, and you want to compare a no-monthly-fee Creator plan against a limited free catalogue or a lower-percentage Pro plan.
+Choose CloverLoop if your catalogue is mainly ebooks, PDFs, study notes, templates, music downloads, presets or other digital files, and you want to compare a no-monthly-fee Creator plan against a limited free catalogue or a 0%-fee Pro plan with a monthly subscription.
 
 Choose SuperProfile if Instagram automation, lead generation, courses, bookings, events or community monetisation are central to how you reach customers. The current pricing page's 0% platform-fee statement may also appeal to sellers whose sales volume justifies its monthly subscription.
 
@@ -69,15 +69,15 @@ Neither headline percentage alone determines total cost. Compare plan subscripti
 
 ### Is CloverLoop cheaper than SuperProfile?
 
-It depends on monthly Gross Sales, plan limits and the tools required. CloverLoop Free has a ₹10,000 monthly Gross Sales allowance; Creator is 4% with no monthly subscription; Pro Creator is 2.5% at ₹1,499/month. SuperProfile's current pricing page states 0% platform fee for Creator but lists a monthly subscription of US$4.99 for the first month and US$29 thereafter.
+It depends on monthly Gross Sales, plan limits and the tools required. CloverLoop Free has a 0% platform fee; Creator is 4% with no monthly subscription; Pro Creator is 0% with a ₹2,999/month subscription. SuperProfile India's Creator plan is ₹99 for the first month and ₹499/month thereafter, plus a 5% platform fee for Indian subscribers. Include payment processing, tax and the tools you need when comparing total cost.
 
-### Does SuperProfile charge a 5% India platform fee?
+### Does SuperProfile charge a 5% platform fee in India?
 
-The official pricing page reviewed on 2 November 2026 states that SuperProfile has no platform fees. The separate 5% + GST India claim in older material could not be verified against that current page, so confirm the terms displayed for your account before relying on it.
+SuperProfile's help centre lists a 5% platform fee for Indian accounts on a subscription, and its About page states 5% per sale in India. The India pricing page does not state whether GST is included in the fee. Confirm the terms shown for your account before relying on an estimate.
 
 ### What does SuperProfile Creator cost?
 
-The reviewed official pricing page lists US$4.99 for the first month and US$29 per month after that. It does not show a separate INR price on the page reviewed.
+The India pricing page lists ₹99 for the first month and ₹499 per month after that. The global page has different USD pricing; check the page for your account's country.
 
 ### Which platform has more creator marketing tools?
 
@@ -86,7 +86,8 @@ SuperProfile's product materials list Instagram automation, lead-generation feat
 ## Sources
 
 - [SuperProfile official pricing](https://superprofile.bio/pricing)
-- [SuperProfile account and payment information](https://iris.superprofile.bio/help/cosmofeed/articles/creating-a-superprofile-account)
+- [SuperProfile India pricing](https://superprofile.bio/in/pricing)
+- [SuperProfile account and payment information](https://support.superprofile.bio/en/articles/12129608-creating-a-superprofile-account)
 - [SuperProfile product overview](https://superprofile.bio/about)
 - [CloverLoop pricing](/pricing)
 - [CloverLoop pricing and platform-fee guide](/help-center/pricing-and-platform-fees/understanding-cloverloop-pricing)

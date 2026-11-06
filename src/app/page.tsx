@@ -182,7 +182,7 @@ export default function HomePage() {
             <article className="earnings-card">
               <h3>Free</h3>
               <p className="earnings-card-caption">₹0/month</p>
-              <p>0% on the first ₹10,000 of monthly Gross Sales; 4% only on incremental Gross Sales above the allowance.</p>
+              <p>0% CloverLoop platform fee on all Gross Sales.</p>
               <p>1 paid and 5 free product listings per account lifetime.</p>
             </article>
             <article className="earnings-card">
@@ -192,13 +192,10 @@ export default function HomePage() {
             </article>
             <article className="earnings-card">
               <h3>Pro Creator</h3>
-              <p className="earnings-card-caption">₹1,499/month · 2.5%</p>
+              <p className="earnings-card-caption">₹2,999/month · 0%</p>
               <p>For established, higher-volume creators. Unlimited listings and no monthly Gross Sales limit.</p>
             </article>
           </div>
-          <ul className="earnings-notes">
-            <li>The Free-plan allowance resets on the first day of each calendar month (IST); sales continue after it is used.</li>
-          </ul>
         </div>
       </section>
 

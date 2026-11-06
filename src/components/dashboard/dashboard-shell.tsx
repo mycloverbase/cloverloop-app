@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
+  Store,
   Tag,
   UserRound,
 } from "lucide-react";
@@ -39,6 +40,7 @@ const UnsavedChangesContext = createContext<UnsavedChangesContextValue | null>(n
 
 const navigation = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard/storefront", label: "Storefront", icon: Store },
   { href: "/dashboard/profile", label: "My Profile", icon: UserRound },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
   { href: "/dashboard/help", label: "Help & Support", icon: CircleHelp },

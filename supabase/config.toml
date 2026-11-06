@@ -1,0 +1,4 @@
+project_id = "cloverloop-app"
+
+[functions.purge-storefronts]
+verify_jwt = false

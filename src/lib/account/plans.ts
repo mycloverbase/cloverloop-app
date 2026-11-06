@@ -7,23 +7,19 @@ export const creatorPlans: Record<
   free: {
     name: "Free",
     monthlyPrice: "₹0/month",
-    commission: "0% on the first ₹10,000 in Gross Sales per calendar month; 4% on incremental Gross Sales above ₹10,000",
-    features: [
-      "1 paid product and 5 free product listings per account lifetime",
-      "The monthly allowance resets on the first day of each calendar month (IST)",
-      "Sales continue after the allowance is used",
-    ],
+    commission: "0% platform transaction fee",
+    features: ["1 paid product and 5 free product listings per account lifetime"],
   },
   creator: {
     name: "Creator",
     monthlyPrice: "₹0/month",
-    commission: "4% of Gross Sales, with no monthly Gross Sales limit",
+    commission: "4% of Gross Sales",
     features: ["Unlimited paid and free product listings", "No monthly Gross Sales limit"],
   },
   pro_creator: {
     name: "Pro Creator",
-    monthlyPrice: "₹1,499/month",
-    commission: "2.5% of Gross Sales, with no monthly Gross Sales limit",
+    monthlyPrice: "₹2,999/month",
+    commission: "0% platform transaction fee",
     features: ["Unlimited paid and free product listings", "No monthly Gross Sales limit"],
   },
 };

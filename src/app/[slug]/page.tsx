@@ -4,6 +4,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PublicLayout } from "@/components/public-layout";
+import { PublicStorefront } from "@/components/storefront/public-storefront";
 import { PublicCta } from "@/components/public-cta";
 import { Breadcrumbs } from "@/components/site-header";
 import { TrackLink } from "@/components/track-link";
@@ -12,6 +13,8 @@ import { PricingPage } from "@/components/pricing-page";
 import { CoursesLandingPage, DigitalProductsLandingPage } from "@/components/marketing-landing-pages";
 import { LegalPolicyPage } from "@/components/legal-policy-page";
 import { legalPolicyPages } from "@/lib/legal-policies";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getPublishedStorefront } from "@/lib/storefront/server";
 
 const slugs = [
   ...featurePages.map((item) => item.slug),
@@ -23,7 +26,7 @@ const slugs = [
   "sitemap",
 ];
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
@@ -60,7 +63,36 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     : company
       ? { title: company.title, description: company.description }
       : pageTitles[slug];
-  if (!meta) return {};
+  if (!meta) {
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) return { robots: { index: false, follow: false } };
+    const storefront = await getPublishedStorefront(supabase, slug);
+    if (!storefront) return { robots: { index: false, follow: false } };
+    const description = storefront.description.trim()
+      ? storefront.description.trim().slice(0, 155)
+      : `Explore ${storefront.store_name}'s creator storefront and upcoming work on CloverLoop.`;
+    const url = `${PRODUCTION_URL}/${storefront.username}`;
+    return {
+      title: `${storefront.store_name} | CloverLoop`,
+      description,
+      alternates: { canonical: url },
+      robots: { index: true, follow: true },
+      openGraph: {
+        type: "website",
+        title: storefront.store_name,
+        description,
+        url,
+        siteName: "CloverLoop",
+        ...(storefront.profileImageUrl ? { images: [storefront.profileImageUrl] } : {}),
+      },
+      twitter: {
+        card: storefront.profileImageUrl ? "summary_large_image" : "summary",
+        title: storefront.store_name,
+        description,
+        ...(storefront.profileImageUrl ? { images: [storefront.profileImageUrl] } : {}),
+      },
+    };
+  }
   return {
     title: meta.title,
     description: meta.description,
@@ -186,6 +218,24 @@ function CompanyPage({ slug }: { slug: string }) {
         <h1>{page.heading}</h1>
         <div className="simple-page-body">
           {page.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          {page.sections?.map((section) => (
+            <section key={section.heading}>
+              <h2>{section.heading}</h2>
+              {section.blocks.map((block, index) =>
+                block.type === "paragraph" ? (
+                  <p key={index}>{block.text}</p>
+                ) : block.ordered ? (
+                  <ol key={index}>
+                    {block.items.map((item) => <li key={item}>{item}</li>)}
+                  </ol>
+                ) : (
+                  <ul key={index}>
+                    {block.items.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                ),
+              )}
+            </section>
+          ))}
           {slug === "contact" && supportEmail && (
             <p><a className="subtle-link" href={`mailto:${supportEmail}`}>{supportEmail}</a></p>
           )}
@@ -248,7 +298,13 @@ function SitemapPage() {
 
 export default async function ContentPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (!slugs.includes(slug)) notFound();
+  if (!slugs.includes(slug)) {
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) notFound();
+    const storefront = await getPublishedStorefront(supabase, slug);
+    if (!storefront) notFound();
+    return <PublicStorefront store={storefront} />;
+  }
   let content = null;
   if (legalPolicyPages.some((item) => item.slug === slug)) content = <LegalPolicyPage slug={slug} />;
   else if (featurePages.some((item) => item.slug === slug)) content = <FeaturePage slug={slug} />;

@@ -9,9 +9,23 @@ import {
   trackPageView,
   updateConsent,
   type AnalyticsConsentChoice,
+  type AnalyticsEvent,
 } from "@/lib/analytics";
 
 const CONSENT_CHANGE_EVENT = "cloverloop-consent-change";
+
+function getTrackedLinkEvent(event: string | undefined): AnalyticsEvent | null {
+  switch (event) {
+    case "pricing_cta_click":
+    case "signup_click":
+    case "login_click":
+    case "founding_creator_click":
+    case "resource_cta_click":
+      return event;
+    default:
+      return null;
+  }
+}
 
 function readConsent() {
   return readAnalyticsConsent() ?? "";
@@ -69,6 +83,11 @@ export function AnalyticsConsent() {
       if (!(target instanceof Element)) return;
       const anchor = target.closest("a[href]");
       if (!(anchor instanceof HTMLAnchorElement)) return;
+      const trackedEvent = getTrackedLinkEvent(anchor.dataset.analyticsEvent);
+      if (trackedEvent) {
+        const eventValue = anchor.dataset.analyticsEventValue;
+        track(trackedEvent, eventValue ? { target: eventValue } : {});
+      }
       const destination = new URL(anchor.href, window.location.origin);
       if (destination.origin === window.location.origin) {
         track("navigation_click", { target: destination.pathname });
