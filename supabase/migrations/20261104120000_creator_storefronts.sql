@@ -315,7 +315,7 @@ set search_path = ''
 as $$
 declare
   current_user_id uuid := auth.uid();
-  storefront_id uuid;
+  v_storefront_id uuid;
   product jsonb;
   social_link jsonb;
   section_count integer;
@@ -426,27 +426,27 @@ begin
         theme = excluded.theme,
         customization = excluded.customization
   where public.creator_storefronts.status <> 'deletion_pending'
-  returning id into storefront_id;
+  returning id into v_storefront_id;
 
-  if storefront_id is null then
+  if v_storefront_id is null then
     raise exception 'A storefront in its deletion period cannot be changed.'
       using errcode = '23514';
   end if;
 
   if requested_profile_image_path is not null and not exists (
-    select 1 from public.storefront_assets
-    where path = requested_profile_image_path
-      and storefront_assets.storefront_id = save_my_storefront.storefront_id
-      and user_id = current_user_id
+    select 1 from public.storefront_assets asset
+    where asset.path = requested_profile_image_path
+      and asset.storefront_id = v_storefront_id
+      and asset.user_id = current_user_id
   ) then
     raise exception 'The profile image has not finished uploading.'
       using errcode = '23514';
   end if;
   if requested_banner_image_path is not null and not exists (
-    select 1 from public.storefront_assets
-    where path = requested_banner_image_path
-      and storefront_assets.storefront_id = save_my_storefront.storefront_id
-      and user_id = current_user_id
+    select 1 from public.storefront_assets asset
+    where asset.path = requested_banner_image_path
+      and asset.storefront_id = v_storefront_id
+      and asset.user_id = current_user_id
   ) then
     raise exception 'The banner image has not finished uploading.'
       using errcode = '23514';
@@ -467,10 +467,10 @@ begin
       or coalesce(length(trim(product->>'category')), 0) not between 1 and 50
       or coalesce(jsonb_typeof(product->'coverImagePath'), '') <> 'string'
       or not exists (
-        select 1 from public.storefront_assets
-        where path = product->>'coverImagePath'
-          and storefront_id = save_my_storefront.storefront_id
-          and user_id = current_user_id
+        select 1 from public.storefront_assets asset
+        where asset.path = product->>'coverImagePath'
+          and asset.storefront_id = v_storefront_id
+          and asset.user_id = current_user_id
       )
     then
       raise exception 'Each sample product needs a title, category and uploaded cover image.'
@@ -504,12 +504,12 @@ begin
 
   update public.storefront_assets
   set is_referenced = false
-  where storefront_assets.storefront_id = save_my_storefront.storefront_id;
+  where storefront_assets.storefront_id = v_storefront_id;
 
   update public.storefront_assets asset
   set is_referenced = true
   from public.creator_storefronts storefront
-  where asset.storefront_id = save_my_storefront.storefront_id
+  where asset.storefront_id = v_storefront_id
     and storefront.id = asset.storefront_id
     and (
       asset.path = requested_profile_image_path
@@ -531,7 +531,7 @@ begin
       )
     );
 
-  return storefront_id;
+  return v_storefront_id;
 end;
 $$;
 
