@@ -5,24 +5,24 @@ category: "managing-products"
 order: 10
 description: "Guidance for creators sharing access to digital products with customers."
 status: "published"
-lastUpdated: "2026-11-03"
+lastUpdated: "2026-11-07"
 related: []
 ---
 
-The delivery method for a digital product depends on the creator's product and chosen tools. Make access instructions clear and use an approach appropriate for the product.
+The current CloverLoop storefront release displays product listings but does not provide checkout or file delivery. Product files remain private.
 
 ## Paid products
 
-Tell customers what they will receive, how access is arranged and whom to contact if they need help. If payment is involved, follow the relevant provider's records and terms.
+Paid listings show their price, but payments are not accepted. The disabled storefront control explains that payments are coming soon.
 
 ## Free products
 
-Free products do not incur platform transaction commission under the published pricing terms. The Free plan has a published limit of five free product listings per account lifetime; Creator and Pro Creator plan terms include unlimited paid and free product listings.
+Creators can list free products, subject to the published plan limits. Free download delivery is not enabled; visitors see a coming-soon message instead of a file or download link.
 
 ## Protecting access
 
-Use access links and file-sharing settings that are appropriate for the product. Avoid sharing passwords, one-time codes or other account credentials.
+Do not expose a product file by sharing a public storage URL. Product files are stored privately and should not be shared until a secure delivery flow is available.
 
 ## If a link does not work
 
-Follow the creator's instructions and contact the creator about access issues. For payment questions, consult the provider that processed the transaction.
+Purchases and downloads are not available in this release. There is no payment provider or order record to consult.

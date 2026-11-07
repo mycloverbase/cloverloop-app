@@ -5,7 +5,12 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ActionResult, SocialLink } from "@/lib/account/types";
 
 type AuthenticatedClient =
-  | { ok: true; supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>; userId: string }
+  | {
+      ok: true;
+      supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>;
+      userId: string;
+      userEmail: string | null;
+    }
   | { ok: false; result: ActionResult };
 
 async function getAuthenticatedClient(): Promise<AuthenticatedClient> {
@@ -18,7 +23,7 @@ async function getAuthenticatedClient(): Promise<AuthenticatedClient> {
     if (error) console.error("Could not verify an account action.", error);
     return { ok: false, result: { ok: false, message: "Please sign in again to continue." } };
   }
-  return { ok: true, supabase, userId: user.id };
+  return { ok: true, supabase, userId: user.id, userEmail: user.email ?? null };
 }
 
 function readText(formData: FormData, key: string): string {
@@ -245,6 +250,18 @@ export async function submitCreatorFeedbackAction(formData: FormData): Promise<A
   }
   const auth = await getAuthenticatedClient();
   if (!auth.ok) return auth.result;
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM_EMAIL;
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim();
+  if (!apiKey || !from || !supportEmail) {
+    console.error("Creator feedback email delivery is not configured.", {
+      apiKeyConfigured: Boolean(apiKey),
+      senderConfigured: Boolean(from),
+      recipientConfigured: Boolean(supportEmail),
+    });
+    return { ok: false, message: "Feedback email delivery is not configured. Please try again later." };
+  }
+
   const { error } = await auth.supabase.from("creator_feedback").insert({
     user_id: auth.userId,
     category,
@@ -254,6 +271,38 @@ export async function submitCreatorFeedbackAction(formData: FormData): Promise<A
     console.error("Could not submit creator feedback.", error);
     return { ok: false, message: "Your feedback could not be submitted. Please try again." };
   }
+
+  let emailResponse: Response;
+  try {
+    emailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [supportEmail],
+        ...(auth.userEmail ? { reply_to: auth.userEmail } : {}),
+        subject: `Creator feedback: ${category}`,
+        text: `Topic: ${category}\nFrom: ${auth.userEmail ?? "Creator account"}\n\n${message}`,
+      }),
+    });
+  } catch (emailError) {
+    console.error("Could not reach the email provider for creator feedback.", emailError);
+    return {
+      ok: false,
+      message: "Your feedback was saved, but we couldn't notify the support team by email. Please contact support directly.",
+    };
+  }
+  if (!emailResponse.ok) {
+    console.error("The email provider rejected creator feedback.", { status: emailResponse.status });
+    return {
+      ok: false,
+      message: "Your feedback was saved, but we couldn't notify the support team by email. Please contact support directly.",
+    };
+  }
+
   return { ok: true, message: "Thank you. Your feedback has been submitted." };
 }
 

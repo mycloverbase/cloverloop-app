@@ -5,11 +5,11 @@ category: "managing-products"
 order: 11
 description: "Creators can use free products to share samples, introductory resources or other downloads with their audience. A free product has a price of zero and does not attract CloverLoop platform transaction commission."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-07"
 related: []
 ---
 
-Free products can help creators share samples, introductory resources or other downloads with their audience. A free product has a price of zero and does not attract platform transaction commission.
+Creators can add free digital products to their storefront catalogue with a price of zero. Free products do not attract platform transaction commission, but secure download delivery is not enabled yet.
 
 ## Free plan limit
 
@@ -17,7 +17,7 @@ The Free plan's published allowance is up to five free product listings per acco
 
 ## Creator and Pro Creator
 
-Creator and Pro Creator plan terms include unlimited free product listings.
+Creator and Pro Creator plan terms include unlimited free product listings. Visitors can see active free listings, but the storefront's free-download control remains disabled until secure delivery is available.
 
 ## Free products and commission
 

@@ -96,7 +96,7 @@ export function ImageCropUploader({
         onUploaded(result.path, result.signedUrl);
         setSelectedFile(null);
         setSelectedUrl(null);
-        setMessage("Image uploaded. Save your storefront to apply it.");
+        setMessage("Image uploaded. Save your changes to apply it.");
       } catch (uploadError) {
         console.error("Could not upload a storefront image.", uploadError);
         setError("The image could not be uploaded. Check your connection and try again.");

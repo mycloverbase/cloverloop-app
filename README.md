@@ -1,6 +1,6 @@
 # CloverLoop
 
-CloverLoop is a creator-focused website with Supabase authentication and creator storefront setup and publishing. Storefronts support branding, public profile sections and non-purchasable sample product cards; the app does not implement checkout, payment processing, product management or digital delivery.
+CloverLoop is a creator-focused website with Supabase authentication, creator storefront publishing and private digital-product management. Creators can publish active product listings; checkout, payments and file delivery are not enabled.
 
 Production domain: **https://cloverloop.in**
 
@@ -45,7 +45,7 @@ Production domain: **https://cloverloop.in**
    npm run build
    ```
 
-The Supabase URL and public anon/publishable key are required to use email or Google authentication. Storefront image uploads and launch-checklist marketing opt-ins require `SUPABASE_SERVICE_ROLE_KEY` on the server. It is read only by server-only modules; never prefix it with `NEXT_PUBLIC_` or expose it in browser code.
+The Supabase URL and public anon/publishable key are required to use email or Google authentication. Storefront image processing, private file cleanup and launch-checklist marketing opt-ins use `SUPABASE_SERVICE_ROLE_KEY` on the server. It is read only by server-only modules; never prefix it with `NEXT_PUBLIC_` or expose it in browser code.
 
 ## Environment variables
 
@@ -54,11 +54,11 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `NEXT_PUBLIC_SITE_URL` | Yes for authentication redirects | Local URL during development (`http://localhost:3000`); production origin is `https://cloverloop.in`. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes for authentication | Supabase project URL. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for authentication | Supabase public anon/publishable key. |
-| `SUPABASE_SERVICE_ROLE_KEY` | For storefront image uploads and checklist opt-ins | Server-only Supabase service-role key used for image uploads and writing consented emails to `email_subscriptions`. Never expose it to client code. |
+| `SUPABASE_SERVICE_ROLE_KEY` | For storefront image processing, file cleanup and checklist opt-ins | Server-only Supabase service-role key. Never expose it to client code. |
 | `NEXT_PUBLIC_FOUNDING_CREATOR_FORM_URL` | For the dashboard programme CTA | External Google Form URL. It is intentionally not hardcoded. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Before launch | Confirmed CloverLoop support address. The Contact page shows a setup notice until provided. |
-| `RESEND_API_KEY` | For the launch checklist | Server-only Resend API key used to email the branded launch checklist and PDF attachment. |
-| `RESEND_FROM_EMAIL` | For the launch checklist | Verified sender address for checklist email. |
+| `RESEND_API_KEY` | For launch checklist and creator feedback | Server-only Resend API key used for transactional email delivery. |
+| `RESEND_FROM_EMAIL` | For launch checklist and creator feedback | Verified sender address for transactional email. |
 
 The launch-checklist email uses the branded HTML in `src/lib/launch-checklist-email.ts`. Its PDF attachment is `public/downloads/cloverloop-link-in-bio-launch-checklist.pdf`, also served as the fallback download link.
 
@@ -102,7 +102,9 @@ Google credentials belong in the Supabase provider configuration; do not put a G
 
 ## Creator storefront setup
 
-The storefront feature adds one public page per creator at `https://cloverloop.in/{username}`. It uses a private `storefront-assets` Supabase Storage bucket; uploaded JPG, PNG and WebP files are cropped and optimized to WebP by the authenticated server action. The service-role key is used only by the Supabase Edge Function and must never be added to Vercel or `.env.local`.
+The storefront feature adds one public page per creator at `https://cloverloop.in/{username}`. Cover/profile images use the private `storefront-assets` bucket and are cropped and optimized to WebP by an authenticated server action. Product metadata is stored in `storefront_products`; product files use the separate private `product-files` bucket and upload directly from the authenticated browser with a short-lived, owner-scoped upload slot. Public storefront queries return only active product display fields; they never return product-file paths or links.
+
+The public catalogue displays paid and free product prices, but purchase and download controls are disabled with a clear coming-soon message. No payment, checkout, order creation or free-product file delivery is enabled. Free-plan limits are enforced server-side: one paid and five free listings per account lifetime; Creator and Pro Creator plans allow unlimited listings.
 
 Apply the database migration with the Supabase CLI after linking the project:
 
@@ -111,7 +113,7 @@ supabase link --project-ref YOUR_PROJECT_REF
 supabase db push
 ```
 
-The migration creates the storefront tables, RLS policies, private storage bucket, username redirect mapping and a daily `pg_cron` job. Permanent deletion and cleanup of replaced or abandoned images are processed by `supabase/functions/purge-storefronts/index.ts`. Deploy the function and configure its shared secret before applying the migration:
+The migrations create storefront and product tables, RLS policies, private storage buckets, username redirect mapping and a daily `pg_cron` job. Permanent deletion and cleanup of replaced or abandoned images and private product files are processed by `supabase/functions/purge-storefronts/index.ts`. Deploy the function and configure its shared secret before applying the migrations:
 
 1. Generate a high-entropy secret and set it for the Edge Function:
 
@@ -127,7 +129,7 @@ The migration creates the storefront tables, RLS policies, private storage bucke
    select vault.create_secret('YOUR_RANDOM_SECRET', 'storefront_purge_secret');
    ```
 
-   The scheduled job runs daily at 03:15 UTC. It hard-deletes storefronts after their 30-day deletion period, releasing usernames only after their assets have been removed. It also removes unreferenced uploads older than 24 hours. Monitor Supabase Edge Function and `pg_cron` logs for failures.
+   The scheduled job runs daily at 03:15 UTC. It hard-deletes storefronts after their 30-day deletion period, releasing usernames only after their assets and private files have been removed. It also removes unreferenced images older than 24 hours, expired product upload slots and retired/deleted product files. Monitor Supabase Edge Function and `pg_cron` logs for failures.
 
 No additional Next.js environment variable is required. The public site only needs the existing Supabase URL and anon/publishable key. Storefront publish, edit, unpublish and delete actions do not send email notifications.
 Account deletion is blocked until a scheduled storefront deletion has completed, so the 30-day retention and username reservation cannot be bypassed.
@@ -217,6 +219,6 @@ The sitemap uses the production canonical origin and excludes authentication, ut
 
 ## Product scope and launch configuration
 
-Storefronts are presentation-only. Sample product cards are marked “Coming Soon” and cannot be opened or purchased. The app does **not** implement checkout, Razorpay connectivity, payment verification, digital file delivery, earnings, sales analytics, subscriptions, monthly commission invoicing, or order management. Marketing copy describes these as intended architecture and planned capabilities rather than live integrations.
+Creators can manage real product listings and upload private product files. Active products appear in the public storefront catalogue; inactive products do not. Paid checkout and all file delivery—including free downloads—remain disabled. The app does **not** implement Razorpay connectivity, payment verification, order creation, earnings, sales analytics, subscriptions, monthly commission invoicing, or order management.
 
 Before launch, configure Supabase and Google OAuth, confirm the support email and programme form, and obtain legal review of the Terms and Privacy drafts. Pricing is presented as the agreed intended pricing model; subscriptions and payment processing are not operational in this implementation.

@@ -1,7 +1,12 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { ArrowUpRight, Mail } from "lucide-react";
-import type { StorefrontCustomization, StorefrontSection, StorefrontTheme } from "@/lib/storefront/types";
+import type {
+  StorefrontCustomization,
+  StorefrontProductDisplay,
+  StorefrontSection,
+  StorefrontTheme,
+} from "@/lib/storefront/types";
 
 type StorefrontView = {
   store_name: string;
@@ -10,6 +15,7 @@ type StorefrontView = {
   profileImageUrl: string | null;
   bannerImageUrl: string | null;
   theme: StorefrontTheme;
+  products: StorefrontProductDisplay[];
   customization: StorefrontCustomization & {
     products: (StorefrontCustomization["products"][number] & { coverImageUrl?: string | null })[];
   };
@@ -31,43 +37,56 @@ function AboutSection({ store }: { store: StorefrontView }) {
 }
 
 function ProductsSection({ store }: { store: StorefrontView }) {
-  const { products, productLayout } = store.customization;
+  const { productLayout } = store.customization;
   return (
     <section className="storefront-section storefront-products" id="products" aria-labelledby="storefront-products-title">
       <div className="storefront-section-heading">
         <div>
-          <h2 id="storefront-products-title">Coming soon</h2>
+          <h2 id="storefront-products-title">Products</h2>
         </div>
       </div>
-      {products.length ? (
+      {store.products.length ? (
         <div className={`storefront-product-grid storefront-product-layout-${productLayout}`}>
-          {products.map((product) => (
-            <article className="storefront-product-card" key={product.id}>
-              {product.coverImageUrl ? (
-                <Image
-                  src={product.coverImageUrl}
-                  alt={`${product.title} cover`}
-                  width={900}
-                  height={675}
-                  unoptimized
-                  loading="lazy"
-                />
-              ) : (
-                <div className="storefront-product-image-placeholder" aria-hidden="true" />
-              )}
-              <div className="storefront-product-copy">
-                <span className="storefront-product-category">{product.category}</span>
-                <h3>{product.title}</h3>
-                {product.description ? <p>{product.description}</p> : null}
-                <span className="storefront-coming-soon">Coming Soon</span>
-              </div>
-            </article>
-          ))}
+          {store.products.map((product) => <StorefrontProductCard key={product.id} product={product} />)}
         </div>
       ) : (
-        <p className="storefront-empty-products">Product previews will appear here when they are ready.</p>
+        <p className="storefront-empty-products">No products are currently available.</p>
       )}
     </section>
+  );
+}
+
+export function StorefrontProductCard({ product }: { product: StorefrontProductDisplay }) {
+  const price = product.isFree
+    ? "Free"
+    : new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(product.pricePaise / 100);
+  return (
+    <article className="storefront-product-card">
+      {product.coverImageUrl ? (
+        <Image
+          src={product.coverImageUrl}
+          alt={`${product.name} cover`}
+          width={900}
+          height={675}
+          unoptimized
+          loading="lazy"
+        />
+      ) : (
+        <div className="storefront-product-image-placeholder" aria-hidden="true" />
+      )}
+      <div className="storefront-product-copy">
+        {product.category ? <span className="storefront-product-category">{product.category}</span> : null}
+        <h3>{product.name}</h3>
+        <p>{product.description}</p>
+        <div className="storefront-product-price-row">
+          <strong>{price}</strong>
+          <span>{product.isFree ? "Free product" : "Digital product"}</span>
+        </div>
+        <button className="storefront-product-action" type="button" disabled>
+          {product.isFree ? "Free download coming soon" : "Payments coming soon"}
+        </button>
+      </div>
+    </article>
   );
 }
 

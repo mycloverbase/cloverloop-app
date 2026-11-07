@@ -58,6 +58,11 @@ function metadataString(user: User, keys: string[]): string | null {
   return null;
 }
 
+export function getCreatorFirstName(displayName: string, email: string): string {
+  const name = displayName.trim() || email.split("@")[0]?.trim() || "Creator";
+  return name.split(/\s+/)[0] || "Creator";
+}
+
 function validUsername(value: string | null): string | null {
   if (!value) return null;
   const username = value.toLowerCase();

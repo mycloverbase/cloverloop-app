@@ -1,32 +1,24 @@
 ---
-title: "Preparing a Digital Product Offer"
+title: "Adding a Digital Product"
 slug: "how-to-add-a-digital-product"
 category: "managing-products"
 order: 8
-description: "Plan clear product information, pricing and access instructions for a digital product."
+description: "Add a digital product listing to your CloverLoop creator storefront."
 status: "published"
-lastUpdated: "2026-11-01"
+lastUpdated: "2026-11-07"
 related: []
 ---
 
-Use these steps to plan a clear digital product offer and the information customers will need.
+Creators can add products from **Dashboard → Products** after saving a storefront.
 
-## Prepare the product
+## Add a listing
 
-Choose a clear title, write an accurate description and prepare a cover image that represents the actual contents.
+Enter a product name and description, choose whether it is free or paid, and provide a price for paid products. A category and cover image are optional. Upload the digital product file; files must use a supported format and be no larger than 100 MB.
 
-## Plan the price
+## Choose visibility
 
-Consider the product's value, audience, costs and whether it is intended to be free or paid.
+Save the product as active to display it on your public storefront, or leave it inactive to keep it out of the public catalogue. You can edit, replace its cover or file, preview its card, deactivate it or delete it from the Products dashboard.
 
-## Prepare the files
+## Payment and delivery status
 
-Prepare the final files, use clear filenames and check that each file opens as expected. Check your signed-in account for current file requirements.
-
-## Explain access
-
-Describe how customers should access the product, any requirements and what support they can expect.
-
-## Review before sharing
-
-Check the title, description, price, files and customer-facing information before sharing the offer.
+The storefront is currently a catalogue only. Paid checkout and both paid and free file delivery are disabled; the public product card displays a clear coming-soon message instead of initiating a payment or exposing a download link.

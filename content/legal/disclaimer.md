@@ -32,6 +32,6 @@ To the extent permitted by applicable law, CloverLoop is not liable for indirect
 
 ARM Gear Co. (CloverLoop)
 
-mycloverbase@gmail.com
+{{SUPPORT_EMAIL}}
 
 Plot 477, Nuasahi, Bhubaneswar, Khordha, Odisha – 751012

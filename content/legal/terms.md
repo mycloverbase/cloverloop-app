@@ -6,7 +6,7 @@ By creating an account, opening a storefront, browsing a storefront, purchasing 
 
 - Creators must be at least 18 years old, have legal capacity to enter into a binding contract and provide accurate, complete and current registration information.
 - Buyers under 18 should use the Platform and make purchases only with the involvement and permission of a parent or legal guardian where required by law.
-- Keep login credentials confidential, maintain accurate contact details and promptly notify us at mycloverbase@gmail.com if you suspect unauthorised access or account misuse.
+- Keep login credentials confidential, maintain accurate contact details and promptly notify us at {{SUPPORT_EMAIL}} if you suspect unauthorised access or account misuse.
 - You are responsible for activity through your account, except to the extent caused by our own breach or failure to meet a legal obligation.
 
 ## 2. What CloverLoop provides
@@ -71,7 +71,7 @@ Creators retain ownership of uploaded content, subject to third-party rights. By
 
 Buyers receive only the licence described by the creator. CloverLoop's software, platform design, branding, logos and underlying technology are owned by or licensed to CloverLoop.
 
-To report suspected infringement, email mycloverbase@gmail.com with the relevant URL, identification of the work, evidence of ownership or authority, and your contact details. We may request further information and restrict or remove content where appropriate.
+To report suspected infringement, email {{SUPPORT_EMAIL}} with the relevant URL, identification of the work, evidence of ownership or authority, and your contact details. We may request further information and restrict or remove content where appropriate.
 
 ## 9. Third-party services
 
@@ -83,7 +83,7 @@ For information about how third-party providers may process your personal data, 
 
 ## 10. Suspension and termination
 
-You may stop using the Platform and request account closure through available account controls or by contacting mycloverbase@gmail.com. Before closure, download records you need and resolve pending customer obligations, refunds and disputes.
+You may stop using the Platform and request account closure through available account controls or by contacting {{SUPPORT_EMAIL}}. Before closure, download records you need and resolve pending customer obligations, refunds and disputes.
 
 We may restrict, suspend or terminate an account, storefront, listing or feature where we reasonably believe there is fraud, unlawful activity, infringement, material breach, payment-provider risk, security risk, harm to users, repeated serious disputes or a legal requirement. Where practicable, we will provide the reason and an opportunity to respond. Immediate action may be taken to prevent harm, preserve evidence or comply with law.
 
@@ -99,7 +99,7 @@ To the extent permitted by law, a creator agrees to indemnify CloverLoop against
 
 ## 13. Complaints and disputes
 
-For a product or order issue, buyers should first contact the creator using the storefront or order communication. CloverLoop may assist with routing a complaint or reviewing a platform-related issue, but cannot guarantee an outcome in a dispute between creator and buyer. For complaints about CloverLoop, email mycloverbase@gmail.com. We will acknowledge and handle complaints within timelines required by applicable law.
+For a product or order issue, buyers should first contact the creator using the storefront or order communication. CloverLoop may assist with routing a complaint or reviewing a platform-related issue, but cannot guarantee an outcome in a dispute between creator and buyer. For complaints about CloverLoop, email {{SUPPORT_EMAIL}}. We will acknowledge and handle complaints within timelines required by applicable law.
 
 These Terms are governed by Indian law. Subject to mandatory consumer-protection rights and jurisdiction that cannot lawfully be excluded, courts at Bhubaneswar, Odisha shall have jurisdiction.
 
@@ -113,4 +113,4 @@ ARM Gear Co. (CloverLoop)
 
 Plot 477, Nuasahi, Bhubaneswar, Khordha, Odisha – 751012
 
-mycloverbase@gmail.com
+{{SUPPORT_EMAIL}}

@@ -16,14 +16,12 @@ import { PublicStorefront } from "@/components/storefront/public-storefront";
 import { useDashboardUnsavedChanges } from "@/components/dashboard/dashboard-shell";
 import {
   DEFAULT_STOREFRONT_CUSTOMIZATION,
-  STOREFRONT_PRODUCT_CATEGORIES,
   STOREFRONT_SECTIONS,
   STOREFRONT_SOCIAL_PLATFORMS,
   type StorefrontCustomization,
   type StorefrontDisplay,
   type StorefrontDraftInput,
   type StorefrontImageKind,
-  type StorefrontProductCard,
   type StorefrontSection,
   type StorefrontSocialLink,
   type StorefrontTheme,
@@ -63,12 +61,8 @@ function draftFromStorefront(storefront: StorefrontDisplay | null): StorefrontDr
     profileImagePath: storefront.profile_image_path,
     bannerImagePath: storefront.banner_image_path,
     theme: storefront.theme,
-    customization: storefront.customization,
+    customization: { ...storefront.customization, products: [] },
   };
-}
-
-function isCompleteProduct(product: StorefrontProductCard) {
-  return Boolean(product.title.trim() && product.category.trim() && product.coverImagePath);
 }
 
 function inputForSnapshot(draft: StorefrontDraftInput): StorefrontDraftInput {
@@ -88,14 +82,7 @@ function inputForSnapshot(draft: StorefrontDraftInput): StorefrontDraftInput {
 }
 
 function inputForSave(draft: StorefrontDraftInput): StorefrontDraftInput {
-  const snapshot = inputForSnapshot(draft);
-  return {
-    ...snapshot,
-    customization: {
-      ...snapshot.customization,
-      products: snapshot.customization.products.filter(isCompleteProduct),
-    },
-  };
+  return inputForSnapshot(draft);
 }
 
 function isIdentityDifferent(draft: StorefrontDraftInput, snapshot: string) {
@@ -108,11 +95,11 @@ function isIdentityDifferent(draft: StorefrontDraftInput, snapshot: string) {
   }
 }
 
-function optionalCompletion(draft: StorefrontDraftInput) {
+function optionalCompletion(draft: StorefrontDraftInput, hasActiveProducts: boolean) {
   return [
     Boolean(draft.description.trim()),
     Boolean(draft.bannerImagePath),
-    draft.customization.products.some(isCompleteProduct),
+    hasActiveProducts,
     draft.customization.socialLinks.length > 0,
     Boolean(draft.customization.publicEmail.trim()),
   ].filter(Boolean).length;
@@ -144,7 +131,11 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
   const serializedDraft = useMemo(() => JSON.stringify(inputForSnapshot(draft)), [draft]);
   const isDirty = serializedDraft !== savedSnapshot;
   const locked = status === "deletion_pending";
-  const completion = optionalCompletion(draft);
+  const activeProducts = useMemo(
+    () => initialStorefront?.products.filter((product) => product.isActive) ?? [],
+    [initialStorefront?.products],
+  );
+  const completion = optionalCompletion(draft, activeProducts.length > 0);
   const publicUrl = `https://cloverloop.in/${draft.username || "your-store"}`;
 
   const previewStore = useMemo(() => ({
@@ -154,14 +145,12 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
     profileImageUrl: profileUrl,
     bannerImageUrl: bannerUrl,
     theme: draft.theme,
+    products: activeProducts,
     customization: {
       ...draft.customization,
-      products: draft.customization.products.map((product) => ({
-        ...product,
-        coverImageUrl: product.coverImageUrl ?? null,
-      })),
+      products: [],
     },
-  }), [draft, profileUrl, bannerUrl]);
+  }), [draft, profileUrl, bannerUrl, activeProducts]);
 
   const changeDraft = useCallback((update: (current: StorefrontDraftInput) => StorefrontDraftInput) => {
     setDraft((current) => {
@@ -351,31 +340,6 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
       changeDraft((current) => ({ ...current, bannerImagePath: path }));
       setBannerUrl(url);
     }
-  }
-
-  function addProduct() {
-    if (draft.customization.products.length >= 3) return;
-    const product: StorefrontProductCard = {
-      id: crypto.randomUUID(),
-      title: "",
-      description: "",
-      category: STOREFRONT_PRODUCT_CATEGORIES[0],
-      coverImagePath: "",
-    };
-    updateCustomization("products", [...draft.customization.products, product]);
-  }
-
-  function updateProduct(id: string, key: keyof StorefrontProductCard, value: string) {
-    updateCustomization(
-      "products",
-      draft.customization.products.map((product) =>
-        product.id === id ? { ...product, [key]: value } : product,
-      ),
-    );
-  }
-
-  function removeProduct(id: string) {
-    updateCustomization("products", draft.customization.products.filter((product) => product.id !== id));
   }
 
   function addSocialLink() {
@@ -672,86 +636,28 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
 
               {step === 3 ? (
                 <section className="storefront-step-fields" aria-labelledby="storefront-products-form-title">
-                  <div className="storefront-step-intro storefront-step-intro-row">
-                    <div>
-                      <h3 id="storefront-products-form-title">Add sample product cards</h3>
-                      <p>These are visual previews only. They are not clickable and cannot be purchased.</p>
-                    </div>
-                    <button type="button" className="dashboard-small-button" onClick={addProduct} disabled={locked || draft.customization.products.length >= 3}>
-                      <Plus size={16} aria-hidden="true" /> Add sample card
-                    </button>
+                  <div className="storefront-step-intro">
+                    <h3 id="storefront-products-form-title">Manage real products</h3>
+                    <p>Add digital products with private files, control their visibility, and preview the cards visitors will see.</p>
                   </div>
-                  {draft.customization.products.length ? (
-                    <div className="storefront-product-editor-list">
-                      {draft.customization.products.map((product, index) => (
-                        <article className="storefront-product-editor" key={product.id}>
-                          <div className="storefront-product-editor-heading">
-                            <strong>Sample card {index + 1}</strong>
-                            <button type="button" className="dashboard-icon-button" onClick={() => removeProduct(product.id)} aria-label={`Remove sample card ${index + 1}`} disabled={locked}>
-                              <Trash2 size={16} aria-hidden="true" />
-                            </button>
-                          </div>
-                          <div className="storefront-product-editor-grid">
-                            <div>
-                              <span className="storefront-field-title">Cover image <em>Required</em></span>
-                              <ImageCropUploader
-                                kind="product"
-                                storefrontId={storefrontId}
-                                imageUrl={product.coverImageUrl ?? null}
-                                onUploaded={(path, url) => {
-                                  changeDraft((current) => ({
-                                    ...current,
-                                    customization: {
-                                      ...current.customization,
-                                      products: current.customization.products.map((item) =>
-                                        item.id === product.id ? { ...item, coverImagePath: path, coverImageUrl: url } : item,
-                                      ),
-                                    },
-                                  }));
-                                }}
-                              />
-                            </div>
-                            <div className="storefront-product-fields">
-                              <label className="dashboard-field">
-                                <span>Product title <em>Required</em></span>
-                                <input maxLength={80} value={product.title} disabled={locked} onChange={(event) => updateProduct(product.id, "title", event.target.value)} />
-                              </label>
-                              <label className="dashboard-field">
-                                <span>Short description <em>Optional</em></span>
-                                <textarea rows={3} maxLength={240} value={product.description} disabled={locked} onChange={(event) => updateProduct(product.id, "description", event.target.value)} />
-                              </label>
-                              <label className="dashboard-field">
-                                <span>Category <em>Required</em></span>
-                                <select
-                                  value={STOREFRONT_PRODUCT_CATEGORIES.includes(product.category as (typeof STOREFRONT_PRODUCT_CATEGORIES)[number]) ? product.category : "__custom"}
-                                  disabled={locked}
-                                  onChange={(event) => updateProduct(product.id, "category", event.target.value === "__custom" ? "" : event.target.value)}
-                                >
-                                  {STOREFRONT_PRODUCT_CATEGORIES.map((category) => <option key={category}>{category}</option>)}
-                                  <option value="__custom">Custom category…</option>
-                                </select>
-                                {!STOREFRONT_PRODUCT_CATEGORIES.includes(product.category as (typeof STOREFRONT_PRODUCT_CATEGORIES)[number]) ? (
-                                  <input
-                                    className="storefront-custom-category"
-                                    maxLength={50}
-                                    placeholder="Enter a category"
-                                    value={product.category}
-                                    disabled={locked}
-                                    onChange={(event) => updateProduct(product.id, "category", event.target.value)}
-                                  />
-                                ) : null}
-                              </label>
-                            </div>
-                          </div>
-                          <p className="storefront-coming-soon-help">A “Coming Soon” label is shown automatically.</p>
-                        </article>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="storefront-empty-editor">
-                      <p>No sample cards added. Your published page will show a helpful empty state.</p>
-                    </div>
-                  )}
+                  <div className="storefront-empty-editor">
+                    <p>
+                      {activeProducts.length
+                        ? `${activeProducts.length} active ${activeProducts.length === 1 ? "product is" : "products are"} shown in the storefront preview.`
+                        : "There are no active products yet. Add a product to populate your storefront."}
+                    </p>
+                    <Link
+                      className="dashboard-small-button"
+                      href="/dashboard/products"
+                      aria-disabled={locked}
+                      tabIndex={locked ? -1 : undefined}
+                      onClick={(event) => {
+                        if (locked) event.preventDefault();
+                      }}
+                    >
+                      Manage products
+                    </Link>
+                  </div>
                   <label className="dashboard-field storefront-layout-control">
                     <span>Product card layout</span>
                     <select value={draft.customization.productLayout} disabled={locked} onChange={(event) => updateCustomization("productLayout", event.target.value as StorefrontCustomization["productLayout"])}>

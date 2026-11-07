@@ -18,6 +18,30 @@ export type StorefrontProductCard = {
   coverImageUrl?: string | null;
 };
 
+export type StorefrontProductDisplay = {
+  id: string;
+  name: string;
+  description: string;
+  category: string | null;
+  productType: "digital";
+  isFree: boolean;
+  pricePaise: number;
+  coverImageUrl: string | null;
+};
+
+export type CreatorStorefrontProduct = StorefrontProductDisplay & {
+  storefrontId: string;
+  coverImagePath: string | null;
+  isActive: boolean;
+  fileName: string | null;
+  fileSize: number | null;
+  fileMimeType: string | null;
+  firstListedAt: string | null;
+  countedAsFree: boolean;
+  countedAsPaid: boolean;
+  createdAt: string;
+};
+
 export type StorefrontCustomization = {
   primaryColor: string;
   accentColor: string;
@@ -60,6 +84,7 @@ export type PublicStorefront = Omit<
 export type StorefrontDisplay = StorefrontRecord & {
   profileImageUrl: string | null;
   bannerImageUrl: string | null;
+  products: CreatorStorefrontProduct[];
   customization: StorefrontCustomization & {
     products: (StorefrontCustomization["products"][number] & { coverImageUrl: string | null })[];
   };
@@ -68,6 +93,7 @@ export type StorefrontDisplay = StorefrontRecord & {
 export type PublicStorefrontDisplay = PublicStorefront & {
   profileImageUrl: string | null;
   bannerImageUrl: string | null;
+  products: StorefrontProductDisplay[];
   customization: StorefrontCustomization & {
     products: (StorefrontCustomization["products"][number] & { coverImageUrl: string | null })[];
   };

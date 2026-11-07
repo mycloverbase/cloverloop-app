@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parseHelpMarkdown, type HelpBlock } from "@/lib/help-markdown";
+import { SUPPORT_EMAIL } from "@/lib/help";
 
 export const legalPolicyPages = [
   {
@@ -56,5 +57,9 @@ export function getLegalPolicy(slug: string): LegalPolicy | undefined {
     path.join(process.cwd(), "content", "legal", `${policy.slug}.md`),
     "utf8",
   );
-  return { ...policy, blocks: parseHelpMarkdown(content) };
+  const supportContact = SUPPORT_EMAIL || "[support team](/contact)";
+  return {
+    ...policy,
+    blocks: parseHelpMarkdown(content.replace(/\{\{SUPPORT_EMAIL\}\}/g, supportContact)),
+  };
 }

@@ -68,7 +68,7 @@ We use reasonable technical and organisational measures designed to protect info
 
 ## 8. Your choices and rights
 
-Depending on the law applicable to you and commencement of relevant provisions, you may have rights to request access to information about your personal data, correction, updating, erasure, withdrawal of consent, grievance redressal and nomination of another person in specified circumstances. You may unsubscribe from non-essential marketing. Send requests to mycloverbase@gmail.com. We may verify your identity and retain information where legally required or an exception applies.
+Depending on the law applicable to you and commencement of relevant provisions, you may have rights to request access to information about your personal data, correction, updating, erasure, withdrawal of consent, grievance redressal and nomination of another person in specified circumstances. You may unsubscribe from non-essential marketing. Send requests to {{SUPPORT_EMAIL}}. We may verify your identity and retain information where legally required or an exception applies.
 
 Buyers may contact the creator about information the creator controls in connection with the creator's store. You may also contact CloverLoop about Platform-related processing or if you are unsure whom to contact.
 
@@ -86,4 +86,4 @@ We may update this Policy as the Platform, providers or legal requirements chang
 
 ARM Gear Co. (CloverLoop), Plot 477, Nuasahi, Bhubaneswar, Khordha, Odisha – 751012
 
-Privacy contact: mycloverbase@gmail.com
+Privacy contact: {{SUPPORT_EMAIL}}

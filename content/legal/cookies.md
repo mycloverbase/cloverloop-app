@@ -21,4 +21,4 @@ CloverLoop's cookie banner lets you reject optional analytics or allow analytics
 
 ## 4. Contact
 
-Questions about cookies or tracking: mycloverbase@gmail.com
+Questions about cookies or tracking: {{SUPPORT_EMAIL}}

@@ -8,6 +8,7 @@ import {
   CircleHelp,
   LayoutDashboard,
   LogOut,
+  Package,
   Settings,
   Store,
   Tag,
@@ -41,6 +42,7 @@ const UnsavedChangesContext = createContext<UnsavedChangesContextValue | null>(n
 const navigation = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/storefront", label: "Storefront", icon: Store },
+  { href: "/dashboard/products", label: "Products", icon: Package },
   { href: "/dashboard/profile", label: "My Profile", icon: UserRound },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
   { href: "/dashboard/help", label: "Help & Support", icon: CircleHelp },

@@ -41,6 +41,6 @@ Before raising a dispute with a bank or payment provider, buyers and creators ar
 
 ARM Gear Co. (CloverLoop)
 
-mycloverbase@gmail.com
+{{SUPPORT_EMAIL}}
 
 Plot 477, Nuasahi, Bhubaneswar, Khordha, Odisha – 751012
