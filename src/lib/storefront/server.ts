@@ -1,4 +1,3 @@
-import { connection } from "next/server";
 import type { createSupabasePublicClient } from "@/lib/supabase/public";
 import {
   type PublicStorefront,
@@ -217,8 +216,6 @@ export async function getPublishedStorefront(
   supabase: StorefrontSupabaseClient,
   username: string,
 ): Promise<PublicStorefrontDisplay | null> {
-  // Signed image URLs expire, so don't capture them in prerendered storefront output.
-  await connection();
   const { data, error } = await supabase
     .from("published_storefronts")
     .select("store_name,username,description,profile_image_path,banner_image_path,theme,customization,published_at")
