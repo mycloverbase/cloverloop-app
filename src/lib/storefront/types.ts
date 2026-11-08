@@ -110,7 +110,7 @@ export type StorefrontDraftInput = {
 };
 
 export type StorefrontActionResult =
-  | { ok: true; message: string; url?: string; path?: string; signedUrl?: string; storefrontId?: string; deleteAfter?: string }
+  | { ok: true; message: string; url?: string; path?: string; imageUrl?: string; storefrontId?: string; deleteAfter?: string }
   | { ok: false; message: string };
 
 export const DEFAULT_STOREFRONT_CUSTOMIZATION: StorefrontCustomization = {

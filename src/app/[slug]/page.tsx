@@ -72,6 +72,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       ? storefront.description.trim().slice(0, 155)
       : `Explore ${storefront.store_name}'s creator storefront and upcoming work on CloverLoop.`;
     const url = `${PRODUCTION_URL}/${storefront.username}`;
+    const profileImageUrl = storefront.profileImageUrl
+      ? new URL(storefront.profileImageUrl, PRODUCTION_URL).toString()
+      : null;
     return {
       title: `${storefront.store_name} | CloverLoop`,
       description,
@@ -83,13 +86,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         description,
         url,
         siteName: "CloverLoop",
-        ...(storefront.profileImageUrl ? { images: [storefront.profileImageUrl] } : {}),
+        ...(profileImageUrl ? { images: [profileImageUrl] } : {}),
       },
       twitter: {
-        card: storefront.profileImageUrl ? "summary_large_image" : "summary",
+        card: profileImageUrl ? "summary_large_image" : "summary",
         title: storefront.store_name,
         description,
-        ...(storefront.profileImageUrl ? { images: [storefront.profileImageUrl] } : {}),
+        ...(profileImageUrl ? { images: [profileImageUrl] } : {}),
       },
     };
   }

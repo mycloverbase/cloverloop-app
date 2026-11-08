@@ -141,32 +141,24 @@ function parsePublicProduct(value: unknown): StorefrontProductDisplay | null {
   };
 }
 
-async function signedImageUrl(
+function storefrontImageUrl(
   supabase: StorefrontSupabaseClient,
   path: string | null,
-  expiresIn = 60 * 60,
-): Promise<string | null> {
+): string | null {
   if (!path) return null;
-  const { data, error } = await supabase.storage
-    .from("storefront-assets")
-    .createSignedUrl(path, expiresIn);
-  if (error) {
-    console.error("Could not create a storefront image URL.", error);
-    return null;
-  }
-  return data.signedUrl;
+  return supabase.storage.from("storefront-assets").getPublicUrl(path).data.publicUrl;
 }
 
-async function signCustomization(
+function addCustomizationImageUrls(
   supabase: StorefrontSupabaseClient,
   customization: StorefrontCustomization,
 ) {
   return {
     ...customization,
-    products: await Promise.all(customization.products.map(async (product) => ({
+    products: customization.products.map((product) => ({
       ...product,
-      coverImageUrl: await signedImageUrl(supabase, product.coverImagePath),
-    }))),
+      coverImageUrl: storefrontImageUrl(supabase, product.coverImagePath),
+    })),
   };
 }
 
@@ -196,19 +188,17 @@ export async function getCreatorStorefront(
     console.error("Could not load creator storefront products.", productsError);
     throw new Error("Your products could not be loaded. Please try again.");
   }
-  const products = await Promise.all((productRows ?? []).map(async (row) => {
+  const products = (productRows ?? []).map((row) => {
     const product = parseCreatorProduct(row);
     if (!product) throw new Error("The product data returned by Supabase is invalid.");
     return {
       ...product,
-      coverImageUrl: await signedImageUrl(supabase, product.coverImagePath),
+      coverImageUrl: storefrontImageUrl(supabase, product.coverImagePath),
     };
-  }));
-  const [profileImageUrl, bannerImageUrl, customization] = await Promise.all([
-    signedImageUrl(supabase, storefront.profile_image_path, 60 * 60 * 12),
-    signedImageUrl(supabase, storefront.banner_image_path, 60 * 60 * 12),
-    signCustomization(supabase, { ...storefront.customization, products: [] }),
-  ]);
+  });
+  const profileImageUrl = storefrontImageUrl(supabase, storefront.profile_image_path);
+  const bannerImageUrl = storefrontImageUrl(supabase, storefront.banner_image_path);
+  const customization = addCustomizationImageUrls(supabase, { ...storefront.customization, products: [] });
   return { ...storefront, profileImageUrl, bannerImageUrl, products, customization };
 }
 
@@ -257,19 +247,17 @@ export async function getPublishedStorefront(
     console.error("Could not load published storefront products.", productsError);
     throw new Error("The storefront products could not be loaded. Please try again.");
   }
-  const products = await Promise.all((productRows ?? []).map(async (row) => {
+  const products = (productRows ?? []).map((row) => {
     const product = parsePublicProduct(row);
     if (!product) throw new Error("The published product data returned by Supabase is invalid.");
     const coverImagePath = isRecord(row) && typeof row.cover_image_path === "string" ? row.cover_image_path : null;
     return {
       ...product,
-      coverImageUrl: await signedImageUrl(supabase, coverImagePath),
+      coverImageUrl: storefrontImageUrl(supabase, coverImagePath),
     };
-  }));
-  const [profileImageUrl, bannerImageUrl, customization] = await Promise.all([
-    signedImageUrl(supabase, publicStorefront.profile_image_path),
-    signedImageUrl(supabase, publicStorefront.banner_image_path),
-    signCustomization(supabase, { ...publicStorefront.customization, products: [] }),
-  ]);
+  });
+  const profileImageUrl = storefrontImageUrl(supabase, publicStorefront.profile_image_path);
+  const bannerImageUrl = storefrontImageUrl(supabase, publicStorefront.banner_image_path);
+  const customization = addCustomizationImageUrls(supabase, { ...publicStorefront.customization, products: [] });
   return { ...publicStorefront, profileImageUrl, bannerImageUrl, products, customization };
 }

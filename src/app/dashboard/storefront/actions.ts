@@ -266,12 +266,6 @@ export async function uploadStorefrontImageAction(formData: FormData): Promise<S
     return { ok: false, message: "The uploaded image could not be attached to this storefront." };
   }
 
-  const { data: signedUrl, error: signedUrlError } = await auth.supabase.storage
-    .from("storefront-assets")
-    .createSignedUrl(path, 60 * 60 * 12);
-  if (signedUrlError) {
-    console.error("Could not prepare a storefront image preview.", signedUrlError);
-    return { ok: false, message: "The image uploaded, but its preview could not be prepared. Refresh and try again." };
-  }
-  return { ok: true, message: "Image uploaded.", path, signedUrl: signedUrl.signedUrl };
+  const imageUrl = auth.supabase.storage.from("storefront-assets").getPublicUrl(path).data.publicUrl;
+  return { ok: true, message: "Image uploaded.", path, imageUrl };
 }

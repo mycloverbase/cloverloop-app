@@ -89,11 +89,11 @@ export function ImageCropUploader({
           setError(result.message);
           return;
         }
-        if (!result.path || !result.signedUrl) {
+        if (!result.path || !result.imageUrl) {
           setError("The uploaded image could not be prepared for preview. Please try again.");
           return;
         }
-        onUploaded(result.path, result.signedUrl);
+        onUploaded(result.path, result.imageUrl);
         setSelectedFile(null);
         setSelectedUrl(null);
         setMessage("Image uploaded. Save your changes to apply it.");

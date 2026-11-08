@@ -35,15 +35,20 @@ export default function HomePage() {
       <section className="hero-section">
         <div className="page-width hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow">A CREATOR-FOCUSED PRODUCT EXPERIENCE</span>
-            <h1>Your work deserves a home of its own.</h1>
+            <span className="eyebrow">YOUR BUSINESS. YOUR STOREFRONT. YOUR AUDIENCE.</span>
+            <h1>
+              <span>Create your storefront.</span>
+              <span>Sell digital products.</span>
+              <span>Grow your audience.</span>
+            </h1>
             <p>
-              CloverLoop is designed around a dedicated storefront concept, clear plan pricing and
-              the direct relationship between creators and their audiences.
+              CloverLoop gives you
+              everything you need to showcase your products, manage your storefront and
+              grow your digital business. All in one place.
             </p>
             <div className="hero-actions">
               <TrackLink href="/signup" event="signup_click" className="button">
-                Create an account <ArrowRight size={17} />
+                Build your store <ArrowRight size={17} />
               </TrackLink>
               <Link href="/pricing" className="button button-secondary">
                 Explore Pricing
