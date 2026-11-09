@@ -50,6 +50,7 @@ export const publicLinks = {
     { label: "How to sell ebooks", href: "/resources/how-to-sell-ebooks" },
     { label: "How to sell Canva templates", href: "/resources/how-to-sell-canva-templates" },
     { label: "Online Course Ideas", href: "/resources/online-course-ideas" },
+    { label: "Homemade Online Course Ideas", href: "/resources/homemade-online-course-ideas" },
     { label: "Content Creator", href: "/resources/content-creator" },
     { label: "Digital Products", href: "/resources/digital-products" },
     { label: "Resource Hub", href: "/resources" },
@@ -549,6 +550,14 @@ export const resourceCards = [
       "Explore educational product ideas across music, business, finance, design and technology.",
     image: "/images/resources/online-course-ideas.webp",
     category: "Creating",
+  },
+  {
+    slug: "homemade-online-course-ideas",
+    title: "50 Homemade Online Course Ideas with Real-Life Examples",
+    description:
+      "Explore 50 homemade online course ideas across 10 niches, with creator examples and a practical framework for validating your idea.",
+    image: "/images/resources/online-course-ideas.webp",
+    category: "Courses",
   },
   {
     slug: "content-creator",

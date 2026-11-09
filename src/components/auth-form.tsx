@@ -12,9 +12,14 @@ type AuthMode = "login" | "signup";
 const AUTH_FLOW_KEY = "cloverloop-auth-flow";
 const AUTH_METHOD_KEY = "cloverloop-auth-method";
 
-function authCallbackUrl(nextPath: string) {
+function authCallbackUrl(nextPath: string, marketingConsent?: boolean) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || window.location.origin;
-  return `${siteUrl}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+  const callback = new URL("/auth/callback", siteUrl);
+  callback.searchParams.set("next", nextPath);
+  if (marketingConsent !== undefined) {
+    callback.searchParams.set("marketing_consent", marketingConsent ? "1" : "0");
+  }
+  return callback.toString();
 }
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
@@ -22,6 +27,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [marketingConsent, setMarketingConsent] = useState(true);
+  const [marketingConsentTouched, setMarketingConsentTouched] = useState(false);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -31,7 +38,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const requestedUsername = searchParams.get("username")?.trim() ?? "";
   const storefrontUsername =
     requestedUsername.length <= 30 &&
-    /^[a-zA-Z0-9](?:[a-zA-Z0-9_-]{0,28}[a-zA-Z0-9])?$/.test(requestedUsername)
+    /^[a-zA-Z0-9](?:[a-zA-Z0-9_-]{1,28}[a-zA-Z0-9])$/.test(requestedUsername)
       ? requestedUsername
       : "";
   const onboardingPath = storefrontUsername
@@ -39,7 +46,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     : "/dashboard";
 
   useEffect(() => {
-    if (callbackError === "callback" || callbackError === "configuration") {
+    if (callbackError === "callback" || callbackError === "configuration" || callbackError === "consent") {
       window.localStorage.removeItem(AUTH_FLOW_KEY);
       window.localStorage.removeItem(AUTH_METHOD_KEY);
     }
@@ -59,8 +66,12 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           email,
           password,
           options: {
-            ...(storefrontUsername ? { data: { storefront_username: storefrontUsername } } : {}),
-            emailRedirectTo: authCallbackUrl(onboardingPath),
+            data: {
+              ...(storefrontUsername ? { storefront_username: storefrontUsername } : {}),
+              marketing_emails: marketingConsent,
+              ...(marketingConsent ? { marketing_consent_at: new Date().toISOString() } : {}),
+            },
+            emailRedirectTo: authCallbackUrl(onboardingPath, marketingConsent),
           },
         });
         if (authError) throw authError;
@@ -73,6 +84,12 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       } else {
         const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
         if (authError) throw authError;
+        if (marketingConsentTouched) {
+          const { error: consentError } = await supabase.rpc("save_my_marketing_consent", {
+            requested_consent: marketingConsent,
+          });
+          if (consentError) throw new Error("You are signed in, but your marketing preference could not be saved. Update it in Account settings.");
+        }
         const next = searchParams.get("next");
         router.replace(safeInternalPath(next));
         router.refresh();
@@ -97,10 +114,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       track("google_oauth_initiation", { mode });
       window.localStorage.setItem(AUTH_FLOW_KEY, mode);
       window.localStorage.setItem(AUTH_METHOD_KEY, "google");
+      const callbackUrl = authCallbackUrl(
+        safeNext,
+        mode === "signup" ? marketingConsent : marketingConsentTouched ? marketingConsent : undefined,
+      );
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: authCallbackUrl(safeNext),
+          redirectTo: callbackUrl,
         },
       });
       if (authError) throw authError;
@@ -118,6 +139,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       ? "Authentication could not be completed. Check the Supabase redirect configuration and try again."
       : callbackError === "configuration"
         ? "Authentication is not configured yet. Contact the CloverLoop team."
+        : callbackError === "consent"
+          ? "Your marketing preference could not be saved. Please sign in again and update it in Account settings."
         : "");
 
   return (
@@ -161,6 +184,18 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           aria-describedby={mode === "signup" ? "password-hint" : undefined}
         />
         {mode === "signup" && <span id="password-hint" className="field-hint">Use at least 8 characters.</span>}
+        <label className="auth-marketing-consent">
+          <input
+            type="checkbox"
+            name="marketing_consent"
+            checked={marketingConsent}
+            onChange={(event) => {
+              setMarketingConsent(event.target.checked);
+              setMarketingConsentTouched(true);
+            }}
+          />
+          <span>Opt in for news about CloverLoop plans, updates and resources.</span>
+        </label>
         {mode === "login" && <Link className="forgot-link" href="/forgot-password">Forgot password?</Link>}
         {visibleError && <p className="form-message form-error" role="alert">{visibleError}</p>}
         {message && <p className="form-message form-success" role="status">{message}</p>}

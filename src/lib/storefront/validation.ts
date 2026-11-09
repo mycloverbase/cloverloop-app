@@ -54,8 +54,8 @@ export function parseStorefrontDraft(value: unknown): Validation<StorefrontDraft
   if (!storeName || !storeName.trim()) {
     return { ok: false, message: "Enter a store name." };
   }
-  if (!username || !/^[a-z0-9_-]{1,30}$/.test(username)) {
-    return { ok: false, message: "Use 1–30 letters, numbers, hyphens or underscores for your username." };
+  if (!username || !/^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/.test(username)) {
+    return { ok: false, message: "Use 3–30 letters, numbers, hyphens or underscores for your username." };
   }
   if (description === null) {
     return { ok: false, message: "Your store description must be 1,200 characters or fewer." };

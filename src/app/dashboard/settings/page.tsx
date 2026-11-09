@@ -51,7 +51,7 @@ export default async function AccountSettingsPage() {
       </header>
 
       <div className="dashboard-stack">
-        <AccountBasicsForm profile={profile} email={user.email ?? ""} />
+        <AccountBasicsForm email={user.email ?? ""} />
         <PasswordChangeForm email={user.email ?? ""} providers={connectedProviders(user)} />
         <NotificationPreferencesForm profile={profile} />
 

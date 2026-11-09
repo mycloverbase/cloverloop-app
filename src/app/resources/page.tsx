@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 const groups = [
-  { title: "Creating digital products and courses", slugs: ["how-to-write-an-ebook", "digital-products", "how-to-sell-digital-products-online", "how-to-sell-templates-online", "online-course-ideas", "how-to-create-and-sell-online-course-india"] },
+  { title: "Creating digital products and courses", slugs: ["how-to-write-an-ebook", "digital-products", "how-to-sell-digital-products-online", "how-to-sell-templates-online", "online-course-ideas", "homemade-online-course-ideas", "how-to-create-and-sell-online-course-india"] },
   { title: "Selling digital products", slugs: ["best-platform-to-sell-digital-products-india-2026", "how-to-sell-ebooks", "how-to-sell-presets", "how-to-sell-printables", "how-to-sell-canva-templates", "accept-upi-payments-digital-products-razorpay"] },
   { title: "Pricing, planning and tax", slugs: ["how-to-price-digital-products", "how-many-sales-to-hit-your-income-goal", "do-you-need-gst-registration-to-sell-online", "gst-on-ebooks-and-online-courses-india"] },
   { title: "Growing as a creator", slugs: ["content-creator", "marketing-ideas-tool"] },

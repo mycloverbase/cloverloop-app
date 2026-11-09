@@ -10,13 +10,11 @@ export type CreatorProfile = {
   bio: string;
   location: string | null;
   contact_number: string | null;
-  instagram_url: string | null;
-  youtube_url: string | null;
-  website_url: string | null;
   social_links: SocialLink[];
   avatar_path: string | null;
   product_announcements: boolean;
   marketing_emails: boolean;
+  marketing_consent_at: string | null;
   created_at: string;
   updated_at: string;
 };

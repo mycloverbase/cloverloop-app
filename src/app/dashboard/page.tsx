@@ -18,12 +18,7 @@ function completionItems(profile: Awaited<ReturnType<typeof requireCreatorContex
     { label: "Upload a profile picture", complete: Boolean(profile.avatar_path) },
     {
       label: "Add a website or social link",
-      complete: Boolean(
-        profile.website_url ||
-          profile.instagram_url ||
-          profile.youtube_url ||
-          profile.social_links.length,
-      ),
+      complete: Boolean(profile.social_links.length),
     },
   ];
 }
@@ -36,6 +31,15 @@ export default async function DashboardPage({
   const { username: requestedValue } = await searchParams;
   const requestedUsername = Array.isArray(requestedValue) ? requestedValue[0] : requestedValue;
   const { supabase, user, profile } = await requireCreatorContext();
+  const { data: storefront, error: storefrontError } = await supabase
+    .from("creator_storefronts")
+    .select("status")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (storefrontError) {
+    console.error("Could not check the creator storefront status.", storefrontError);
+    throw new Error("Your storefront status could not be loaded. Please refresh and try again.");
+  }
   let profileUsername = profile.username;
   let usernameMessage = "";
   if (!profileUsername && requestedUsername) {
@@ -88,9 +92,11 @@ export default async function DashboardPage({
         not included.
         </p>
         <div className="dashboard-founder-banner-actions">
-        <Link className="button" href="/dashboard/storefront">
-          Set Up Your Storefront <ArrowRight size={16} aria-hidden="true" />
-        </Link>
+        {storefront?.status !== "published" ? (
+          <Link className="button" href="/dashboard/storefront">
+            Set Up Your Storefront <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        ) : null}
         <Link className="button" href="/dashboard/profile">
           Complete Your Profile <ArrowRight size={16} aria-hidden="true" />
           </Link>

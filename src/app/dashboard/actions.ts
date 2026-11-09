@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ActionResult, SocialLink } from "@/lib/account/types";
 
@@ -69,8 +70,8 @@ function parseSocialLinks(value: string): Validation<SocialLink[]> {
   } catch {
     return { ok: false, message: "Check the additional social links and try again." };
   }
-  if (!Array.isArray(parsed) || parsed.length > 5) {
-    return { ok: false, message: "Add no more than five additional social links." };
+  if (!Array.isArray(parsed) || parsed.length > 10) {
+    return { ok: false, message: "Add no more than ten additional social links." };
   }
   const links: SocialLink[] = [];
   for (const entry of parsed) {
@@ -106,7 +107,7 @@ function profileInput(formData: FormData) {
   if (!/^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/.test(username)) {
     return { ok: false as const, message: "Username must be 3–30 characters using letters, numbers, underscores or hyphens." };
   }
-  if (bio.length > 280) return { ok: false as const, message: "Bio must be 280 characters or fewer." };
+  if (bio.length > 1200) return { ok: false as const, message: "About must be 1,200 characters or fewer." };
   if (location.length > 80) return { ok: false as const, message: "Location must be 80 characters or fewer." };
   if (
     contactNumber &&
@@ -120,13 +121,7 @@ function profileInput(formData: FormData) {
     return { ok: false as const, message: "Enter a valid contact number with 7–15 digits." };
   }
 
-  const instagram = optionalUrl(readText(formData, "instagram_url"), "Instagram", ["instagram.com"]);
-  const youtube = optionalUrl(readText(formData, "youtube_url"), "YouTube", ["youtube.com", "youtu.be"]);
-  const website = optionalUrl(readText(formData, "website_url"), "website");
   const links = parseSocialLinks(readText(formData, "social_links") || "[]");
-  if (!instagram.ok) return instagram;
-  if (!youtube.ok) return youtube;
-  if (!website.ok) return website;
   if (!links.ok) return links;
 
   return {
@@ -137,9 +132,6 @@ function profileInput(formData: FormData) {
       bio,
       location: location || null,
       contact_number: contactNumber || null,
-      instagram_url: instagram.value,
-      youtube_url: youtube.value,
-      website_url: website.value,
       social_links: links.value,
     },
   };
@@ -163,11 +155,27 @@ export async function saveCreatorProfileAction(formData: FormData): Promise<Acti
   const auth = await getAuthenticatedClient();
   if (!auth.ok) return auth.result;
 
+  const { data: previousProfile, error: previousProfileError } = await auth.supabase
+    .from("creator_profiles")
+    .select("username")
+    .eq("user_id", auth.userId)
+    .maybeSingle();
+  if (previousProfileError) {
+    console.error("Could not load the previous creator username.", previousProfileError);
+    return { ok: false, message: "Your profile could not be saved. Please try again." };
+  }
   const { error } = await auth.supabase.from("creator_profiles").upsert(
     { user_id: auth.userId, ...parsed.value },
     { onConflict: "user_id" },
   );
   const failure = usernameSaveResult(error);
+  if (!failure) {
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/profile");
+    revalidatePath("/dashboard/storefront");
+    if (previousProfile?.username) revalidatePath(`/${previousProfile.username}`);
+    revalidatePath(`/${parsed.value.username}`);
+  }
   return failure ?? { ok: true, message: "Profile saved." };
 }
 
@@ -183,6 +191,15 @@ export async function saveProfileBasicsAction(formData: FormData): Promise<Actio
   const auth = await getAuthenticatedClient();
   if (!auth.ok) return auth.result;
 
+  const { data: previousProfile, error: previousProfileError } = await auth.supabase
+    .from("creator_profiles")
+    .select("username")
+    .eq("user_id", auth.userId)
+    .maybeSingle();
+  if (previousProfileError) {
+    console.error("Could not load the previous creator username.", previousProfileError);
+    return { ok: false, message: "Your account details could not be saved. Please try again." };
+  }
   const { data, error } = await auth.supabase
     .from("creator_profiles")
     .update({ display_name: displayName, username })
@@ -191,17 +208,38 @@ export async function saveProfileBasicsAction(formData: FormData): Promise<Actio
     .maybeSingle();
   const failure = usernameSaveResult(error);
   if (!failure && !data) return { ok: false, message: "Your profile could not be found. Reload and try again." };
+  if (!failure && data) {
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/profile");
+    revalidatePath("/dashboard/storefront");
+    if (previousProfile?.username) revalidatePath(`/${previousProfile.username}`);
+    revalidatePath(`/${username}`);
+  }
   return failure ?? { ok: true, message: "Account details saved." };
 }
 
 export async function saveNotificationPreferencesAction(formData: FormData): Promise<ActionResult> {
   const auth = await getAuthenticatedClient();
   if (!auth.ok) return auth.result;
+  const marketingEmails = formData.get("marketing_emails") === "on";
+  const { data: currentProfile, error: currentProfileError } = await auth.supabase
+    .from("creator_profiles")
+    .select("marketing_emails,marketing_consent_at")
+    .eq("user_id", auth.userId)
+    .maybeSingle();
+  if (currentProfileError) {
+    console.error("Could not load notification preferences.", currentProfileError);
+    return { ok: false, message: "Notification preferences could not be saved. Please try again." };
+  }
   const { data, error } = await auth.supabase
     .from("creator_profiles")
     .update({
       product_announcements: formData.get("product_announcements") === "on",
-      marketing_emails: formData.get("marketing_emails") === "on",
+      marketing_emails: marketingEmails,
+      marketing_consent_at:
+        marketingEmails && !currentProfile?.marketing_emails
+          ? new Date().toISOString()
+          : currentProfile?.marketing_consent_at ?? null,
     })
     .eq("user_id", auth.userId)
     .select("user_id")

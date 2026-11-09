@@ -1,6 +1,18 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { ArrowUpRight, Mail } from "lucide-react";
+import {
+  AtSign,
+  BriefcaseBusiness,
+  Camera,
+  CirclePlay,
+  Gamepad2,
+  Link2,
+  Mail,
+  Music2,
+  Pin,
+  UsersRound,
+  X,
+} from "lucide-react";
 import type {
   StorefrontCustomization,
   StorefrontProductDisplay,
@@ -90,22 +102,19 @@ export function StorefrontProductCard({ product }: { product: StorefrontProductD
   );
 }
 
-function SocialSection({ store }: { store: StorefrontView }) {
-  if (!store.customization.socialLinks.length) return null;
-  return (
-    <section className="storefront-section storefront-social" id="social" aria-labelledby="storefront-social-title">
-      <span className="storefront-eyebrow">Around the web</span>
-      <h2 id="storefront-social-title">Find me elsewhere</h2>
-      <div className="storefront-social-links">
-        {store.customization.socialLinks.map((link) => (
-          <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer">
-            <span>{link.label}</span>
-            <ArrowUpRight size={16} aria-hidden="true" />
-          </a>
-        ))}
-      </div>
-    </section>
-  );
+function SocialIcon({ platform }: { platform: string }) {
+  const icon = platform.toLowerCase();
+  const Icon = icon === "instagram" ? Camera
+    : icon === "youtube" ? CirclePlay
+      : icon === "facebook" ? UsersRound
+        : icon === "linkedin" ? BriefcaseBusiness
+          : icon === "x" ? X
+            : icon === "tiktok" ? Music2
+              : icon === "pinterest" ? Pin
+                : icon === "threads" ? AtSign
+                  : icon === "twitch" ? Gamepad2
+                    : Link2;
+  return <Icon size={19} strokeWidth={2} aria-hidden="true" />;
 }
 
 function ContactSection({ store }: { store: StorefrontView }) {
@@ -124,10 +133,9 @@ function ContactSection({ store }: { store: StorefrontView }) {
   );
 }
 
-const sectionComponents: Record<StorefrontSection, (props: { store: StorefrontView }) => React.ReactNode> = {
+const sectionComponents: Partial<Record<StorefrontSection, (props: { store: StorefrontView }) => React.ReactNode>> = {
   about: AboutSection,
   products: ProductsSection,
-  social: SocialSection,
   contact: ContactSection,
 };
 
@@ -149,22 +157,19 @@ export function PublicStorefront({ store }: { store: StorefrontView }) {
       className={`storefront-shell storefront-theme-${store.theme} storefront-banner-${store.customization.bannerStyle}`}
       style={style}
     >
-      {store.bannerImageUrl ? (
-        <div className="storefront-banner">
-          <Image
-            src={store.bannerImageUrl}
-            alt=""
-            width={1800}
-            height={600}
-            unoptimized
-            priority
-            sizes="100vw"
-          />
-        </div>
-      ) : null}
-
       <div className="storefront-content">
-        <header className="storefront-hero">
+        <header className={`storefront-hero${store.bannerImageUrl ? " storefront-hero-has-banner" : ""}`}>
+          {store.bannerImageUrl ? (
+            <Image
+              className="storefront-hero-banner"
+              src={store.bannerImageUrl}
+              alt=""
+              fill
+              unoptimized
+              priority
+              sizes="(max-width: 760px) 100vw, 1120px"
+            />
+          ) : null}
           {store.profileImageUrl ? (
             <Image
               className="storefront-profile-image"
@@ -181,13 +186,30 @@ export function PublicStorefront({ store }: { store: StorefrontView }) {
           <div className="storefront-hero-copy">
             <h1>{store.store_name}</h1>
             <p>@{store.username}</p>
+            {!hidden.has("social") && store.customization.socialLinks.length ? (
+              <nav className="storefront-social-icons" aria-label="Social links">
+                {store.customization.socialLinks.map((link) => (
+                  <a
+                    key={link.id}
+                    className="storefront-social-icon-link"
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.label}
+                    title={link.label}
+                  >
+                    <SocialIcon platform={link.platform} />
+                  </a>
+                ))}
+              </nav>
+            ) : null}
           </div>
         </header>
 
         <div className="storefront-sections">
           {orderedSections.map((section) => {
             const Section = sectionComponents[section];
-            return <Section key={section} store={store} />;
+            return Section ? <Section key={section} store={store} /> : null;
           })}
         </div>
 

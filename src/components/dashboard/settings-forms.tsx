@@ -7,115 +7,31 @@ import { LoaderCircle, ShieldCheck, Trash2 } from "lucide-react";
 import {
   deleteCreatorAccountAction,
   saveNotificationPreferencesAction,
-  saveProfileBasicsAction,
 } from "@/app/dashboard/actions";
 import { useDashboardUnsavedChanges } from "@/components/dashboard/dashboard-shell";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { CreatorProfile } from "@/lib/account/types";
 
-export function AccountBasicsForm({
-  profile,
-  email,
-}: {
-  profile: CreatorProfile;
-  email: string;
-}) {
-  const [displayName, setDisplayName] = useState(profile.display_name);
-  const [username, setUsername] = useState(profile.username ?? "");
-  const [savedSnapshot, setSavedSnapshot] = useState(
-    JSON.stringify([profile.display_name, profile.username ?? ""]),
-  );
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const [isPending, startTransition] = useTransition();
-  const setHasUnsavedChanges = useDashboardUnsavedChanges("account-basics");
-  const snapshot = JSON.stringify([displayName, username]);
-  const isDirty = snapshot !== savedSnapshot;
-
-  useEffect(() => {
-    setHasUnsavedChanges(isDirty);
-    return () => setHasUnsavedChanges(false);
-  }, [isDirty, setHasUnsavedChanges]);
-
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setMessage("");
-    setError("");
-    const data = new FormData();
-    data.set("display_name", displayName);
-    data.set("username", username);
-    const submitted = snapshot;
-    startTransition(async () => {
-      try {
-        const result = await saveProfileBasicsAction(data);
-        if (!result.ok) {
-          setError(result.message);
-          return;
-        }
-        setSavedSnapshot(submitted);
-        setMessage(result.message);
-      } catch (saveError) {
-        console.error("Could not save creator account details.", saveError);
-        setError("Account details could not be saved. Check your connection and try again.");
-      }
-    });
-  }
-
+export function AccountBasicsForm({ email }: { email: string }) {
   return (
-    <form className="dashboard-card dashboard-form-card" onSubmit={submit}>
+    <section className="dashboard-card dashboard-form-card">
       <div className="dashboard-section-heading">
         <div>
           <span className="dashboard-card-label">General</span>
           <h2>Account details</h2>
         </div>
-        <p>Use your profile to manage creator information associated with this account.</p>
+        <p>Manage your creator identity in one place.</p>
       </div>
       <label className="dashboard-field">
         <span>Registered email</span>
         <input type="email" value={email} readOnly aria-describedby="account-email-note" />
         <small id="account-email-note">Email address changes are managed through account support.</small>
       </label>
-      <div className="dashboard-form-grid">
-        <label className="dashboard-field">
-          <span>Display name</span>
-          <input
-            maxLength={80}
-            autoComplete="name"
-            required
-            value={displayName}
-            onChange={(event) => setDisplayName(event.target.value)}
-          />
-        </label>
-        <label className="dashboard-field">
-          <span>Username</span>
-          <div className="dashboard-username-input">
-            <span aria-hidden="true">@</span>
-            <input
-              minLength={3}
-              maxLength={30}
-              pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,28}[A-Za-z0-9]"
-              autoComplete="username"
-              required
-              value={username}
-              onChange={(event) => setUsername(event.target.value.toLowerCase())}
-            />
-          </div>
-          <small>Usernames are unique and case-insensitive.</small>
-        </label>
-      </div>
       <p className="dashboard-inline-note">
-        For your bio, location and social links, visit <Link href="/dashboard/profile">My Profile</Link>.
+        Your name, username, About and social links are managed in <Link href="/dashboard/profile">My Profile</Link> or
+        {" "}<Link href="/dashboard/storefront">Storefront</Link>.
       </p>
-      {error && <p className="dashboard-message dashboard-message-error" role="alert">{error}</p>}
-      {message && <p className="dashboard-message dashboard-message-success" role="status">{message}</p>}
-      <div className="dashboard-form-actions">
-        <span>{isDirty ? "You have unsaved changes." : "Your account details are up to date."}</span>
-        <button type="submit" className="button" disabled={isPending || !isDirty}>
-          {isPending ? <LoaderCircle className="spin" size={17} /> : null}
-          Save details
-        </button>
-      </div>
-    </form>
+    </section>
   );
 }
 

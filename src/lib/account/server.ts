@@ -38,13 +38,11 @@ function parseProfile(value: unknown): CreatorProfile {
     bio: textOr(value.bio, ""),
     location: nullableText(value.location),
     contact_number: nullableText(value.contact_number),
-    instagram_url: nullableText(value.instagram_url),
-    youtube_url: nullableText(value.youtube_url),
-    website_url: nullableText(value.website_url),
     social_links: parseSocialLinks(value.social_links),
     avatar_path: nullableText(value.avatar_path),
     product_announcements: value.product_announcements !== false,
     marketing_emails: value.marketing_emails === true,
+    marketing_consent_at: nullableText(value.marketing_consent_at),
     created_at: textOr(value.created_at, ""),
     updated_at: textOr(value.updated_at, ""),
   };
@@ -100,6 +98,15 @@ export async function ensureCreatorProfile(
     user_id: user.id,
     display_name: displayName,
     username,
+    ...(typeof user.user_metadata?.marketing_emails === "boolean"
+      ? {
+          marketing_emails: user.user_metadata.marketing_emails,
+          marketing_consent_at:
+            typeof user.user_metadata.marketing_consent_at === "string"
+              ? user.user_metadata.marketing_consent_at
+              : null,
+        }
+      : {}),
   };
 
   const { error: insertError } = await client.from("creator_profiles").insert(seed);

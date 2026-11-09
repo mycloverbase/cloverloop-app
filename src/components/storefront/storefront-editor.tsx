@@ -228,7 +228,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
       return;
     }
     if (!draftRef.current.username.trim()) {
-      setError("Add at least one letter, number, hyphen or underscore to your username.");
+      setError("Choose a username with 3–30 letters, numbers, underscores or hyphens.");
       return;
     }
     setBusy(true);
@@ -496,7 +496,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                 <section className="storefront-step-fields" aria-labelledby="storefront-identity-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-identity-title">Choose your store identity</h3>
-                    <p>Your store name is shown to visitors. We create a URL from that name, which you can edit.</p>
+                    <p>Your store name and username are shared with My Profile and update your creator identity everywhere.</p>
                   </div>
                   <label className="dashboard-field">
                     <span>Store name <em>Required</em></span>
@@ -523,7 +523,9 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                       <span>cloverloop.in/</span>
                       <input
                         value={draft.username}
+                        minLength={3}
                         maxLength={30}
+                        pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,28}[A-Za-z0-9]"
                         autoComplete="off"
                         disabled={locked}
                         onChange={(event) => {
@@ -535,9 +537,9 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                         aria-describedby="storefront-username-help"
                       />
                     </div>
-                    <small id="storefront-username-help">1–30 letters, numbers, hyphens or underscores. Availability is checked when you continue.</small>
+                    <small id="storefront-username-help">3–30 letters, numbers, hyphens or underscores. Availability is checked when you continue.</small>
                   </label>
-                  <p className="storefront-identity-note">Your display name stays exactly as entered. A changed username permanently redirects old storefront links.</p>
+                  <p className="storefront-identity-note">Store name, creator name, username and About details stay in sync. A changed username redirects old storefront links.</p>
                 </section>
               ) : null}
 
@@ -617,10 +619,10 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                 <section className="storefront-step-fields" aria-labelledby="storefront-about-form-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-about-form-title">Tell visitors about your work</h3>
-                    <p>This description is optional and appears in your storefront and search preview.</p>
+                    <p>This is the same About content shown on your creator profile.</p>
                   </div>
                   <label className="dashboard-field">
-                    <span>Store description <em>Optional</em></span>
+                    <span>About / bio <em>Optional</em></span>
                     <textarea
                       rows={7}
                       maxLength={1200}

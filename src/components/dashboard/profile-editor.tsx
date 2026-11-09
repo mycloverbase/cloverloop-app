@@ -14,9 +14,6 @@ type ProfileForm = {
   bio: string;
   location: string;
   contactNumber: string;
-  instagramUrl: string;
-  youtubeUrl: string;
-  websiteUrl: string;
   socialLinks: SocialLink[];
 };
 
@@ -27,9 +24,6 @@ function formFromProfile(profile: CreatorProfile): ProfileForm {
     bio: profile.bio,
     location: profile.location ?? "",
     contactNumber: profile.contact_number ?? "",
-    instagramUrl: profile.instagram_url ?? "",
-    youtubeUrl: profile.youtube_url ?? "",
-    websiteUrl: profile.website_url ?? "",
     socialLinks: profile.social_links,
   };
 }
@@ -88,9 +82,6 @@ export function ProfileEditor({
     data.set("bio", form.bio);
     data.set("location", form.location);
     data.set("contact_number", form.contactNumber);
-    data.set("instagram_url", form.instagramUrl);
-    data.set("youtube_url", form.youtubeUrl);
-    data.set("website_url", form.websiteUrl);
     data.set("social_links", JSON.stringify(form.socialLinks));
     startTransition(async () => {
       try {
@@ -109,7 +100,7 @@ export function ProfileEditor({
   }
 
   function addSocialLink() {
-    if (form.socialLinks.length >= 5) return;
+    if (form.socialLinks.length >= 10) return;
     update("socialLinks", [...form.socialLinks, { label: "", url: "" }]);
   }
 
@@ -140,12 +131,12 @@ export function ProfileEditor({
             <span className="dashboard-card-label">Public profile details</span>
             <h2>Creator information</h2>
           </div>
-          <p>Keep the creator details associated with your CloverLoop account up to date.</p>
+          <p>Your name, username, About and social links are shared with your storefront.</p>
         </div>
 
         <div className="dashboard-form-grid">
           <label className="dashboard-field">
-            <span>Display name</span>
+            <span>Profile / store name</span>
             <input
               name="display_name"
               maxLength={80}
@@ -176,16 +167,16 @@ export function ProfileEditor({
         </div>
 
         <label className="dashboard-field">
-          <span>Short bio</span>
+          <span>About / bio</span>
           <textarea
             name="bio"
             rows={4}
-            maxLength={280}
+            maxLength={1200}
             value={form.bio}
             onChange={(event) => update("bio", event.target.value)}
             aria-describedby="bio-count"
           />
-          <small id="bio-count">{form.bio.length}/280 characters</small>
+          <small id="bio-count">{form.bio.length}/1,200 characters</small>
         </label>
 
         <label className="dashboard-field dashboard-field-narrow">
@@ -217,50 +208,17 @@ export function ProfileEditor({
 
         <fieldset className="dashboard-fieldset">
           <legend>Social links</legend>
-          <div className="dashboard-form-grid">
-            <label className="dashboard-field">
-              <span>Instagram URL</span>
-              <input
-                type="url"
-                inputMode="url"
-                placeholder="https://instagram.com/yourname"
-                value={form.instagramUrl}
-                onChange={(event) => update("instagramUrl", event.target.value)}
-              />
-            </label>
-            <label className="dashboard-field">
-              <span>YouTube URL</span>
-              <input
-                type="url"
-                inputMode="url"
-                placeholder="https://youtube.com/@yourchannel"
-                value={form.youtubeUrl}
-                onChange={(event) => update("youtubeUrl", event.target.value)}
-              />
-            </label>
-            <label className="dashboard-field">
-              <span>Website URL</span>
-              <input
-                type="url"
-                inputMode="url"
-                placeholder="https://example.com"
-                value={form.websiteUrl}
-                onChange={(event) => update("websiteUrl", event.target.value)}
-              />
-            </label>
-          </div>
-
           <div className="dashboard-social-links">
             <div className="dashboard-social-heading">
               <div>
                 <strong>Additional links</strong>
-                <small>Add up to five other social or portfolio links.</small>
+                <small>Add up to ten social or portfolio links.</small>
               </div>
               <button
                 type="button"
                 className="dashboard-small-button"
                 onClick={addSocialLink}
-                disabled={form.socialLinks.length >= 5}
+                disabled={form.socialLinks.length >= 10}
               >
                 <Plus size={16} aria-hidden="true" /> Add link
               </button>

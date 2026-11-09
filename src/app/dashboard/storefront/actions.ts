@@ -44,8 +44,8 @@ function databaseMessage(error: { code?: string; message?: string }): string {
 
 export async function checkStorefrontUsernameAction(username: string): Promise<StorefrontActionResult> {
   const normalized = typeof username === "string" ? username.trim().toLowerCase() : "";
-  if (!/^[a-z0-9_-]{1,30}$/.test(normalized)) {
-    return { ok: false, message: "Use 1–30 letters, numbers, hyphens or underscores for your username." };
+  if (!/^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/.test(normalized)) {
+    return { ok: false, message: "Use 3–30 letters, numbers, hyphens or underscores for your username." };
   }
   const auth = await getStorefrontAuth();
   if (!auth.ok) return auth.result;
@@ -68,6 +68,15 @@ export async function saveStorefrontAction(input: unknown): Promise<StorefrontAc
   const auth = await getStorefrontAuth();
   if (!auth.ok) return auth.result;
   const storefront = parsed.value;
+  const { data: previousStorefront, error: previousStorefrontError } = await auth.supabase
+    .from("creator_storefronts")
+    .select("username")
+    .eq("user_id", auth.userId)
+    .maybeSingle();
+  if (previousStorefrontError) {
+    console.error("Could not load the previous storefront username.", previousStorefrontError);
+    return { ok: false, message: "Your storefront could not be updated. Please try again." };
+  }
   const { data, error } = await auth.supabase.rpc("save_my_storefront", {
     requested_store_name: storefront.storeName,
     requested_username: storefront.username,
@@ -78,6 +87,11 @@ export async function saveStorefrontAction(input: unknown): Promise<StorefrontAc
     requested_customization: storefront.customization,
   });
   if (error) return { ok: false, message: databaseMessage(error) };
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/profile");
+  revalidatePath("/dashboard/storefront");
+  if (previousStorefront?.username) revalidatePath(`/${previousStorefront.username}`);
+  revalidatePath(`/${storefront.username}`);
   return {
     ok: true,
     message: "Storefront changes saved.",
@@ -100,6 +114,8 @@ export async function publishStorefrontAction(): Promise<StorefrontActionResult>
   const { error } = await auth.supabase.rpc("publish_my_storefront");
   if (error) return { ok: false, message: databaseMessage(error) };
   revalidatePath(`/${data.username}`);
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/storefront");
   return {
     ok: true,
     message: "Your storefront is live.",
@@ -112,6 +128,8 @@ export async function unpublishStorefrontAction(): Promise<StorefrontActionResul
   if (!auth.ok) return auth.result;
   const { error } = await auth.supabase.rpc("unpublish_my_storefront");
   if (error) return { ok: false, message: databaseMessage(error) };
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/storefront");
   return { ok: true, message: "Your storefront is unpublished. Its public URL now returns 404." };
 }
 
