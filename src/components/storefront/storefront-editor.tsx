@@ -660,13 +660,6 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                       Manage products
                     </Link>
                   </div>
-                  <label className="dashboard-field storefront-layout-control">
-                    <span>Product card layout</span>
-                    <select value={draft.customization.productLayout} disabled={locked} onChange={(event) => updateCustomization("productLayout", event.target.value as StorefrontCustomization["productLayout"])}>
-                      <option value="grid">Grid</option>
-                      <option value="list">List</option>
-                    </select>
-                  </label>
                 </section>
               ) : null}
 

@@ -49,7 +49,6 @@ function AboutSection({ store }: { store: StorefrontView }) {
 }
 
 function ProductsSection({ store }: { store: StorefrontView }) {
-  const { productLayout } = store.customization;
   return (
     <section className="storefront-section storefront-products" id="products" aria-labelledby="storefront-products-title">
       <div className="storefront-section-heading">
@@ -58,7 +57,7 @@ function ProductsSection({ store }: { store: StorefrontView }) {
         </div>
       </div>
       {store.products.length ? (
-        <div className={`storefront-product-grid storefront-product-layout-${productLayout}`}>
+        <div className="storefront-product-grid">
           {store.products.map((product) => <StorefrontProductCard key={product.id} product={product} />)}
         </div>
       ) : (

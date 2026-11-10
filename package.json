@@ -13,6 +13,7 @@
   "dependencies": {
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
+    "@vercel/analytics": "^2.0.1",
     "lucide-react": "latest",
     "next": "latest",
     "react": "latest",

@@ -20,6 +20,7 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
   useState,
   type MouseEvent,
   type ReactNode,
@@ -65,6 +66,7 @@ function initials(name: string) {
 
 export function DashboardShell({ creatorName, email, avatarUrl, children }: DashboardShellProps) {
   const pathname = usePathname();
+  const accountMenuRef = useRef<HTMLDetailsElement>(null);
   const [unsavedSources, setUnsavedSources] = useState<Set<string>>(() => new Set());
   const setUnsavedChanges = useCallback((source: string, value: boolean) => {
     setUnsavedSources((current) => {
@@ -78,6 +80,10 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
   }, []);
   const unsavedContext = useMemo(() => ({ setUnsavedChanges }), [setUnsavedChanges]);
   const hasUnsavedChanges = unsavedSources.size > 0;
+
+  useEffect(() => {
+    if (accountMenuRef.current) accountMenuRef.current.open = false;
+  }, [pathname]);
 
   useEffect(() => {
     if (!hasUnsavedChanges) return;
@@ -110,7 +116,7 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
             <Image src="/images/brand/logo.png" alt="CloverLoop" width={143} height={54} priority />
             <span>Creator studio</span>
           </Link>
-          <details className="dashboard-account-menu">
+          <details ref={accountMenuRef} className="dashboard-account-menu">
             <summary aria-label={`Account menu for ${creatorName}`}>
               {avatarUrl ? (
                 <Image className="dashboard-avatar" src={avatarUrl} alt="" width={38} height={38} />

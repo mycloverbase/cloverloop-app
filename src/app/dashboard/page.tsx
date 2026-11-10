@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CircleCheck, CircleHelp, UserRound } from "lucide-react";
 import { getCreatorPlan, creatorPlans } from "@/lib/account/plans";
-import { getCreatorFirstName, requireCreatorContext } from "@/lib/account/server";
+import { getCreatorName, requireCreatorContext } from "@/lib/account/server";
 
 export const metadata: Metadata = {
   title: "Dashboard | CloverLoop",
@@ -64,7 +64,7 @@ export default async function DashboardPage({
       }
     }
   }
-  const name = getCreatorFirstName(profile.display_name, user.email ?? "");
+  const name = getCreatorName(profile.display_name, user.email ?? "");
   const plan = creatorPlans[getCreatorPlan(user.app_metadata?.plan)];
   const checklist = completionItems(profile);
   const completed = checklist.filter((item) => item.complete).length;
