@@ -6,6 +6,7 @@ import { PublicCta } from "@/components/public-cta";
 import { ResourceViewEvent } from "@/components/resource-view-event";
 import { getArticle, getArticleReadingTime, type ResourceBlock } from "@/lib/resources";
 import { getGuide } from "@/lib/guides";
+import { getBlogArticle } from "@/lib/blog";
 import { PRODUCTION_URL, resourceCards } from "@/lib/site";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -94,21 +95,24 @@ function ArticleBlocks({ blocks, slug }: { blocks: ResourceBlock[]; slug: string
   );
 }
 
-export function ArticlePage({ slug, contentType = "resource" }: { slug: string; contentType?: "resource" | "guide" }) {
+export function ArticlePage({ slug, contentType = "resource" }: { slug: string; contentType?: "resource" | "guide" | "blog" }) {
   const isGuide = contentType === "guide";
-  const article = isGuide ? getGuide(slug) : getArticle(slug);
+  const isBlog = contentType === "blog";
+  const article = isGuide ? getGuide(slug) : isBlog ? getBlogArticle(slug) : getArticle(slug);
   if (!article) notFound();
 
-  const articlePath = `/${isGuide ? "guides" : "resources"}/${slug}`;
-  const collectionLabel = "Resources";
-  const collectionPath = "/resources";
+  const articlePath = `/${isBlog ? "blog" : isGuide ? "guides" : "resources"}/${slug}`;
+  const collectionLabel = isBlog ? "Blog" : "Resources";
+  const collectionPath = isBlog ? "/blog" : "/resources";
   const { minutes, wordCount } = getArticleReadingTime(article);
   const related = article.related
     .map((relatedSlug) => {
       const resource = resourceCards.find((item) => item.slug === relatedSlug);
       if (resource) return { slug: resource.slug, title: resource.title, href: `/resources/${resource.slug}` };
       const guide = getGuide(relatedSlug);
-      return guide ? { slug: guide.slug, title: guide.title, href: `/guides/${guide.slug}` } : null;
+      if (guide) return { slug: guide.slug, title: guide.title, href: `/guides/${guide.slug}` };
+      const blog = getBlogArticle(relatedSlug);
+      return blog ? { slug: blog.slug, title: blog.title, href: `/blog/${blog.slug}` } : null;
     })
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
   const headings = article.blocks

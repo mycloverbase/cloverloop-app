@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { comparisonArticles } from "@/lib/comparisons";
 import { getCategories, getCategoryArticles, getPublishedArticles } from "@/lib/help";
 import { getGuideSlugs } from "@/lib/guides";
+import { getBlogSlugs } from "@/lib/blog";
 import { legalPolicyPages } from "@/lib/legal-policies";
 import { companyPages, featurePages, PRODUCTION_URL, resourceCards } from "@/lib/site";
 
@@ -28,6 +29,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...publishedCompanySlugs.map((slug) => `/${slug}`),
     "/resources",
     ...resourceCards.map((resource) => `/resources/${resource.slug}`),
+    "/blog",
+    ...getBlogSlugs().map((slug) => `/blog/${slug}`),
     ...getGuideSlugs().map((slug) => `/guides/${slug}`),
     "/compare",
     ...comparisonArticles.map((article) => `/compare/${article.slug}`),
@@ -36,7 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [...new Set(routes)].map((route) => ({
     url: `${PRODUCTION_URL}${route === "/" ? "" : route}`,
     changeFrequency:
-      route.startsWith("/resources/") || route.startsWith("/guides/") || route.startsWith("/compare") ? "monthly" : "yearly",
+      route.startsWith("/resources/") || route.startsWith("/guides/") || route.startsWith("/blog/") || route.startsWith("/compare") ? "monthly" : "yearly",
     priority:
       route === "/"
         ? 1
