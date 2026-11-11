@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CircleCheck, CircleHelp, UserRound } from "lucide-react";
-import { getCreatorPlan, creatorPlans } from "@/lib/account/plans";
+import { creatorPlans } from "@/lib/account/plans";
 import { getCreatorName, requireCreatorContext } from "@/lib/account/server";
+import { getMyPlanEntitlements } from "@/lib/account/entitlements";
+import {
+  UpgradeToCreatorButton,
+  UpgradeToProCreatorButton,
+} from "@/components/dashboard/plan-upgrade-controls";
 
 export const metadata: Metadata = {
   title: "Dashboard | CloverLoop",
@@ -26,20 +31,12 @@ function completionItems(profile: Awaited<ReturnType<typeof requireCreatorContex
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ username?: string | string[] }>;
+  searchParams: Promise<{ username?: string | string[]; referral?: string | string[] }>;
 }) {
-  const { username: requestedValue } = await searchParams;
+  const { username: requestedValue, referral: referralValue } = await searchParams;
+  const referralStatus = Array.isArray(referralValue) ? referralValue[0] : referralValue;
   const requestedUsername = Array.isArray(requestedValue) ? requestedValue[0] : requestedValue;
   const { supabase, user, profile } = await requireCreatorContext();
-  const { data: storefront, error: storefrontError } = await supabase
-    .from("creator_storefronts")
-    .select("status")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  if (storefrontError) {
-    console.error("Could not check the creator storefront status.", storefrontError);
-    throw new Error("Your storefront status could not be loaded. Please refresh and try again.");
-  }
   let profileUsername = profile.username;
   let usernameMessage = "";
   if (!profileUsername && requestedUsername) {
@@ -65,9 +62,17 @@ export default async function DashboardPage({
     }
   }
   const name = getCreatorName(profile.display_name, user.email ?? "");
-  const plan = creatorPlans[getCreatorPlan(user.app_metadata?.plan)];
+  const entitlements = await getMyPlanEntitlements(supabase);
+  const plan = creatorPlans[entitlements.plan];
+  const monthlyPlanPrice = `₹${(entitlements.monthlyPricePaise / 100).toLocaleString("en-IN")}/month`;
+  const monthlyGrossSalesLimit = entitlements.monthlyGrossSalesLimitPaise === null
+    ? null
+    : `₹${(entitlements.monthlyGrossSalesLimitPaise / 100).toLocaleString("en-IN")}`;
   const checklist = completionItems(profile);
   const completed = checklist.filter((item) => item.complete).length;
+  const founderDate = (value: string | null) => value
+    ? new Date(value).toLocaleDateString("en-IN", { dateStyle: "long", timeZone: "Asia/Kolkata" })
+    : "—";
 
   return (
     <div className="dashboard-page-content">
@@ -79,33 +84,35 @@ export default async function DashboardPage({
         </div>
       </header>
 
-      <section className="dashboard-founder-banner" aria-labelledby="founder-banner-title">
-        <span className="dashboard-card-label">CloverLoop Founding Creator Programme</span>
-        <h2 id="founder-banner-title">Pilot status and account availability</h2>
-        <p>
-          You&apos;re among the early creators in CloverLoop&apos;s pilot. Your creator profile,
-          account settings, help and feedback tools are available in your account.
+      {referralStatus === "save-error" ? (
+        <p className="dashboard-message dashboard-message-warning" role="alert">
+          Your account is ready, but referral attribution could not be saved. Contact CloverLoop support before publishing your storefront.
         </p>
-        <p>
-        <strong>Available now:</strong> create and publish a branded storefront with sample cards
-        marked Coming Soon. Checkout, payment processing, product delivery and course hosting are
-        not included.
-        </p>
-        <div className="dashboard-founder-banner-actions">
-        {storefront?.status !== "published" ? (
-          <Link className="button" href="/dashboard/storefront">
-            Set Up Your Storefront <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-        ) : null}
-        <Link className="button" href="/dashboard/profile">
-          Complete Your Profile <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-          <Link className="dashboard-founder-feedback-link" href="/dashboard/help#feedback">
-            Share Feedback <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-        </div>
-        <p className="dashboard-founder-thanks">Thank you for being part of our journey!</p>
-      </section>
+      ) : null}
+
+      {entitlements.founderAllocationNumber !== null ? (
+        <section className="dashboard-founder-banner" aria-labelledby="founder-banner-title">
+          <span className="dashboard-card-label">Founding Creator Programme</span>
+          <h2 id="founder-banner-title">
+            {entitlements.founderStatus === "active"
+              ? "Welcome to the Founding Creator Programme!"
+              : "Your Founding Creator membership has ended"}
+          </h2>
+          <p>
+            {entitlements.founderStatus === "active"
+              ? entitlements.plan === "pro_creator"
+                ? "Your storefront is live. The programme benefit waives the platform fee for six months; your separately authorised Pro subscription remains active."
+                : "Your storefront is live. You have six months of unlimited Creator membership with 0% platform transaction fees."
+              : entitlements.plan === "pro_creator"
+                ? "Your Founding Creator benefit has expired. Pro Creator remains active at 0%; if that subscription ends, the standard Creator platform fee applies."
+                : "Your Creator plan and unlimited listings continue. The standard 4% platform transaction fee now applies."}
+          </p>
+          <p>
+            Allocation #{entitlements.founderAllocationNumber} · Activated {founderDate(entitlements.founderActivatedAt)} ·
+            {" "}Expires {founderDate(entitlements.founderExpiresAt)} · Effective platform fee {entitlements.platformFeePercentage}%.
+          </p>
+        </section>
+      ) : null}
 
       <section className="dashboard-overview-grid" aria-label="Account overview">
         <article className="dashboard-card dashboard-plan-card">
@@ -114,8 +121,44 @@ export default async function DashboardPage({
               <span className="dashboard-card-label">Current plan</span>
               <h2>{plan.name}</h2>
             </div>
-            <span className="dashboard-plan-price">{plan.monthlyPrice}</span>
+            <span className="dashboard-plan-price">{monthlyPlanPrice}</span>
           </div>
+          <p>{entitlements.platformFeePercentage}% effective CloverLoop platform transaction fee</p>
+          <p>
+            {entitlements.paidProductLimit === null ? "Unlimited paid" : `${entitlements.paidProductLimit} paid`} and{" "}
+            {entitlements.freeProductLimit === null ? "unlimited free" : `${entitlements.freeProductLimit} free`} product listings
+            {entitlements.plan === "free" ? " (free product allowance is lifetime)" : ""}.
+          </p>
+          <p>
+            {monthlyGrossSalesLimit
+              ? `Monthly Gross Sales limit: ${monthlyGrossSalesLimit} per calendar month. Upgrade to Creator to continue selling after reaching the limit.`
+              : "No monthly Gross Sales limit."}
+          </p>
+          {entitlements.plan === "free" ? (
+            <section id="creator-upgrade" className="dashboard-plan-upgrade">
+              <h3>Unlock unlimited product listings</h3>
+              <p>Upgrade to Creator to publish unlimited paid and free products, remove the ₹10,000 monthly Gross Sales limit, and pay a 4% platform transaction fee.</p>
+              <UpgradeToCreatorButton />
+            </section>
+          ) : entitlements.plan === "creator" ? (
+            <section id="pro-upgrade" className="dashboard-plan-upgrade">
+              <h3>Upgrade to Pro Creator</h3>
+              <p>Eliminate CloverLoop&apos;s platform transaction fee with Pro Creator for ₹2,999/month, excluding applicable GST.</p>
+              <UpgradeToProCreatorButton />
+              <p>Payment-provider processing charges are additional. Subscription setup is not available until a provider is configured.</p>
+            </section>
+          ) : (
+            <p>
+              Pro subscription: {entitlements.subscriptionStatus ?? "Active"}
+              {entitlements.nextBillingAt ? ` · Next billing date ${founderDate(entitlements.nextBillingAt)}` : ""}
+            </p>
+          )}
+          {entitlements.plan !== "pro_creator" && entitlements.subscriptionStatus ? (
+            <p>
+              Pro subscription status: {entitlements.subscriptionStatus}
+              {entitlements.nextBillingAt ? ` · Period end ${founderDate(entitlements.nextBillingAt)}` : ""}
+            </p>
+          ) : null}
           <Link className="dashboard-text-link" href="/pricing">
             View all plans <ArrowRight size={16} aria-hidden="true" />
           </Link>

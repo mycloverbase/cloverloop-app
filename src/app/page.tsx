@@ -187,7 +187,7 @@ export default function HomePage() {
             <article className="earnings-card">
               <h3>Free</h3>
               <p className="earnings-card-caption">₹0/month</p>
-              <p>0% CloverLoop platform fee on all Gross Sales.</p>
+              <p>0% CloverLoop platform fee up to ₹10,000 Gross Sales per calendar month.</p>
               <p>1 paid and 5 free product listings per account lifetime.</p>
             </article>
             <article className="earnings-card">

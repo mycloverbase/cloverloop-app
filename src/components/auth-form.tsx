@@ -76,7 +76,20 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         });
         if (authError) throw authError;
         if (data.session) {
-          router.replace(onboardingPath);
+          let referralSaved = true;
+          try {
+            const referralResponse = await fetch("/api/founder-referral", {
+              method: "POST",
+              cache: "no-store",
+            });
+            referralSaved = referralResponse.ok;
+          } catch (referralError) {
+            console.error("Could not finish founder referral attribution after account creation.", referralError);
+            referralSaved = false;
+          }
+          const destination = new URL(onboardingPath, window.location.origin);
+          if (!referralSaved) destination.searchParams.set("referral", "save-error");
+          router.replace(`${destination.pathname}${destination.search}`);
           router.refresh();
           return;
         }

@@ -13,7 +13,6 @@ import {
 } from "@/app/dashboard/products/actions";
 import { ImageCropUploader } from "@/components/storefront/image-crop-uploader";
 import { StorefrontProductCard } from "@/components/storefront/public-storefront";
-import { getCreatorPlan } from "@/lib/account/plans";
 import type { CreatorPlanKey } from "@/lib/account/types";
 import {
   PRODUCT_FILE_ACCEPT,
@@ -148,7 +147,7 @@ export function ProductManager({
 
   const canCreateFree = plan !== "free" || freeListingCount < 5;
   const canCreatePaid = plan !== "free" || paidListingCount < 1;
-  const limitedPlan = getCreatorPlan(plan) === "free";
+  const limitedPlan = plan === "free";
 
   function startCreate() {
     setError("");
@@ -365,7 +364,7 @@ export function ProductManager({
             className="dashboard-small-button"
             type="button"
             onClick={startCreate}
-            disabled={!storefrontId || storefrontStatus === "deletion_pending" || busy || (!canCreateFree && !canCreatePaid)}
+            disabled={!storefrontId || storefrontStatus === "deletion_pending" || busy}
           >
             <Plus size={16} aria-hidden="true" /> Add product
           </button>
@@ -383,7 +382,14 @@ export function ProductManager({
       {storefrontStatus === "deletion_pending" ? (
         <div className="product-manager-alert" role="status">This storefront is scheduled for deletion; product changes are disabled.</div>
       ) : null}
-      {error ? <div className="product-manager-alert error" role="alert">{error}</div> : null}
+      {error ? (
+        <div className="product-manager-alert error" role="alert">
+          {error}
+          {error.includes("Upgrade to Creator") ? (
+            <p><Link href="/dashboard#creator-upgrade">Upgrade to Creator</Link></p>
+          ) : null}
+        </div>
+      ) : null}
       {feedback ? <div className="product-manager-alert success" role="status">{feedback}</div> : null}
 
       {form ? (

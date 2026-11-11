@@ -270,17 +270,19 @@ export const companyPages: Record<
       { type: "p", text: "Whether you are a musician, designer, educator, photographer or content creator, if you have something valuable to share, CloverLoop is made with you in mind." },
       { type: "p", text: "Explore the platform, discover our approach to creator monetisation and join us as a Founding Creator." },
       { type: "strong", text: "Your work. Your audience. Your own storefront." },
-      { type: "cta", text: "Get Started for Free", href: "/signup" },
+      { type: "cta", text: "Get Started for Free", href: "/signup?ref=founder" },
     ],
   },
   "founding-creators": {
-    title: "Creator Feedback | CloverLoop",
+    title: "Founding Creator Programme | CloverLoop",
     description:
-      "Share your perspective on the tools independent creators need.",
-    heading: "Share your creator perspective",
+      "Join CloverLoop's Founding Creator Programme for six months of unlimited Creator listings and a 0% platform fee.",
+    heading: "Founding Creator Programme",
     paragraphs: [
-      "CloverLoop is focused on the needs of independent creators. We value practical feedback about the tools, workflows and experiences that help creators present digital products to their audiences.",
-      "Create an account to continue to the next step in the CloverLoop experience.",
+      "The Founding Creator Programme is an entitlement overlay on CloverLoop's Creator plan, not a paid subscription.",
+      "The first 50 eligible creators must register through the founder referral link and successfully publish their storefront. Creating an account or publishing an individual product does not qualify on its own.",
+      "Once allocated, members receive unlimited paid and free product listings with a 100% waiver of the standard 4% CloverLoop platform transaction fee for six calendar months. Payment-provider charges and applicable taxes remain separate.",
+      "After the six-month period, the Creator plan and unlimited listings continue with the standard 4% platform fee. CloverLoop will not start a subscription automatically. Temporary storefront unpublishing does not revoke an allocated place.",
     ],
   },
   "help-center": {
@@ -678,7 +680,7 @@ export const faqItems = [
   {
     question: "What are CloverLoop's platform transaction fees?",
     answer:
-      "Free has a 0% platform fee, Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
+      "Free has a 0% platform fee up to ₹10,000 Gross Sales per calendar month. Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
   },
   {
     question: "Are payment gateway processing fees included in CloverLoop pricing?",
@@ -688,12 +690,12 @@ export const faqItems = [
   {
     question: "What are the available plans?",
     answer:
-      "Free is ₹0/month with a 0% platform fee and includes one paid and five free product listings per account lifetime. Creator is ₹0/month with a 4% platform fee and unlimited paid and free listings. Pro Creator is ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
+      "Free is ₹0/month with a 0% platform fee up to ₹10,000 Gross Sales per calendar month, one paid product listing and five free product listings per account lifetime. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator is ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
   },
   {
     question: "How is the platform transaction fee calculated?",
     answer:
-      "The Free plan has a 0% platform fee. Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
+      "The Free plan has a 0% platform fee up to ₹10,000 Gross Sales per calendar month. Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
   },
   {
     question: "Does the Free plan have a limit on free products?",

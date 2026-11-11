@@ -4,9 +4,11 @@ import { TrackLink } from "@/components/track-link";
 export function PublicCta({
   title = "Give your digital products a dedicated home.",
   body = "Plan how to present your work and connect it with the people who value it.",
+  href = "/signup",
 }: {
   title?: string;
   body?: string;
+  href?: string;
 }) {
   return (
     <section className="cta-section">
@@ -16,7 +18,7 @@ export function PublicCta({
           <h2>{title}</h2>
           <p>{body}</p>
         </div>
-        <TrackLink href="/signup" event="signup_click" className="button button-light">
+        <TrackLink href={href} event="signup_click" className="button button-light">
           Get Started for Free <ArrowRight size={17} />
         </TrackLink>
       </div>

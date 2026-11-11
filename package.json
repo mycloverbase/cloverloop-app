@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "optimize:assets": "node tools/optimize-assets.mjs"
   },
@@ -28,6 +29,7 @@
     "eslint": "latest",
     "eslint-config-next": "latest",
     "tailwindcss": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "vitest": "^3.2.7"
   }
 }

@@ -19,6 +19,7 @@ import type {
   StorefrontSection,
   StorefrontTheme,
 } from "@/lib/storefront/types";
+import { FreeProductClaim } from "@/components/storefront/free-product-claim";
 
 type StorefrontView = {
   store_name: string;
@@ -27,6 +28,7 @@ type StorefrontView = {
   profileImageUrl: string | null;
   bannerImageUrl: string | null;
   theme: StorefrontTheme;
+  claimLinkExpiryHours?: number;
   products: StorefrontProductDisplay[];
   customization: StorefrontCustomization & {
     products: (StorefrontCustomization["products"][number] & { coverImageUrl?: string | null })[];
@@ -58,7 +60,14 @@ function ProductsSection({ store }: { store: StorefrontView }) {
       </div>
       {store.products.length ? (
         <div className="storefront-product-grid">
-          {store.products.map((product) => <StorefrontProductCard key={product.id} product={product} />)}
+          {store.products.map((product) => (
+            <StorefrontProductCard
+              key={product.id}
+              product={product}
+              storefrontUsername={store.username}
+              claimLinkExpiryHours={store.claimLinkExpiryHours ?? 48}
+            />
+          ))}
         </div>
       ) : (
         <p className="storefront-empty-products">No products are currently available.</p>
@@ -67,7 +76,15 @@ function ProductsSection({ store }: { store: StorefrontView }) {
   );
 }
 
-export function StorefrontProductCard({ product }: { product: StorefrontProductDisplay }) {
+export function StorefrontProductCard({
+  product,
+  storefrontUsername,
+  claimLinkExpiryHours,
+}: {
+  product: StorefrontProductDisplay;
+  storefrontUsername?: string;
+  claimLinkExpiryHours?: number;
+}) {
   const price = product.isFree
     ? "Free"
     : new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(product.pricePaise / 100);
@@ -93,9 +110,18 @@ export function StorefrontProductCard({ product }: { product: StorefrontProductD
           <strong>{price}</strong>
           <span>{product.isFree ? "Free product" : "Digital product"}</span>
         </div>
-        <button className="storefront-product-action" type="button" disabled>
-          {product.isFree ? "Free download coming soon" : "Payments coming soon"}
-        </button>
+        {product.isFree && storefrontUsername ? (
+          <FreeProductClaim
+            productId={product.id}
+            productName={product.name}
+            storefrontUsername={storefrontUsername}
+            linkExpiryHours={claimLinkExpiryHours ?? 48}
+          />
+        ) : (
+          <button className="storefront-product-action" type="button" disabled>
+            {product.isFree ? "Free download coming soon" : "Payments coming soon"}
+          </button>
+        )}
       </div>
     </article>
   );

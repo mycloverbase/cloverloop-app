@@ -13,7 +13,7 @@ Publish operational how-to instructions only after the steps have been checked a
 
 Use neutral descriptions for payment and plan-related topics. Do not describe a provider connection, transaction, billing or fee-collection flow as available unless the relevant user-facing experience has been verified.
 
-Authoritative published pricing: Free — ₹0/month, 0% platform fee, one paid and five free product listings per account lifetime. Creator — ₹0/month, 4% platform commission, unlimited paid and free product listings, no monthly Gross Sales limit. Pro Creator — ₹2,999/month, 0% platform fee, unlimited paid and free product listings. Razorpay or other payment-provider processing charges, if applicable, are separate, payable by creators to the provider, and not included in platform commission.
+Authoritative published pricing: Free — ₹0/month, 0% platform fee up to ₹10,000 Gross Sales per calendar month, one paid and five free product listings per account lifetime; reaching the cap requires creator-confirmed upgrade to Creator to continue selling. Creator — ₹0/month, 4% platform commission, unlimited paid and free product listings, no monthly Gross Sales limit. Pro Creator — ₹2,999/month, 0% platform fee, unlimited paid and free product listings. Razorpay or other payment-provider processing charges, if applicable, are separate, payable by creators to the provider, and not included in platform commission.
 
 The Free plan's one paid and five free product listings are lifetime account-level limits. They are not download quotas and do not reset monthly.
 

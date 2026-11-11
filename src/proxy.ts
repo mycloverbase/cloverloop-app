@@ -1,6 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig } from "@/lib/supabase/config";
+import {
+  createFounderReferralCookieValue,
+  FOUNDER_REFERRAL_COOKIE,
+  verifyFounderReferralCookie,
+} from "@/lib/referrals/server";
 
 export async function proxy(request: NextRequest) {
   const config = getSupabaseConfig();
@@ -47,6 +52,23 @@ export async function proxy(request: NextRequest) {
   }
   if ((pathname === "/login" || pathname === "/signup") && user) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+  if (pathname === "/signup" && !user && request.nextUrl.searchParams.get("ref") === "founder") {
+    const currentValue = request.cookies.get(FOUNDER_REFERRAL_COOKIE)?.value;
+    if (!verifyFounderReferralCookie(currentValue)) {
+      const signedValue = createFounderReferralCookieValue();
+      if (signedValue) {
+        response.cookies.set(FOUNDER_REFERRAL_COOKIE, signedValue, {
+          httpOnly: true,
+          secure: request.nextUrl.protocol === "https:",
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 365,
+        });
+      } else {
+        console.error("Founder referral attribution could not be signed because the service role key is unavailable.");
+      }
+    }
   }
   return response;
 }

@@ -10,7 +10,7 @@ export const legalPolicyPages = [
     seoTitle: "Terms of Use | CloverLoop",
     description:
       "Read the terms that govern access to and use of CloverLoop, including creator accounts, plans, fees, content, purchases and disputes.",
-    lastUpdated: "2 November 2026",
+    lastUpdated: "11 November 2026",
   },
   {
     slug: "privacy",
@@ -18,7 +18,7 @@ export const legalPolicyPages = [
     seoTitle: "Privacy Policy | CloverLoop",
     description:
       "Learn how CloverLoop collects, uses, stores and shares personal data, and how to contact us about privacy requests.",
-    lastUpdated: "2 November 2026",
+    lastUpdated: "11 November 2026",
   },
   {
     slug: "refunds",

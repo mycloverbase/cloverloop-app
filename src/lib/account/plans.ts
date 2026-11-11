@@ -8,7 +8,10 @@ export const creatorPlans: Record<
     name: "Free",
     monthlyPrice: "₹0/month",
     commission: "0% platform transaction fee",
-    features: ["1 paid product and 5 free product listings per account lifetime"],
+    features: [
+      "1 paid product and 5 free product listings per account lifetime",
+      "₹10,000 Gross Sales limit per calendar month",
+    ],
   },
   creator: {
     name: "Creator",

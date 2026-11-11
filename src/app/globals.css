@@ -2526,6 +2526,29 @@ a {
   font-weight: 700;
 }
 
+.dashboard-plan-upgrade {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin: 20px 0;
+  padding: 18px;
+  border: 1px solid #dfe8df;
+  border-radius: 12px;
+  background: #f8faf6;
+}
+
+.dashboard-plan-upgrade h3,
+.dashboard-plan-upgrade p {
+  margin: 0;
+}
+
+.dashboard-admin-form {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  margin: 16px 0;
+}
+
 .dashboard-text-link {
   display: inline-flex;
   align-items: center;
@@ -6544,6 +6567,238 @@ a {
   font-size: 0.78rem;
   font-weight: 720;
   cursor: not-allowed;
+}
+
+.storefront-product-action:not(:disabled) {
+  background: var(--store-primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.storefront-product-action:not(:disabled):hover {
+  filter: brightness(1.08);
+}
+
+.free-product-modal-backdrop {
+  position: fixed;
+  z-index: 1000;
+  display: grid;
+  overflow-y: auto;
+  place-items: center;
+  padding: 22px;
+  background: rgb(17 34 25 / 58%);
+  inset: 0;
+}
+
+.free-product-modal {
+  position: relative;
+  width: min(100%, 480px);
+  border: 1px solid #d3dbc8;
+  border-top: 4px solid #a8c5a0;
+  border-radius: 14px;
+  padding: 32px;
+  background: #fbfaf5;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 22%);
+}
+
+.free-product-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #4f6157;
+  cursor: pointer;
+}
+
+.free-product-modal h2 {
+  margin: 8px 36px 10px 0;
+  color: #14382b;
+  font-size: 1.55rem;
+  line-height: 1.25;
+}
+
+.free-product-modal > p,
+.free-product-claim-success > p {
+  color: #4f6157;
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.free-product-claim-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.free-product-claim-form > label:not(.free-product-terms) {
+  color: #14382b;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.free-product-claim-form > input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #cbd6cc;
+  border-radius: 7px;
+  padding: 0 12px;
+  background: #fff;
+  color: #243029;
+}
+
+.free-product-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 4px 0;
+  color: #4f6157;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.free-product-terms input {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+}
+
+.free-product-terms a {
+  color: #1b4332;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.free-product-claim-form .button,
+.free-product-claim-success .button {
+  width: 100%;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.free-product-claim-form .button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.free-product-claim-note {
+  margin: 2px 0 0;
+  color: #64716a !important;
+  font-size: 0.78rem !important;
+}
+
+.free-product-claim-error {
+  margin: 0;
+  color: #9b3429;
+  font-size: 0.84rem;
+}
+
+.free-product-download-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+  background: #f3f1e4;
+}
+
+.free-product-download-card {
+  width: min(100%, 560px);
+  border: 1px solid #d3dbc8;
+  border-top: 4px solid #a8c5a0;
+  border-radius: 14px;
+  padding: 34px;
+  background: #fbfaf5;
+  box-shadow: 0 14px 40px rgb(20 43 29 / 8%);
+}
+
+.free-product-download-card h1 {
+  margin: 8px 0 12px;
+  color: #14382b;
+}
+
+.free-product-download-card p {
+  color: #4f6157;
+  line-height: 1.6;
+}
+
+.free-product-download-card .button {
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.free-product-claims-section {
+  display: grid;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.free-product-claims-section h2 {
+  margin: 0;
+  color: var(--forest);
+}
+
+.free-product-claims-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.free-product-claims-stat,
+.free-product-claim-row {
+  border: 1px solid #e1e8e0;
+  border-radius: 9px;
+  padding: 14px;
+  background: #fff;
+}
+
+.free-product-claims-stat h3 {
+  margin: 0 0 9px;
+  color: var(--forest);
+  font-size: 0.95rem;
+}
+
+.free-product-claims-stat p,
+.free-product-claim-row p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.free-product-claim-list {
+  display: grid;
+  gap: 8px;
+}
+
+.free-product-claim-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 16px;
+}
+
+.free-product-claim-row strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--forest);
+}
+
+.free-product-claim-row span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+@media (max-width: 560px) {
+  .free-product-modal,
+  .free-product-download-card {
+    padding: 26px 20px;
+  }
 }
 
 .product-manager {

@@ -41,13 +41,15 @@ We may review reports, request information, restrict access to content or take o
 
 The published plan structure is:
 
-| Plan | Subscription | Platform fee | Product allowance |
-| --- | --- | --- | --- |
-| Free | ₹0/month | 0% | 1 paid product and 5 free product listings per account lifetime |
-| Creator | ₹0/month | 4%; no monthly Gross Sales limit | Unlimited paid and free products |
-| Pro Creator | ₹2,999/month | 0% | Unlimited paid and free products |
+| Plan | Subscription | Platform fee | Product allowance | Monthly Gross Sales limit |
+| --- | --- | --- | --- | --- |
+| Free | ₹0/month | 0% up to ₹10,000 Gross Sales per calendar month | 1 paid product and 5 free product listings per account lifetime | ₹10,000 |
+| Creator | ₹0/month | 4% | Unlimited paid and free products | None |
+| Pro Creator | ₹2,999/month | 0% | Unlimited paid and free products | None |
 
 Platform rates and monthly subscription prices are exclusive of applicable GST where required.
+
+The Free plan's monthly Gross Sales limit is measured per calendar month. Reaching the limit requires an upgrade to the Creator plan to continue selling; plan upgrades require the creator's confirmation.
 
 Razorpay or other payment-provider processing charges, if applicable, are separate from CloverLoop's platform commission and payable by the creator to the provider under its terms. These charges are not included in CloverLoop's platform commission.
 
@@ -59,11 +61,17 @@ Creators are responsible for taxes arising from their sales and business. Obtain
 
 Any plan changes, renewals, cancellations or refunds are governed by the applicable plan terms and any non-waivable rights under applicable law.
 
+The Founding Creator Programme is an entitlement overlay on the Creator plan, not a subscription. It is limited to the first 50 eligible creators who register through CloverLoop's founder referral link and successfully publish a storefront. Qualifying creators receive unlimited Creator listings and a 100% waiver of the standard 4% platform fee for six calendar months from programme activation. A signup or product publication alone does not qualify. After expiry, the Creator plan and unlimited listings continue and the 4% platform fee applies; CloverLoop will not start a paid subscription automatically. Temporary storefront unpublishing does not itself revoke an allocated programme slot.
+
+Pro Creator requires a separately authorised recurring subscription. CloverLoop will not activate paid Pro benefits based only on a browser redirect or charge a creator without explicit subscription authorisation. Pro availability, cancellation, renewal and payment-failure terms will be shown before any subscription is offered.
+
 ## 7. Buyer purchases and delivery
 
 The creator sets product price, description and buyer-facing terms. The applicable payment provider and delivery conditions should be clearly identified to buyers before purchase.
 
 Buyers may use purchased content only within the licence stated by the creator. Unless permitted by the creator or law, buyers must not resell, redistribute, publicly share or make unauthorised copies.
+
+To claim an available free digital product, you must provide an email address and accept these Terms and the [Privacy Policy](/privacy). CloverLoop uses the email address to send a secure download link and shares it with the creator offering the product so they can fulfil the request and provide support. Download links expire and may have download limits shown in the claim flow. A claim may be unavailable if the creator disables or removes the product.
 
 ## 8. Intellectual property
 

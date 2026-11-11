@@ -26,7 +26,11 @@ const pricingFaqs = [
   },
   {
     question: "What is the difference between Free, Creator and Pro Creator?",
-    answer: "Free costs ₹0/month, has a 0% platform fee and includes one paid product listing and five free product listings per account lifetime. Creator costs ₹0/month with a 4% platform fee and unlimited paid and free listings. Pro Creator costs ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
+    answer: "Free costs ₹0/month, has a 0% platform fee up to ₹10,000 Gross Sales per calendar month and includes one paid product listing and five free product listings per account lifetime. Creator costs ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator costs ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
+  },
+  {
+    question: "What happens when I reach the Free plan's monthly Gross Sales limit?",
+    answer: "At ₹10,000 Gross Sales in a calendar month, the Free plan requires an upgrade to Creator to continue selling. Creator remains ₹0/month, charges a 4% platform transaction fee, and has no monthly Gross Sales limit. An upgrade requires your confirmation.",
   },
   {
     question: "Does the calculator show guaranteed earnings?",
@@ -68,6 +72,7 @@ export function PricingPage() {
         <div className="pricing-grid" aria-label="CloverLoop plans">
           {pricingPlans.map((plan) => (
             <article
+              id={`${plan.id}-pricing-card`}
               className={`pricing-card ${"recommended" in plan && plan.recommended ? "pricing-card-featured" : ""}`}
               key={plan.id}
             >
@@ -86,12 +91,12 @@ export function PricingPage() {
                 <p className="platform-fee-details">{plan.feeDetails}</p>
               </div>
               <TrackLink
-                href="/signup"
+                href={plan.id === "free" ? "/signup" : `/dashboard#${plan.id === "creator" ? "creator-upgrade" : "pro-upgrade"}`}
                 event="pricing_cta_click"
                 eventValue={plan.name}
                 className={`button ${"recommended" in plan && plan.recommended ? "" : "button-secondary"}`}
               >
-                Create an account <ArrowRight size={17} />
+                {plan.id === "free" ? "Create an account" : `Upgrade to ${plan.name}`} <ArrowRight size={17} />
               </TrackLink>
               <div className="plan-includes">
                 <h3>Plan includes</h3>
@@ -133,13 +138,13 @@ export function PricingPage() {
           <header className="pricing-earnings-heading">
             <h2 id="pricing-earnings-title">How platform fees and subscriptions work</h2>
             <p>
-              Free has a 0% platform fee. Creator has a 4% platform fee with no monthly subscription.
+              Free has a 0% platform fee up to ₹10,000 Gross Sales per calendar month. Creator has a 4% platform fee with no monthly subscription.
               Pro Creator has a 0% platform fee and costs ₹2,999/month.
             </p>
           </header>
           <p className="pricing-earnings-accounting">
             Payment-provider charges and applicable taxes are separate. Free includes one paid and five
-            free product listings per account lifetime.
+            free product listings per account lifetime and a ₹10,000 Gross Sales limit per calendar month.
           </p>
         </section>
 

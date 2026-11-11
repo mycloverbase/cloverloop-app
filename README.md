@@ -1,6 +1,6 @@
 # CloverLoop
 
-CloverLoop is a creator-focused website with Supabase authentication, creator storefront publishing and private digital-product management. Creators can publish active product listings; checkout, payments and file delivery are not enabled.
+CloverLoop is a creator-focused website with Supabase authentication, creator storefront publishing and private digital-product management. Customers can claim published free products and receive secure, expiring email download links. Paid checkout and payment processing are not enabled.
 
 Production domain: **https://cloverloop.in**
 
@@ -40,6 +40,7 @@ Production domain: **https://cloverloop.in**
 5. Run checks and create a production build:
 
    ```sh
+   npm test
    npm run typecheck
    npm run lint
    npm run build
@@ -54,11 +55,13 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `NEXT_PUBLIC_SITE_URL` | Yes for authentication redirects | Local URL during development (`http://localhost:3000`); production origin is `https://cloverloop.in`. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes for authentication | Supabase project URL. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for authentication | Supabase public anon/publishable key. |
-| `SUPABASE_SERVICE_ROLE_KEY` | For storefront image processing, file cleanup and checklist opt-ins | Server-only Supabase service-role key. Never expose it to client code. |
-| `NEXT_PUBLIC_FOUNDING_CREATOR_FORM_URL` | For the dashboard programme CTA | External Google Form URL. It is intentionally not hardcoded. |
+| `SUPABASE_SERVICE_ROLE_KEY` | For storefront image processing, file cleanup, checklist opt-ins, free product claims/downloads, and signed founder referral attribution | Server-only Supabase service-role key. Never expose it to client code. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Before launch | Confirmed CloverLoop support address. The Contact page shows a setup notice until provided. |
-| `RESEND_API_KEY` | For launch checklist and creator feedback | Server-only Resend API key used for transactional email delivery. |
-| `RESEND_FROM_EMAIL` | For launch checklist and creator feedback | Verified sender address for transactional email. |
+| `RESEND_API_KEY` | For launch checklist, creator feedback, free product delivery, and programme reminders | Server-only Resend API key used for transactional email delivery. |
+| `RESEND_FROM_EMAIL` | For launch checklist, creator feedback, free product delivery, and programme reminders | Verified sender address for transactional email. |
+| `CRON_SECRET` | For Vercel production schedule | Long, random bearer secret used to authorize the Founding Creator expiry and reminder route. Configure it as a Vercel production environment variable. |
+| `FREE_PRODUCT_LINK_EXPIRY_HOURS` | No | Free product download link expiry in hours (1–168; default 48). |
+| `FREE_PRODUCT_MAX_DOWNLOADS` | No | Maximum successful download redirects per claim (1–20; default 3). |
 
 The launch-checklist email uses the branded HTML in `src/lib/launch-checklist-email.ts`. Its PDF attachment is `public/downloads/cloverloop-link-in-bio-launch-checklist.pdf`, also served as the fallback download link.
 
@@ -104,7 +107,9 @@ Google credentials belong in the Supabase provider configuration; do not put a G
 
 The storefront feature adds one public page per creator at `https://cloverloop.in/{username}`. Cover/profile images use the private `storefront-assets` bucket and are cropped and optimized to WebP by an authenticated server action. Product metadata is stored in `storefront_products`; product files use the separate private `product-files` bucket and upload directly from the authenticated browser with a short-lived, owner-scoped upload slot. Public storefront queries return only active product display fields; they never return product-file paths or links.
 
-The public catalogue displays paid and free product prices, but purchase and download controls are disabled with a clear coming-soon message. No payment, checkout, order creation or free-product file delivery is enabled. Free-plan limits are enforced server-side: one paid and five free listings per account lifetime; Creator and Pro Creator plans allow unlimited listings.
+The public catalogue displays paid and free product prices. Published free products with an active downloadable file can be claimed without a CloverLoop account; a Resend email contains an expiring secure download link. Product files remain private in Supabase Storage. Paid purchase controls remain disabled; no payment, checkout, order creation or paid product delivery is enabled. Free-plan limits are enforced server-side: one paid and five free listings per account lifetime; Creator and Pro Creator plans allow unlimited listings.
+
+Claim records are separate from future paid orders. A repeat claim for the same product and email reuses a currently valid link; failed or expired delivery attempts can be retried subject to rate limits. Each link defaults to a 48-hour lifetime and three successful download redirects. Creators can review claim counts, download counts, dates and customer email addresses in **Dashboard → Products**; access is restricted to their own products.
 
 Apply the database migration with the Supabase CLI after linking the project:
 
@@ -131,8 +136,32 @@ The migrations create storefront and product tables, RLS policies, private stora
 
    The scheduled job runs daily at 03:15 UTC. It hard-deletes storefronts after their 30-day deletion period, releasing usernames only after their assets and private files have been removed. It also removes unreferenced images older than 24 hours, expired product upload slots and retired/deleted product files. Monitor Supabase Edge Function and `pg_cron` logs for failures.
 
-No additional Next.js environment variable is required. The public site only needs the existing Supabase URL and anon/publishable key. Storefront publish, edit, unpublish and delete actions do not send email notifications.
+The storefront image pipeline does not require an additional Next.js environment variable. The public site only needs the existing Supabase URL and anon/publishable key. Storefront publish, edit, unpublish and delete actions do not send email notifications.
 Account deletion is blocked until a scheduled storefront deletion has completed, so the 30-day retention and username reservation cannot be bypassed.
+
+The free product claim flow uses `SUPABASE_SERVICE_ROLE_KEY` and the existing Resend settings (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`) on the server. Apply all migrations with `supabase db push` before enabling it. Confirm the configured Resend sender is verified and set `NEXT_PUBLIC_SITE_URL` to the canonical production origin (`https://cloverloop.in`) in Vercel so emailed links resolve to the deployed app. No additional storage bucket or public file access is needed. The download API creates 60-second signed URLs only after revalidating the claim, product, storefront and download limit.
+
+## Plans and Founding Creator Programme
+
+The pricing source in `src/lib/pricing-plans.ts` matches these current terms (prices exclude applicable GST; provider processing fees are additional):
+
+| Plan | Monthly price | CloverLoop platform fee | Paid listings | Free listings | Monthly Gross Sales limit |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Free | ₹0 | 0% up to ₹10,000/month | 1 | 5 lifetime per account | ₹10,000 per calendar month |
+| Creator | ₹0 | 4% of Gross Sales | Unlimited | Unlimited | None |
+| Pro Creator | ₹2,999 | 0% | Unlimited | Unlimited | None |
+
+The database migrations `20261111190000_creator_plans_and_founding_programme.sql` and `20261111193000_free_monthly_gross_sales_limit.sql` add the audited plan and entitlement structures, referral attribution, programme allocation and subscription records. Free-plan Gross Sales are limited to ₹10,000 per calendar month; reaching that threshold requires an explicitly confirmed upgrade to Creator to continue selling. Creator listings are counted when first activated, not while a product is an unpublished draft. The plan entitlement view determines the effective platform fee and limits; Free-to-Creator activation uses an authenticated database RPC and requires the creator to confirm in the dashboard. Existing listings are not deleted or unpublished.
+
+The Free plan entitlement now exposes the ₹10,000 monthly cap, but sales accumulation and threshold enforcement are not operational: this repository still has no paid checkout or trusted paid-order ledger. Do not treat the upgrade prompt at the sales threshold as live until paid sales are recorded and the cap is enforced server-side.
+
+The referral URL is `https://cloverloop.in/signup?ref=founder`. The `ref=founder` visit is recorded in a signed, HTTP-only cookie and committed server-side after successful account creation; a creator-controlled profile field cannot set the source. Storefront publication triggers one atomic allocation from slots 1–50. The qualification date and original storefront publication date are retained; unpublishing does not revoke a slot. The dashboard shows an allocation confirmation and expiry.
+
+The Vercel cron at `/api/cron/founding-programme` runs daily at 03:00 UTC. Set a high-entropy `CRON_SECRET` and the existing verified Resend sender/API key in Vercel to activate programme expiry and 14-day/3-day reminder delivery. The endpoint is idempotently authorized, records reminder outcomes and releases failed email attempts for retry. The expiry job preserves the Creator plan and unlimited listings; its entitlement calculation restores the 4% fee after six calendar months and never starts a subscription.
+
+The minimal admin page is `/dashboard/admin/founding-creators`. To grant an administrator, use a trusted Supabase Auth Admin operation to set `app_metadata.role` to `admin`; never grant this role via user-editable metadata. Admin RPCs independently enforce that role, audit attribution corrections/enrolments, and do not permit allocations beyond 50.
+
+**Pro Creator billing is not operational.** This repository has no payment provider integration, and no provider was selected or configured. Subscription/webhook tables and the entitlement model are prepared, but the Pro upgrade endpoint explicitly refuses to start billing and no Pro entitlement can activate. Do not mark a subscription active from a browser redirect. Completing Pro billing requires choosing a provider, its merchant approval and server-only credentials, then implementing and verifying provider subscription creation, signed/idempotent webhook processing, renewals, failures, cancellation, and expiry.
 
 ## Routes
 
@@ -140,6 +169,7 @@ Account deletion is blocked until a scheduled storefront deletion has completed,
 
 - `/`
 - `/{username}` for a published creator storefront
+- `/free-product-download` for secure, expiring free-product links
 - `/sell-online`
 - `/sell-digital-downloads`
 - `/courses`
@@ -183,6 +213,7 @@ Account deletion is blocked until a scheduled storefront deletion has completed,
 - `/auth/callback`
 - `/dashboard`
 - `/dashboard/storefront`
+- `/dashboard/admin/founding-creators` for administrators with the trusted Supabase app metadata role
 
 Login, signup, password reset, auth callback and dashboard responses are noindex. The dashboard route is protected by Supabase session verification and redirects unauthenticated visitors to `/login`.
 
@@ -200,7 +231,7 @@ All article reading-time estimates are calculated from the actual words rendered
 
 ## Analytics and cookie consent
 
-Google Tag Manager container `GTM-K4BMMLN3` loads once from the root layout on every route with Google Consent Mode defaults denied. GA4 is not installed separately by the app; configure it in GTM with a Google Tag ID of `G-PS230HQXZY` and require `analytics_storage` consent. Disable the Google Tag's automatic `page_view` (`send_page_view: false`), then send one GA4 `page_view` event from the app's custom `page_view` data-layer event, mapping `page_path` as an event parameter. Do not also use a History Change trigger for page views. The app emits one custom page-view event per route after consent is granted, including the current page when consent is first accepted. Rejecting stores that choice locally, keeps consent denied and pushes no custom events. Other tracked events include navigation, pricing visits and CTAs, signup/login outcomes, Google OAuth initiation, resource views and the authenticated programme CTA. Authentication credentials and tokens are never included in analytics payloads.
+Google Tag Manager container `GTM-K4BMMLN3` loads once from the root layout on each route after hydration; on `/free-product-download`, it waits until the token fragment is removed from the address bar. Google Consent Mode defaults denied. GA4 is not installed separately by the app; configure it in GTM with a Google Tag ID of `G-PS230HQXZY` and require `analytics_storage` consent. Disable the Google Tag's automatic `page_view` (`send_page_view: false`), then send one GA4 `page_view` event from the app's custom `page_view` data-layer event, mapping `page_path` as an event parameter. Do not also use a History Change trigger for page views. The app emits one custom page-view event per route after consent is granted, including the current page when consent is first accepted. Rejecting stores that choice locally, keeps consent denied and pushes no custom events. Other tracked events include navigation, pricing visits and CTAs, signup/login outcomes, Google OAuth initiation, resource views, free-product claim starts/completions, email-send acceptance and download-link use, and the authenticated programme CTA. Customer emails and download tokens are never included in analytics payloads.
 
 ## Production and Vercel deployment
 
@@ -210,7 +241,7 @@ Google Tag Manager container `GTM-K4BMMLN3` loads once from the root layout on e
 4. Add `cloverloop.in` to the Vercel project domains and follow Vercel's DNS instructions. Configure the `www` hostname only if you intend to redirect it to the canonical production domain.
 5. Add `https://cloverloop.in/auth/callback` to the Supabase redirect allow list and set the Supabase production Site URL to `https://cloverloop.in`.
 6. Configure Google OAuth's authorized origin and Supabase callback as described above.
-7. Set the confirmed support email and external Founding Creator form URL before launch.
+7. Set the confirmed support email before launch; the Founding Creator Programme uses the in-app referral link rather than an external form.
 8. Configure and publish the GTM Google Tag and `page_view` event tag for `G-PS230HQXZY`; test consent and page views with Tag Assistant before validating GA4 Realtime.
 9. Run `npm run typecheck`, `npm run lint` and `npm run build`, then deploy.
 10. After launch, submit `https://cloverloop.in/sitemap.xml` to Google Search Console.
@@ -219,6 +250,6 @@ The sitemap uses the production canonical origin and excludes authentication, ut
 
 ## Product scope and launch configuration
 
-Creators can manage real product listings and upload private product files. Active products appear in the public storefront catalogue; inactive products do not. Paid checkout and all file delivery—including free downloads—remain disabled. The app does **not** implement Razorpay connectivity, payment verification, order creation, earnings, sales analytics, subscriptions, monthly commission invoicing, or order management.
+Creators can manage real product listings and upload private product files. Active products appear in the public storefront catalogue; inactive products do not. Free products can be claimed and delivered through expiring, limited-use email links. Paid checkout and paid product delivery remain disabled. The app does **not** implement Razorpay connectivity, payment verification, paid order creation, earnings, sales analytics, operational Pro subscription billing, monthly commission invoicing, or paid order management. Subscription tables and entitlement fields are scaffolding only until a provider is selected and its trusted webhook flow is implemented.
 
-Before launch, configure Supabase and Google OAuth, confirm the support email and programme form, and obtain legal review of the Terms and Privacy drafts. Pricing is presented as the agreed intended pricing model; subscriptions and payment processing are not operational in this implementation.
+Before launch, configure Supabase and Google OAuth, apply all migrations, set the cron and Resend variables, verify the support email, and obtain legal review of the Terms and Privacy drafts. Pricing is presented as the agreed intended pricing model; Pro subscription billing and paid checkout are not operational in this implementation.

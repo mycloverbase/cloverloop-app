@@ -5,12 +5,13 @@ export const pricingPlans = [
     monthlyCost: 0,
     price: "₹0",
     fee: "0%",
-    feeDetails: "0% platform fee on all Gross Sales.",
+    feeDetails: "0% platform fee up to ₹10,000 Gross Sales per calendar month.",
     calculatorFee: "0%",
     platformFee: (grossSales: number) => grossSales * 0,
     description: "A simple way to start offering a small digital product catalogue.",
     features: [
       "1 paid product and 5 free products (lifetime account-level limit)",
+      "₹10,000 Gross Sales limit per calendar month",
     ],
   },
   {

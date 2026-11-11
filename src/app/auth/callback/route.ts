@@ -2,6 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { safeInternalPath } from "@/lib/auth-redirect";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+  FOUNDER_REFERRAL_COOKIE,
+  getFounderReferralIssuedAt,
+} from "@/lib/referrals/server";
 
 export async function GET(request: NextRequest) {
   const config = getSupabaseConfig();
@@ -43,6 +48,47 @@ export async function GET(request: NextRequest) {
       const failure = NextResponse.redirect(new URL("/login?error=consent", request.url));
       failure.headers.set("X-Robots-Tag", "noindex, nofollow");
       return failure;
+    }
+  }
+  const referralIssuedAt = getFounderReferralIssuedAt(
+    request.cookies.get(FOUNDER_REFERRAL_COOKIE)?.value,
+  );
+  if (referralIssuedAt !== null) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const accountCreatedAt = user?.created_at ? Date.parse(user.created_at) : Number.NaN;
+    if (userError || !user) {
+      console.error("Could not verify the founder referral account.", userError);
+      response.headers.set("Location", new URL("/dashboard?referral=save-error", request.url).toString());
+    } else if (Number.isFinite(accountCreatedAt) && accountCreatedAt >= referralIssuedAt) {
+      const admin = createSupabaseAdminClient();
+      if (!admin) {
+        console.error("Founder referral attribution could not be stored because Supabase admin access is unavailable.");
+        response.headers.set("Location", new URL("/dashboard?referral=save-error", request.url).toString());
+      } else {
+        const { error: referralError } = await admin.rpc("record_founding_creator_referral", {
+          requested_creator_id: user.id,
+        });
+        if (referralError) {
+          console.error("Could not store verified founder referral attribution.", referralError);
+          response.headers.set("Location", new URL("/dashboard?referral=save-error", request.url).toString());
+        } else {
+          response.cookies.set(FOUNDER_REFERRAL_COOKIE, "", {
+            httpOnly: true,
+            secure: request.nextUrl.protocol === "https:",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 0,
+          });
+        }
+      }
+    } else {
+      response.cookies.set(FOUNDER_REFERRAL_COOKIE, "", {
+        httpOnly: true,
+        secure: request.nextUrl.protocol === "https:",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0,
+      });
     }
   }
   response.headers.set("X-Robots-Tag", "noindex, nofollow");

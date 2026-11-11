@@ -14,6 +14,10 @@ export type AnalyticsEvent =
   | "founding_creator_click"
   | "resource_view"
   | "resource_cta_click"
+  | "free_product_claim_started"
+  | "free_product_claim_completed"
+  | "free_product_email_sent"
+  | "free_product_downloaded"
   | "page_view";
 
 declare global {
@@ -54,7 +58,12 @@ let lastPageViewUrl = "";
 // Sends at most one page_view per distinct URL, only after analytics consent.
 export function trackPageView() {
   if (!analyticsAllowed()) return;
-  const pageLocation = window.location.href;
+  const safeLocation = new URL(window.location.href);
+  safeLocation.hash = "";
+  safeLocation.searchParams.delete("token");
+  safeLocation.searchParams.delete("download_token");
+  safeLocation.searchParams.delete("email");
+  const pageLocation = safeLocation.toString();
   if (pageLocation === lastPageViewUrl) return;
   lastPageViewUrl = pageLocation;
   track("page_view", {

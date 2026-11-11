@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
 import { ANALYTICS_CONSENT_KEY, SITE_NAME, PRODUCTION_URL, GTM_ID } from "@/lib/site";
 import { AnalyticsConsent } from "@/components/analytics-consent";
+import { AnalyticsBootstrap } from "@/components/analytics-bootstrap";
 import { AuthFlowTracker } from "@/components/auth-flow-tracker";
+import { SiteAnalytics } from "@/components/site-analytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -56,20 +56,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   };
   return (
     <html lang="en-IN">
-      <head>
-        <Script
-          id="google-tag-manager-bootstrap"
-          src="/scripts/google-tag-manager-bootstrap.js"
-          strategy="beforeInteractive"
-          data-gtm-id={GTM_ID}
-          data-consent-key={ANALYTICS_CONSENT_KEY}
-        />
-      </head>
       <body>
+        <AnalyticsBootstrap gtmId={GTM_ID} consentKey={ANALYTICS_CONSENT_KEY} />
         <AuthFlowTracker />
         <AnalyticsConsent />
         {children}
-        <Analytics />
+        <SiteAnalytics />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }} />
       </body>

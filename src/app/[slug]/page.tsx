@@ -15,6 +15,7 @@ import { LegalPolicyPage } from "@/components/legal-policy-page";
 import { legalPolicyPages } from "@/lib/legal-policies";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { getPublishedStorefront } from "@/lib/storefront/server";
+import { getFreeProductConfig } from "@/lib/free-products/server";
 
 const slugs = [
   ...featurePages.map((item) => item.slug),
@@ -244,13 +245,13 @@ function CompanyPage({ slug }: { slug: string }) {
           )}
           {slug === "help-center" && <Link href="/faq" className="button">Visit the FAQ <ArrowRight size={16} /></Link>}
           {slug === "founding-creators" && (
-            <TrackLink href="/signup" event="signup_click" className="button">Get Started for Free <ArrowRight size={16} /></TrackLink>
+            <TrackLink href="/signup?ref=founder" event="signup_click" className="button">Join as a Founding Creator <ArrowRight size={16} /></TrackLink>
           )}
           {slug === "partner-program" && <Link href="/contact" className="subtle-link">Contact CloverLoop <ArrowRight size={16} /></Link>}
           {slug === "terms" || slug === "privacy" ? <p className="draft-label">Draft — requires qualified legal review before publication.</p> : null}
         </div>
       </section>
-      <PublicCta />
+      <PublicCta href={slug === "founding-creators" ? "/signup?ref=founder" : undefined} />
     </>
   );
 }
@@ -306,7 +307,14 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
     if (!supabase) notFound();
     const storefront = await getPublishedStorefront(supabase, slug);
     if (!storefront) notFound();
-    return <PublicStorefront store={storefront} />;
+    return (
+      <PublicStorefront
+        store={{
+          ...storefront,
+          claimLinkExpiryHours: getFreeProductConfig()?.linkExpiryHours ?? 48,
+        }}
+      />
+    );
   }
   let content = null;
   if (legalPolicyPages.some((item) => item.slug === slug)) content = <LegalPolicyPage slug={slug} />;

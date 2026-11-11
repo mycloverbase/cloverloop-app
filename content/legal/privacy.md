@@ -13,12 +13,14 @@ For account, platform, website, support, security and business-administration in
 - Creator profile information such as display name, username, bio, location, contact number, profile image, social links and communication preferences.
 - Storefront information such as product titles, descriptions, prices, files, images and settings.
 - Plan selection and related account information, where applicable.
+- Founder referral attribution, storefront publication, Founding Creator allocation number, programme activation/expiry, and programme audit records where applicable.
 - Payment-provider connection information, where applicable.
 - Support requests, feedback, complaints and communications.
 
 ### Buyers and storefront visitors
 
 - Information entered in a purchase flow, where applicable, which may include name, email and other details requested by the creator or needed to fulfil an order.
+- Email address, product claimed, claim date, download-link expiry and download events when you request a free digital product. The creator offering the product can view the email address, claim date and download count for that product.
 - Order details, product purchased, order status, download or access events, and payment references or transaction identifiers, where applicable.
 - Information submitted in forms or communications with the creator or CloverLoop.
 - Technical information such as browser, device, approximate location derived from network information, referring page, pages viewed, timestamps and diagnostic logs, subject to applicable consent and configuration.
@@ -32,7 +34,8 @@ Payment providers process payment credentials under their own systems and terms.
 - Create and administer accounts, authenticate users and operate creator storefronts.
 - Operate the website and account features and provide related services.
 - Explain published plan pricing and administer plan-related information, where applicable.
-- Send service notices, order confirmations, support responses and security alerts.
+- Verify referral eligibility, allocate programme slots, administer fee-waiver periods, and send programme expiry notices.
+- Send service notices, free-product delivery links, order confirmations, support responses and security alerts.
 - Detect fraud, abuse, unauthorised access and policy violations, and address payment disputes where applicable.
 - Maintain, troubleshoot, secure and improve the Platform and understand aggregate usage.
 - Comply with legal obligations, respond to lawful requests and establish, exercise or defend legal claims.
@@ -48,7 +51,7 @@ Google Analytics 4 and Google Tag Manager may be used to measure website usage i
 
 ## 5. Who we share information with
 
-- Creators: a creator may receive buyer details and order information needed to fulfil a purchase, provide support and manage the creator's customer relationship, where applicable.
+- Creators: a creator may receive buyer or claimant details and product claim/download information needed to fulfil a request and provide support. Claimant email addresses are visible to the creator who offered the claimed product.
 - Supabase: may provide authentication, database and file-storage infrastructure, depending on deployed configuration.
 - Vercel: may provide website hosting, content delivery, security and technical diagnostics.
 - Resend: may provide transactional email delivery, such as account, order and product-delivery communications, where configured.
@@ -60,7 +63,7 @@ Providers may process information in India or other countries depending on infra
 
 ## 6. Data retention
 
-We retain personal data only for as long as reasonably necessary for account operation, order fulfilment, support, security, dispute handling, legal compliance and tax / accounting records. Retention periods vary by data type and legal requirement. When information is no longer required, we will delete it, anonymise it or securely restrict access, subject to backups, audit logs and legal holds.
+We retain personal data only for as long as reasonably necessary for account operation, product-claim fulfilment, support, security, dispute handling, legal compliance and tax / accounting records. Claim records and associated email addresses are retained while the creator account/product record exists, unless deletion is required sooner or information must be retained for a legal or security purpose. Retention periods vary by data type and legal requirement. When information is no longer required, we will delete it, anonymise it or securely restrict access, subject to backups, audit logs and legal holds.
 
 ## 7. Security
 

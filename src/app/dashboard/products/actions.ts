@@ -94,10 +94,10 @@ function parseProductInput(value: unknown): ProductInput | null {
 function productErrorMessage(error: { code?: string; message?: string }): string {
   const message = error.message ?? "";
   if (message.includes("Free product listing limit reached")) {
-    return "Your Free plan allows five free product listings per account lifetime.";
+    return "Your Free plan has reached its five free product listing lifetime limit. Upgrade to Creator to publish unlimited free products.";
   }
   if (message.includes("Paid product listing limit reached")) {
-    return "Your Free plan allows one paid product listing per account lifetime.";
+    return "Your Free plan has reached its one paid product listing lifetime limit. Upgrade to Creator to publish unlimited paid products.";
   }
   if (message.includes("A product file is required")) {
     return "Upload a product file before saving or activating this product.";
