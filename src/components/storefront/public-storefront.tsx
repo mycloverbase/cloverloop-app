@@ -1,18 +1,9 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import {
-  AtSign,
-  BriefcaseBusiness,
-  Camera,
-  CirclePlay,
-  Gamepad2,
-  Link2,
   Mail,
-  Music2,
-  Pin,
-  UsersRound,
-  X,
 } from "lucide-react";
+import { SocialPlatformIcon } from "@/components/storefront/social-platform-icon";
 import type {
   StorefrontCustomization,
   StorefrontProductDisplay,
@@ -128,18 +119,7 @@ export function StorefrontProductCard({
 }
 
 function SocialIcon({ platform }: { platform: string }) {
-  const icon = platform.toLowerCase();
-  const Icon = icon === "instagram" ? Camera
-    : icon === "youtube" ? CirclePlay
-      : icon === "facebook" ? UsersRound
-        : icon === "linkedin" ? BriefcaseBusiness
-          : icon === "x" ? X
-            : icon === "tiktok" ? Music2
-              : icon === "pinterest" ? Pin
-                : icon === "threads" ? AtSign
-                  : icon === "twitch" ? Gamepad2
-                    : Link2;
-  return <Icon size={19} strokeWidth={2} aria-hidden="true" />;
+  return <SocialPlatformIcon platform={platform} monochrome />;
 }
 
 function ContactSection({ store }: { store: StorefrontView }) {

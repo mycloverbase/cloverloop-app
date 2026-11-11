@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowDown, ArrowUp, Check, Copy, ExternalLink, GripVertical, LoaderCircle, Plus, Share2, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, Copy, ExternalLink, GripVertical, Link2, LoaderCircle, Plus, Share2, Trash2 } from "lucide-react";
 import { createPortal } from "react-dom";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   checkStorefrontUsernameAction,
   deleteStorefrontAction,
@@ -13,6 +13,7 @@ import {
 } from "@/app/dashboard/storefront/actions";
 import { ImageCropUploader } from "@/components/storefront/image-crop-uploader";
 import { PublicStorefront } from "@/components/storefront/public-storefront";
+import { SocialPlatformIcon } from "@/components/storefront/social-platform-icon";
 import { useDashboardUnsavedChanges } from "@/components/dashboard/dashboard-shell";
 import {
   DEFAULT_STOREFRONT_CUSTOMIZATION,
@@ -29,18 +30,23 @@ import {
 import { parseStorefrontDraft } from "@/lib/storefront/validation";
 import { storefrontUsernameFromName } from "@/lib/storefront/types";
 
-const steps = [
-  "Store identity",
-  "Store branding",
-  "About",
-  "Product showcase",
-  "Social links",
-  "Contact",
-  "Preview & publish",
-];
-
 type DialogAction = "publish" | "unpublish" | "delete" | null;
 type DevicePreview = "desktop" | "mobile";
+
+function socialUrlPrefix(platform: string): string {
+  const prefixes: Record<string, string> = {
+    Instagram: "https://www.instagram.com/",
+    YouTube: "https://www.youtube.com/@",
+    Facebook: "https://www.facebook.com/",
+    LinkedIn: "https://www.linkedin.com/in/",
+    X: "https://x.com/",
+    TikTok: "https://www.tiktok.com/@",
+    Pinterest: "https://www.pinterest.com/",
+    Threads: "https://www.threads.net/@",
+    Twitch: "https://www.twitch.tv/",
+  };
+  return prefixes[platform] ?? "";
+}
 
 function draftFromStorefront(storefront: StorefrontDisplay | null): StorefrontDraftInput {
   if (!storefront) {
@@ -116,14 +122,16 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
   const [deleteAfter, setDeleteAfter] = useState(initialStorefront?.delete_after ?? null);
   const [profileUrl, setProfileUrl] = useState(initialStorefront?.profileImageUrl ?? null);
   const [bannerUrl, setBannerUrl] = useState(initialStorefront?.bannerImageUrl ?? null);
-  const [step, setStep] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<DevicePreview>("desktop");
   const [dialogAction, setDialogAction] = useState<DialogAction>(null);
+  const [socialLinkPickerOpen, setSocialLinkPickerOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const publishScrollPosition = useRef<number | null>(null);
+  const [publishActionCompleted, setPublishActionCompleted] = useState(0);
   const [usernameManuallyEdited, setUsernameManuallyEdited] = useState(
     Boolean(initialStorefront && initialStorefront.username !== storefrontUsernameFromName(initialStorefront.store_name)),
   );
@@ -198,6 +206,16 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
     return () => setHasUnsavedChanges(false);
   }, [isDirty, setHasUnsavedChanges]);
 
+  useLayoutEffect(() => {
+    if (!publishActionCompleted || publishScrollPosition.current === null) return;
+    const scrollTop = publishScrollPosition.current;
+    publishScrollPosition.current = null;
+    const frame = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => window.scrollTo({ top: scrollTop, behavior: "auto" }));
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [publishActionCompleted]);
+
   useEffect(() => {
     if (!storefrontId || locked || !isDirty || isIdentityDifferent(draft, savedSnapshotRef.current)) return;
     const input = inputForSave(draft);
@@ -220,7 +238,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
     setError("");
   }
 
-  async function continueFromIdentity() {
+  async function saveInitialStorefront() {
     setFeedback("");
     setError("");
     if (!draftRef.current.storeName.trim()) {
@@ -239,12 +257,15 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
         return;
       }
       const saved = await saveDraft(true);
-      if (saved) setStep(1);
+      if (saved) setFeedback("Your store identity is saved. Continue editing the sections below.");
     } catch (checkError) {
       console.error("Could not continue storefront identity setup.", checkError);
       setError("Username availability could not be checked. Please try again.");
     } finally {
       setBusy(false);
+      if (dialogAction === "publish" && publishScrollPosition.current !== null) {
+        setPublishActionCompleted((current) => current + 1);
+      }
     }
   }
 
@@ -342,24 +363,23 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
     }
   }
 
-  function addSocialLink() {
+  function addSocialLink(platform: string) {
     if (draft.customization.socialLinks.length >= 10) return;
-    const platform = STOREFRONT_SOCIAL_PLATFORMS[0];
     const link: StorefrontSocialLink = {
       id: crypto.randomUUID(),
       platform,
       label: platform,
-      url: "",
+      url: socialUrlPrefix(platform),
     };
     updateCustomization("socialLinks", [...draft.customization.socialLinks, link]);
+    setSocialLinkPickerOpen(false);
   }
 
-  function updateSocialLink(id: string, key: keyof StorefrontSocialLink, value: string) {
+  function updateSocialLink(id: string, key: "label" | "url", value: string) {
     updateCustomization(
       "socialLinks",
       draft.customization.socialLinks.map((link) => {
         if (link.id !== id) return link;
-        if (key === "platform" && value !== "Other") return { ...link, platform: value, label: value };
         return { ...link, [key]: value };
       }),
     );
@@ -461,43 +481,17 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
           <section className="storefront-wizard-card dashboard-card">
             <div className="storefront-wizard-top">
               <div>
-                <span className="dashboard-card-label">Setup progress</span>
-                <h2>{steps[step]}</h2>
+                <span className="dashboard-card-label">Storefront editor</span>
+                <h2>Edit your storefront</h2>
               </div>
               <span className="storefront-optional-progress">{optionalLabel}</span>
             </div>
-            <div className="storefront-progress-track" role="progressbar" aria-label="Storefront setup progress" aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={step + 1}>
-              <span style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
-            </div>
-            <nav className="storefront-step-nav" aria-label="Storefront setup steps">
-              {steps.map((label, index) => (
-                <button
-                  type="button"
-                  key={label}
-                  className={index === step ? "active" : ""}
-                  aria-current={index === step ? "step" : undefined}
-                  onClick={() => setStep(index)}
-                >
-                  <span>{index + 1}</span>{label}
-                </button>
-              ))}
-            </nav>
-            <label className="storefront-mobile-step-picker">
-              <span>Go to step</span>
-              <select value={step} onChange={(event) => setStep(Number(event.target.value))}>
-                {steps.map((label, index) => (
-                  <option key={label} value={index}>{index + 1}. {label}</option>
-                ))}
-              </select>
-            </label>
 
             <div className="storefront-step-content">
-              {step === 0 ? (
-                <section className="storefront-step-fields" aria-labelledby="storefront-identity-title">
-                  <div className="storefront-step-intro">
-                    <h3 id="storefront-identity-title">Choose your store identity</h3>
-                    <p>Your store name and username are shared with My Profile and update your creator identity everywhere.</p>
-                  </div>
+                    <section className="storefront-step-fields" aria-labelledby="storefront-identity-title">
+                        <div className="storefront-step-intro">
+                          <h3 id="storefront-identity-title">Choose your store identity</h3>
+                        </div>
                   <label className="dashboard-field">
                     <span>Store name <em>Required</em></span>
                     <input
@@ -537,17 +531,13 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                         aria-describedby="storefront-username-help"
                       />
                     </div>
-                    <small id="storefront-username-help">3–30 letters, numbers, hyphens or underscores. Availability is checked when you continue.</small>
+                    <small id="storefront-username-help">3–30 letters, numbers, hyphens or underscores. Availability is checked when you save your store identity.</small>
                   </label>
-                  <p className="storefront-identity-note">Store name, creator name, username and About details stay in sync. A changed username redirects old storefront links.</p>
-                </section>
-              ) : null}
+              </section>
 
-              {step === 1 ? (
-                <section className="storefront-step-fields" aria-labelledby="storefront-branding-title">
+              <section className="storefront-step-fields" aria-labelledby="storefront-branding-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-branding-title">Make the storefront yours</h3>
-                    <p>Your profile image is required to publish. The banner and theme are optional.</p>
                   </div>
                   <div className="storefront-image-settings">
                     <div>
@@ -612,14 +602,11 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                       <input type="color" value={draft.customization.backgroundColor} onChange={(event) => updateCustomization("backgroundColor", event.target.value)} />
                     </label>
                   </fieldset>
-                </section>
-              ) : null}
+              </section>
 
-              {step === 2 ? (
-                <section className="storefront-step-fields" aria-labelledby="storefront-about-form-title">
+              <section className="storefront-step-fields" aria-labelledby="storefront-about-form-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-about-form-title">Tell visitors about your work</h3>
-                    <p>This is the same About content shown on your creator profile.</p>
                   </div>
                   <label className="dashboard-field">
                     <span>About / bio <em>Optional</em></span>
@@ -633,21 +620,32 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                     />
                     <small id="storefront-description-count">{draft.description.length}/1,200 characters</small>
                   </label>
-                </section>
-              ) : null}
+              </section>
 
-              {step === 3 ? (
-                <section className="storefront-step-fields" aria-labelledby="storefront-products-form-title">
+              <section className="storefront-step-fields" aria-labelledby="storefront-products-form-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-products-form-title">Manage real products</h3>
-                    <p>Add digital products with private files, control their visibility, and preview the cards visitors will see.</p>
                   </div>
                   <div className="storefront-empty-editor">
-                    <p>
-                      {activeProducts.length
-                        ? `${activeProducts.length} active ${activeProducts.length === 1 ? "product is" : "products are"} shown in the storefront preview.`
-                        : "There are no active products yet. Add a product to populate your storefront."}
-                    </p>
+                    {!activeProducts.length ? (
+                      <p>There are no active products yet. Add a product to populate your storefront.</p>
+                    ) : null}
+                    {activeProducts.length ? (
+                      <ul className="storefront-active-products">
+                        {activeProducts.map((product) => (
+                          <li key={product.id}>
+                            <span>
+                              <strong>{product.name}</strong>
+                              {product.category ? <small>{product.category}</small> : null}
+                            </span>
+                            <strong>{product.isFree
+                              ? "Free"
+                              : new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(product.pricePaise / 100)}
+                            </strong>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                     <Link
                       className="dashboard-small-button"
                       href="/dashboard/products"
@@ -660,17 +658,15 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                       Manage products
                     </Link>
                   </div>
-                </section>
-              ) : null}
+              </section>
 
-              {step === 4 ? (
-                <section className="storefront-step-fields" aria-labelledby="storefront-social-form-title">
+              <section className="storefront-step-fields" aria-labelledby="storefront-social-form-title">
                   <div className="storefront-step-intro storefront-step-intro-row">
                     <div>
                       <h3 id="storefront-social-form-title">Link your social channels</h3>
                       <p>Add up to ten links. External links open in a new tab.</p>
                     </div>
-                    <button type="button" className="dashboard-small-button" onClick={addSocialLink} disabled={locked || draft.customization.socialLinks.length >= 10}>
+                    <button type="button" className="dashboard-small-button" onClick={() => setSocialLinkPickerOpen(true)} disabled={locked || draft.customization.socialLinks.length >= 10}>
                       <Plus size={16} aria-hidden="true" /> Add social link
                     </button>
                   </div>
@@ -678,25 +674,32 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                     <div className="storefront-social-editor-list">
                       {draft.customization.socialLinks.map((link, index) => (
                         <div className="storefront-social-editor-row" key={link.id}>
-                          <label className="dashboard-field">
-                            <span>Platform</span>
-                            <select
-                              value={link.platform}
-                              disabled={locked}
-                              onChange={(event) => updateSocialLink(link.id, "platform", event.target.value)}
-                            >
-                              {STOREFRONT_SOCIAL_PLATFORMS.map((platform) => <option key={platform}>{platform}</option>)}
-                            </select>
-                          </label>
                           {link.platform === "Other" ? (
-                            <label className="dashboard-field">
-                              <span>Platform name</span>
-                              <input maxLength={40} value={link.label} disabled={locked} onChange={(event) => updateSocialLink(link.id, "label", event.target.value)} />
-                            </label>
+                            <input
+                              className="storefront-social-name-input"
+                              aria-label="Social channel name"
+                              placeholder="Social channel name"
+                              maxLength={40}
+                              value={link.label}
+                              disabled={locked}
+                              onChange={(event) => updateSocialLink(link.id, "label", event.target.value)}
+                            />
                           ) : null}
-                          <label className="dashboard-field storefront-social-url-field">
-                            <span>URL</span>
-                            <input type="url" inputMode="url" placeholder="https://" value={link.url} disabled={locked} onChange={(event) => updateSocialLink(link.id, "url", event.target.value)} />
+                          <label className="storefront-social-link-field">
+                            <span className="storefront-social-link-icon">
+                              {link.platform === "Other"
+                                ? <Link2 size={19} aria-hidden="true" />
+                                : <SocialPlatformIcon platform={link.platform} />}
+                            </span>
+                            <input
+                              type="url"
+                              inputMode="url"
+                              aria-label={`${link.platform === "Other" ? link.label || "Social" : link.platform} profile link`}
+                              placeholder={socialUrlPrefix(link.platform) || "https://"}
+                              value={link.url}
+                              disabled={locked}
+                              onChange={(event) => updateSocialLink(link.id, "url", event.target.value)}
+                            />
                           </label>
                           <button type="button" className="dashboard-icon-button" aria-label={`Remove social link ${index + 1}`} onClick={() => updateCustomization("socialLinks", draft.customization.socialLinks.filter((item) => item.id !== link.id))} disabled={locked}>
                             <Trash2 size={16} aria-hidden="true" />
@@ -705,26 +708,11 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                       ))}
                     </div>
                   ) : (
-                    <div className="storefront-empty-editor"><p>No social links added yet. This step is optional.</p></div>
+                    <div className="storefront-empty-editor"><p>No social links added yet. This section is optional.</p></div>
                   )}
-                  <SectionManager
-                    draft={draft}
-                    locked={locked}
-                    onVisibilityChange={(section, visible) => {
-                      const hidden = new Set(draft.customization.hiddenSections);
-                      if (visible) hidden.delete(section);
-                      else hidden.add(section);
-                      updateCustomization("hiddenSections", [...hidden]);
-                    }}
-                    onMove={moveSection}
-                    onDrop={reorderSections}
-                    onBannerStyleChange={(style) => updateCustomization("bannerStyle", style)}
-                  />
-                </section>
-              ) : null}
+              </section>
 
-              {step === 5 ? (
-                <section className="storefront-step-fields" aria-labelledby="storefront-contact-form-title">
+              <section className="storefront-step-fields" aria-labelledby="storefront-contact-form-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-contact-form-title">Choose a public contact address</h3>
                     <p>This is separate from your CloverLoop login email. Visitors only see a Contact button that opens their email app.</p>
@@ -741,24 +729,23 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                       placeholder="hello@example.com"
                     />
                   </label>
-                  <SectionManager
-                    draft={draft}
-                    locked={locked}
-                    onVisibilityChange={(section, visible) => {
-                      const hidden = new Set(draft.customization.hiddenSections);
-                      if (visible) hidden.delete(section);
-                      else hidden.add(section);
-                      updateCustomization("hiddenSections", [...hidden]);
-                    }}
-                    onMove={moveSection}
-                    onDrop={reorderSections}
-                    onBannerStyleChange={(style) => updateCustomization("bannerStyle", style)}
-                  />
-                </section>
-              ) : null}
+              </section>
 
-              {step === 6 ? (
-                <section className="storefront-step-fields storefront-final-preview" aria-labelledby="storefront-final-title">
+              <SectionManager
+                draft={draft}
+                locked={locked}
+                onVisibilityChange={(section, visible) => {
+                  const hidden = new Set(draft.customization.hiddenSections);
+                  if (visible) hidden.delete(section);
+                  else hidden.add(section);
+                  updateCustomization("hiddenSections", [...hidden]);
+                }}
+                onMove={moveSection}
+                onDrop={reorderSections}
+                onBannerStyleChange={(style) => updateCustomization("bannerStyle", style)}
+              />
+
+              <section className="storefront-step-fields storefront-final-preview" aria-labelledby="storefront-final-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-final-title">Preview your storefront</h3>
                     <p>Check both screen sizes. Optional details can stay blank; a store name, username and profile image are required to publish.</p>
@@ -775,27 +762,25 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                     <span className={draft.profileImagePath ? "complete" : ""}><Check size={15} /> Profile image</span>
                   </div>
                   <p className="storefront-final-note">Sample cards are marked Coming Soon, cannot be opened and do not accept payments.</p>
-                </section>
-              ) : null}
+              </section>
             </div>
 
             {error ? <p className="dashboard-message dashboard-message-error" role="alert">{error}</p> : null}
             {feedback ? <p className="dashboard-message dashboard-message-success" role="status">{feedback}</p> : null}
             <div className="storefront-wizard-actions">
-              <span>{isDirty ? "Unsaved changes" : storefrontId ? "Changes save automatically" : "Save your store identity to begin"}</span>
+              <span>{isDirty ? "Unsaved changes" : storefrontId ? "Changes save automatically" : "Save your store identity to enable image uploads"}</span>
               <div>
                 {storefrontId ? (
                   <button type="button" className="button button-secondary" onClick={() => void saveExplicitly()} disabled={busy || !isDirty}>
                     {busy ? <LoaderCircle className="spin" size={16} /> : null} Save
                   </button>
-                ) : null}
-                {step > 0 ? <button type="button" className="button button-secondary" onClick={() => setStep((current) => current - 1)} disabled={busy}>Back</button> : null}
-                {step < 6 ? (
-                  <button type="button" className="button" onClick={() => step === 0 ? void continueFromIdentity() : setStep((current) => current + 1)} disabled={busy || (step === 0 && !draft.storeName.trim())}>
-                    {busy && step === 0 ? <LoaderCircle className="spin" size={16} /> : null}
-                    {step === 0 ? "Continue" : "Continue"}
-                  </button>
                 ) : (
+                  <button type="button" className="button" onClick={() => void saveInitialStorefront()} disabled={busy || !draft.storeName.trim()}>
+                    {busy ? <LoaderCircle className="spin" size={16} /> : null}
+                    Save store identity
+                  </button>
+                )}
+                {storefrontId ? (
                   <button
                     type="button"
                     className="button"
@@ -810,7 +795,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                   >
                     {isPublished ? "Publish changes" : status === "unpublished" ? "Republish storefront" : "Publish storefront"}
                   </button>
-                )}
+                ) : null}
               </div>
             </div>
           </section>
@@ -864,11 +849,48 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
             {dialogAction === "publish" ? <code>{publicUrl}</code> : null}
             <div className="storefront-dialog-actions">
               <button type="button" className="button button-secondary" onClick={() => setDialogAction(null)} disabled={busy}>Cancel</button>
-              <button type="button" className={dialogAction === "delete" ? "button storefront-danger-button" : "button"} onClick={() => void handleConfirmedAction()} disabled={busy}>
+              <button
+                type="button"
+                className={dialogAction === "delete" ? "button storefront-danger-button" : "button"}
+                onClick={() => {
+                  if (dialogAction === "publish") publishScrollPosition.current = window.scrollY;
+                  void handleConfirmedAction();
+                }}
+                disabled={busy}
+              >
                 {busy ? <LoaderCircle className="spin" size={16} /> : null}
                 {dialogAction === "publish" ? "Confirm and publish" :
                 dialogAction === "unpublish" ? "Unpublish storefront" : "Schedule deletion"}
               </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+      {socialLinkPickerOpen ? (
+        <div
+          className="storefront-dialog-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setSocialLinkPickerOpen(false);
+          }}
+        >
+          <section className="storefront-social-picker" role="dialog" aria-modal="true" aria-labelledby="storefront-social-picker-title">
+            <div className="storefront-dialog-heading">
+              <div>
+                <span className="dashboard-card-label">Social links</span>
+                <h2 id="storefront-social-picker-title">Choose a social channel</h2>
+              </div>
+              <button type="button" className="dashboard-icon-button" onClick={() => setSocialLinkPickerOpen(false)} aria-label="Close social channel picker">×</button>
+            </div>
+            <div className="storefront-social-picker-options">
+              {STOREFRONT_SOCIAL_PLATFORMS.map((platform) => (
+                <button key={platform} type="button" onClick={() => addSocialLink(platform)}>
+                  {platform === "Other"
+                    ? <Link2 size={19} aria-hidden="true" />
+                    : <SocialPlatformIcon platform={platform} />}
+                  <span>{platform}</span>
+                </button>
+              ))}
             </div>
           </section>
         </div>
