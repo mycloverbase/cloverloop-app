@@ -57,7 +57,8 @@ export async function POST(request: Request) {
       { key: `claim-ip:${clientIp}`, maxRequests: 10 },
       { key: `claim-email:${email}`, maxRequests: 3 },
     ]);
-  } catch {
+  } catch (error) {
+    console.error("Could not check the free product claim rate limit.", error);
     return jsonError("Free product delivery is temporarily unavailable. Please try again later.", 503);
   }
   if (!withinRateLimit) {
