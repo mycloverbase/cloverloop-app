@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState, useTransition, type ChangeEvent } from "react";
-import { LoaderCircle, Trash2, Upload } from "lucide-react";
+import { ImagePlus, LoaderCircle, Trash2, Upload } from "lucide-react";
 import { uploadStorefrontImageAction } from "@/app/dashboard/storefront/actions";
 import type { StorefrontImageKind } from "@/lib/storefront/types";
 
@@ -23,12 +23,14 @@ export function ImageCropUploader({
   imageUrl,
   onUploaded,
   onRemove,
+  onError,
 }: {
   kind: StorefrontImageKind;
   storefrontId: string | null;
   imageUrl: string | null;
   onUploaded: (path: string, url: string) => void;
   onRemove?: () => void;
+  onError?: (message: string) => void;
 }) {
   const fileInputId = useId();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -54,17 +56,22 @@ export function ImageCropUploader({
     setSelectedFile(null);
     setSelectedUrl(null);
     setError("");
+    onError?.("");
     setMessage("");
     setZoom(1);
     setHorizontal(50);
     setVertical(50);
     if (!file) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      setError("Choose a JPG, PNG or WebP image.");
+      const message = "Choose a JPG, PNG or WebP image.";
+      setError(message);
+      onError?.(`Image upload failed. ${message}`);
       return;
     }
     if (file.size > imageLimits[kind]) {
-      setError(`Choose an image no larger than ${limitInMb} MB.`);
+      const message = `Choose an image no larger than ${limitInMb} MB.`;
+      setError(message);
+      onError?.(`Image upload failed. ${message}`);
       return;
     }
     setSelectedFile(file);
@@ -74,6 +81,7 @@ export function ImageCropUploader({
   function uploadImage() {
     if (!selectedFile || !storefrontId) return;
     setError("");
+    onError?.("");
     setMessage("");
     const formData = new FormData();
     formData.set("kind", kind);
@@ -87,19 +95,25 @@ export function ImageCropUploader({
         const result = await uploadStorefrontImageAction(formData);
         if (!result.ok) {
           setError(result.message);
+          onError?.(`Image upload failed. ${result.message}`);
           return;
         }
         if (!result.path || !result.imageUrl) {
-          setError("The uploaded image could not be prepared for preview. Please try again.");
+          const message = "The uploaded image could not be prepared for preview. Please try again.";
+          setError(message);
+          onError?.(`Image upload failed. ${message}`);
           return;
         }
         onUploaded(result.path, result.imageUrl);
+        onError?.("");
         setSelectedFile(null);
         setSelectedUrl(null);
         setMessage("Image uploaded. Save your changes to apply it.");
       } catch (uploadError) {
         console.error("Could not upload a storefront image.", uploadError);
-        setError("The image could not be uploaded. Check your connection and try again.");
+        const message = "Image upload failed. Check your connection and try again with a supported image format.";
+        setError(message);
+        onError?.(message);
       }
     });
   }
@@ -108,6 +122,7 @@ export function ImageCropUploader({
     setSelectedFile(null);
     setSelectedUrl(null);
     setError("");
+    onError?.("");
     setMessage("");
     onRemove?.();
   }
@@ -128,12 +143,15 @@ export function ImageCropUploader({
             }}
           />
         ) : (
-          <span>{kind === "profile" ? "Add a profile image" : `Add a ${kind} image`}</span>
+          <span className="storefront-image-empty">
+            {kind === "product" ? <ImagePlus size={27} aria-hidden="true" /> : null}
+            {kind === "product" ? "Upload cover image" : kind === "profile" ? "Add a profile image" : `Add a ${kind} image`}
+          </span>
         )}
       </div>
       <label className="storefront-file-picker" htmlFor={fileInputId}>
         <Upload size={16} aria-hidden="true" />
-        Choose image
+        {previewUrl ? "Change image" : kind === "product" ? "Upload cover image" : "Choose image"}
       </label>
       <input
         id={fileInputId}

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parseHelpMarkdown, type HelpBlock } from "@/lib/help-markdown";
@@ -44,6 +45,18 @@ export const legalPolicyPages = [
       "Read CloverLoop's disclaimer covering platform information, third-party services, creator content, availability and liability.",
     lastUpdated: "2 November 2026",
   },
+  {
+    slug: "creator-agreement",
+    title: "CLOVERLOOP CREATOR AGREEMENT",
+    seoTitle: "CloverLoop Creator Agreement v1.0",
+    description:
+      "Read the CloverLoop Creator Agreement v1.0, effective 12 November 2026.",
+    lastUpdated: "12 November 2026",
+    documentVersion: "1.0",
+    effectiveDate: "12 November 2026",
+    documentSha256: "78f03248f8228ec9d5d2ad880d6f3d5d20a24fdd9a0f63b0b63f3a9d6f034337",
+    documentPath: "creator-agreement-v1.0.md",
+  },
 ] as const;
 
 export type LegalPolicySummary = (typeof legalPolicyPages)[number];
@@ -53,13 +66,20 @@ export function getLegalPolicy(slug: string): LegalPolicy | undefined {
   const policy = legalPolicyPages.find((item) => item.slug === slug);
   if (!policy) return undefined;
 
-  const content = readFileSync(
-    path.join(process.cwd(), "content", "legal", `${policy.slug}.md`),
-    "utf8",
-  );
+  const contentPath = "documentPath" in policy ? policy.documentPath : `${policy.slug}.md`;
+  const content = readFileSync(path.join(process.cwd(), "content", "legal", contentPath), "utf8");
+  if ("documentSha256" in policy) {
+    const actualDigest = createHash("sha256").update(content).digest("hex");
+    if (actualDigest !== policy.documentSha256) {
+      throw new Error(`The immutable legal document ${contentPath} does not match its registered SHA-256 digest.`);
+    }
+  }
   const supportContact = SUPPORT_EMAIL || "[support team](/contact)";
+  const displayContent = "documentVersion" in policy
+    ? content.split(/\r?\n/).slice(5).join("\n")
+    : content;
   return {
     ...policy,
-    blocks: parseHelpMarkdown(content.replace(/\{\{SUPPORT_EMAIL\}\}/g, supportContact)),
+    blocks: parseHelpMarkdown(displayContent.replace(/\{\{SUPPORT_EMAIL\}\}/g, supportContact)),
   };
 }

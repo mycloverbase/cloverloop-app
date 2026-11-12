@@ -84,7 +84,7 @@ export function FreeProductClaim({
   return (
     <>
       <button className="storefront-product-action" type="button" onClick={openForm}>
-        Get for Free
+        Get Lead Magnet
       </button>
       {open ? (
         <div className="free-product-modal-backdrop" onMouseDown={(event) => {
@@ -107,7 +107,7 @@ export function FreeProductClaim({
             </button>
             {sentTo ? (
               <div className="free-product-claim-success" role="status">
-                <span className="storefront-eyebrow">Free digital product</span>
+                <span className="storefront-eyebrow">Lead Magnet</span>
                 <h2 id="free-product-modal-title">Your product is on its way!</h2>
                 <p>We&apos;ve sent the download link to <strong>{sentTo}</strong>. Check your inbox.</p>
                 <p className="free-product-claim-note">If you don&apos;t see it soon, check your spam or promotions folder.</p>
@@ -115,7 +115,7 @@ export function FreeProductClaim({
               </div>
             ) : (
               <>
-                <span className="storefront-eyebrow">Free digital product</span>
+                <span className="storefront-eyebrow">Lead Magnet</span>
                 <h2 id="free-product-modal-title">Get {productName}</h2>
                 <p>Enter your email and we&apos;ll send you a secure download link.</p>
                 <form className="free-product-claim-form" onSubmit={submit}>

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CircleCheck, CircleHelp, UserRound } from "lucide-react";
+import { ArrowRight, CircleCheck, CircleHelp, Package, Store, UserRound } from "lucide-react";
 import { creatorPlans } from "@/lib/account/plans";
-import { getCreatorName, requireCreatorContext } from "@/lib/account/server";
+import { getAvatarSignedUrl, getCreatorName, requireCreatorContext } from "@/lib/account/server";
 import { getMyPlanEntitlements } from "@/lib/account/entitlements";
 import {
   UpgradeToCreatorButton,
@@ -62,7 +63,30 @@ export default async function DashboardPage({
     }
   }
   const name = getCreatorName(profile.display_name, user.email ?? "");
-  const entitlements = await getMyPlanEntitlements(supabase);
+  const [entitlements, storefrontResponse, productCountResponse, avatarUrl] = await Promise.all([
+    getMyPlanEntitlements(supabase),
+    supabase
+      .from("creator_storefronts")
+      .select("id,username,status")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("storefront_products")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .is("deleted_at", null),
+    getAvatarSignedUrl(supabase, profile.avatar_path),
+  ]);
+  if (storefrontResponse.error) {
+    console.error("Could not load creator storefront status.", storefrontResponse.error);
+    throw new Error("Your storefront status could not be loaded. Please try again.");
+  }
+  if (productCountResponse.error) {
+    console.error("Could not load creator product listing count.", productCountResponse.error);
+    throw new Error("Your product listing count could not be loaded. Please try again.");
+  }
+  const storefront = storefrontResponse.data;
+  const productCount = productCountResponse.count ?? 0;
   const plan = creatorPlans[entitlements.plan];
   const monthlyPlanPrice = `₹${(entitlements.monthlyPricePaise / 100).toLocaleString("en-IN")}/month`;
   const monthlyGrossSalesLimit = entitlements.monthlyGrossSalesLimitPaise === null
@@ -70,17 +94,43 @@ export default async function DashboardPage({
     : `₹${(entitlements.monthlyGrossSalesLimitPaise / 100).toLocaleString("en-IN")}`;
   const checklist = completionItems(profile);
   const completed = checklist.filter((item) => item.complete).length;
+  const completionPercentage = Math.round((completed / checklist.length) * 100);
+  const storefrontStatus = storefront?.status === "published"
+    ? "Published"
+    : storefront?.status === "deletion_pending"
+      ? "Deletion scheduled"
+      : storefront
+        ? "Draft"
+        : "Not set up";
   const founderDate = (value: string | null) => value
     ? new Date(value).toLocaleDateString("en-IN", { dateStyle: "long", timeZone: "Asia/Kolkata" })
     : "—";
 
   return (
     <div className="dashboard-page-content">
-      <header className="dashboard-page-heading">
+      <header className="dashboard-page-heading dashboard-welcome-heading">
         <div>
           <span className="eyebrow">Creator dashboard</span>
           <h1>Welcome back, {name}</h1>
-          <p>Manage your creator profile, account preferences and support requests.</p>
+          <p>Your creator space is ready. Keep your profile fresh and your storefront looking its best.</p>
+        </div>
+        <div className="dashboard-welcome-actions">
+          {avatarUrl ? (
+            <Image className="dashboard-welcome-avatar" src={avatarUrl} alt="" width={56} height={56} unoptimized />
+          ) : (
+            <span className="dashboard-welcome-avatar dashboard-welcome-avatar-fallback" aria-hidden="true">
+              <UserRound size={23} />
+            </span>
+          )}
+          <Link
+            className="button button-secondary"
+            href={storefront?.status === "published" && storefront.username ? `/${storefront.username}` : "/dashboard/storefront"}
+            target={storefront?.status === "published" && storefront.username ? "_blank" : undefined}
+            rel={storefront?.status === "published" && storefront.username ? "noopener noreferrer" : undefined}
+          >
+            <Store size={17} aria-hidden="true" />
+            {storefront?.status === "published" ? "View storefront" : "Set up storefront"}
+          </Link>
         </div>
       </header>
 
@@ -182,6 +232,33 @@ export default async function DashboardPage({
         </article>
       </section>
 
+      <section className="dashboard-account-overview" aria-label="Creator account at a glance">
+        <article className="dashboard-account-stat">
+          <span className="dashboard-account-stat-icon"><Package size={18} aria-hidden="true" /></span>
+          <div>
+            <span>Product listings</span>
+            <strong>{productCount}</strong>
+            <Link href="/dashboard/products">Manage products <ArrowRight size={14} aria-hidden="true" /></Link>
+          </div>
+        </article>
+        <article className="dashboard-account-stat">
+          <span className="dashboard-account-stat-icon"><UserRound size={18} aria-hidden="true" /></span>
+          <div>
+            <span>Profile completion</span>
+            <strong>{completionPercentage}%</strong>
+            <Link href="/dashboard/profile">Complete profile <ArrowRight size={14} aria-hidden="true" /></Link>
+          </div>
+        </article>
+        <article className="dashboard-account-stat">
+          <span className="dashboard-account-stat-icon"><Store size={18} aria-hidden="true" /></span>
+          <div>
+            <span>Storefront</span>
+            <strong className={storefrontStatus === "Published" ? "dashboard-stat-success" : ""}>{storefrontStatus}</strong>
+            <Link href="/dashboard/storefront">{storefront ? "Edit storefront" : "Create storefront"} <ArrowRight size={14} aria-hidden="true" /></Link>
+          </div>
+        </article>
+      </section>
+
       {usernameMessage && (
         <p className="dashboard-message dashboard-message-error" role="alert">
           {usernameMessage} <Link href="/dashboard/profile">Edit your profile</Link>
@@ -211,12 +288,44 @@ export default async function DashboardPage({
             <li key={item.label} className={item.complete ? "complete" : ""}>
               <CircleCheck size={18} aria-hidden="true" />
               <span>{item.label}</span>
+              {!item.complete ? <Link href="/dashboard/profile">Add <ArrowRight size={13} aria-hidden="true" /></Link> : null}
             </li>
           ))}
         </ul>
         <Link className="dashboard-text-link" href="/dashboard/profile">
           Update your profile <ArrowRight size={16} aria-hidden="true" />
         </Link>
+      </section>
+
+      <section className="dashboard-quick-actions" aria-labelledby="quick-actions-title">
+        <div className="dashboard-section-heading">
+          <div>
+            <span className="dashboard-card-label">Keep things moving</span>
+            <h2 id="quick-actions-title">Quick actions</h2>
+          </div>
+        </div>
+        <div className="dashboard-quick-action-grid">
+          <Link href="/dashboard/products" className="dashboard-quick-action">
+            <span className="dashboard-quick-action-icon"><Package size={19} aria-hidden="true" /></span>
+            <span><strong>Add a product</strong><small>Build your product library</small></span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+          <Link href="/dashboard/storefront" className="dashboard-quick-action">
+            <span className="dashboard-quick-action-icon"><Store size={19} aria-hidden="true" /></span>
+            <span><strong>Edit storefront</strong><small>Shape your public page</small></span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+          <Link href="/dashboard/profile" className="dashboard-quick-action">
+            <span className="dashboard-quick-action-icon"><UserRound size={19} aria-hidden="true" /></span>
+            <span><strong>Manage profile</strong><small>Update your creator details</small></span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+          <Link href="/pricing" className="dashboard-quick-action">
+            <span className="dashboard-quick-action-icon"><ArrowRight size={19} aria-hidden="true" /></span>
+            <span><strong>Explore plans</strong><small>Compare creator plans</small></span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
       </section>
 
       <section className="dashboard-card dashboard-support-card">

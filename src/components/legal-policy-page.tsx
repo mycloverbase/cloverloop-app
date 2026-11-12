@@ -30,7 +30,13 @@ export function LegalPolicyPage({ slug }: { slug: string }) {
         <header className="legal-document-header">
           <span className="eyebrow">Legal</span>
           <h1>{policy.title}</h1>
-          <p>Last updated: {policy.lastUpdated}</p>
+          <p>
+            {"documentVersion" in policy ? (
+              <>Version {policy.documentVersion} · Effective {policy.effectiveDate} · Last updated {policy.lastUpdated}</>
+            ) : (
+              <>Last updated: {policy.lastUpdated}</>
+            )}
+          </p>
         </header>
         {headings.length > 0 && (
           <nav className="legal-toc" aria-label="Table of contents">

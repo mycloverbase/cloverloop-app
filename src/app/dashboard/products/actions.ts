@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
 import { validateProductFileMetadata } from "@/lib/storefront/product-files";
 
 export type ProductActionResult =
@@ -46,6 +47,12 @@ async function getProductAuth(): Promise<ProductAuth> {
   if (error || !user) {
     if (error) console.error("Could not verify a product action.", error);
     return { ok: false, result: { ok: false, message: "Please sign in again to continue." } };
+  }
+  if (!(await creatorAgreementIsAccepted(supabase))) {
+    return {
+      ok: false,
+      result: { ok: false, message: "Accept the Creator Agreement before managing products." },
+    };
   }
   return { ok: true, supabase, userId: user.id };
 }
@@ -94,10 +101,10 @@ function parseProductInput(value: unknown): ProductInput | null {
 function productErrorMessage(error: { code?: string; message?: string }): string {
   const message = error.message ?? "";
   if (message.includes("Free product listing limit reached")) {
-    return "Your Free plan has reached its five free product listing lifetime limit. Upgrade to Creator to publish unlimited free products.";
+    return "You have reached the Lead Magnet listing limit on your current plan. Upgrade to Creator to add more listings.";
   }
   if (message.includes("Paid product listing limit reached")) {
-    return "Your Free plan has reached its one paid product listing lifetime limit. Upgrade to Creator to publish unlimited paid products.";
+    return "You have reached the Paid Product listing limit on your current plan. Upgrade to Creator to add more listings.";
   }
   if (message.includes("A product file is required")) {
     return "Upload a product file before saving or activating this product.";

@@ -7,6 +7,10 @@ import { ArrowRight, LoaderCircle } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { safeInternalPath } from "@/lib/auth-redirect";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import {
+  issueCreatorAgreementAcceptanceProofAction,
+  recordCreatorAgreementAcceptanceAction,
+} from "@/app/creator-agreement/actions";
 
 type AuthMode = "login" | "signup";
 const AUTH_FLOW_KEY = "cloverloop-auth-flow";
@@ -29,6 +33,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const [password, setPassword] = useState("");
   const [marketingConsent, setMarketingConsent] = useState(true);
   const [marketingConsentTouched, setMarketingConsentTouched] = useState(false);
+  const [agreementAccepted, setAgreementAccepted] = useState(false);
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [agreementError, setAgreementError] = useState("");
+  const [ageError, setAgeError] = useState("");
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -45,6 +53,15 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     ? `/dashboard?username=${encodeURIComponent(storefrontUsername)}`
     : "/dashboard";
 
+  function validateCreatorConsent() {
+    const hasAgreement = agreementAccepted;
+    const hasAgeConfirmation = ageConfirmed;
+    setAgreementError(hasAgreement ? "" : "Please accept the Creator Agreement to continue.");
+    setAgeError(hasAgeConfirmation ? "" : "Please confirm that you are at least 18 years old to continue.");
+    setError("");
+    return hasAgreement && hasAgeConfirmation;
+  }
+
   useEffect(() => {
     if (callbackError === "callback" || callbackError === "configuration" || callbackError === "consent") {
       window.localStorage.removeItem(AUTH_FLOW_KEY);
@@ -54,6 +71,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (mode === "signup" && !validateCreatorConsent()) return;
     setPending(true);
     setError("");
     setMessage("");
@@ -62,6 +80,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       window.localStorage.setItem(AUTH_FLOW_KEY, mode);
       window.localStorage.setItem(AUTH_METHOD_KEY, "email");
       if (mode === "signup") {
+        const proofResult = await issueCreatorAgreementAcceptanceProofAction(agreementAccepted, ageConfirmed);
+        if (!proofResult.ok) {
+          setError(proofResult.message);
+          return;
+        }
         const { data, error: authError } = await supabase.auth.signUp({
           email,
           password,
@@ -76,6 +99,15 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         });
         if (authError) throw authError;
         if (data.session) {
+          const acceptance = await recordCreatorAgreementAcceptanceAction();
+          if (!acceptance.ok) {
+            const acceptancePath = new URL("/creator-agreement/accept", window.location.origin);
+            acceptancePath.searchParams.set("next", onboardingPath);
+            acceptancePath.searchParams.set("error", "save");
+            router.replace(`${acceptancePath.pathname}${acceptancePath.search}`);
+            router.refresh();
+            return;
+          }
           let referralSaved = true;
           try {
             const referralResponse = await fetch("/api/founder-referral", {
@@ -118,6 +150,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   }
 
   async function signInWithGoogle() {
+    if (mode === "signup" && !validateCreatorConsent()) return;
     setPending(true);
     setError("");
     try {
@@ -127,6 +160,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       track("google_oauth_initiation", { mode });
       window.localStorage.setItem(AUTH_FLOW_KEY, mode);
       window.localStorage.setItem(AUTH_METHOD_KEY, "google");
+      const proofResult = mode === "signup"
+        ? await issueCreatorAgreementAcceptanceProofAction(agreementAccepted, ageConfirmed)
+        : null;
+      if (proofResult && !proofResult.ok) {
+        setError(proofResult.message);
+        setPending(false);
+        return;
+      }
       const callbackUrl = authCallbackUrl(
         safeNext,
         mode === "signup" ? marketingConsent : marketingConsentTouched ? marketingConsent : undefined,
@@ -209,6 +250,53 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           />
           <span>Opt in for news about CloverLoop plans, updates and resources.</span>
         </label>
+        {mode === "signup" ? (
+          <>
+            <label className="auth-legal-consent">
+              <input
+                type="checkbox"
+                name="creator_agreement_accepted"
+                checked={agreementAccepted}
+                aria-describedby={agreementError ? "creator-agreement-error" : undefined}
+                aria-invalid={Boolean(agreementError)}
+                onChange={(event) => {
+                  setAgreementAccepted(event.target.checked);
+                  if (event.target.checked) setAgreementError("");
+                }}
+              />
+              <span>
+                I agree to the{" "}
+                <Link href="/creator-agreement" target="_blank" rel="noopener noreferrer">
+                  CloverLoop Creator Agreement
+                </Link>.
+              </span>
+            </label>
+            {agreementError ? (
+              <small id="creator-agreement-error" className="auth-consent-error" role="alert">
+                {agreementError}
+              </small>
+            ) : null}
+            <label className="auth-legal-consent auth-age-consent">
+              <input
+                type="checkbox"
+                name="age_confirmed"
+                checked={ageConfirmed}
+                aria-describedby={ageError ? "creator-age-error" : undefined}
+                aria-invalid={Boolean(ageError)}
+                onChange={(event) => {
+                  setAgeConfirmed(event.target.checked);
+                  if (event.target.checked) setAgeError("");
+                }}
+              />
+              <span>I confirm that I am at least 18 years old.</span>
+            </label>
+            {ageError ? (
+              <small id="creator-age-error" className="auth-consent-error" role="alert">
+                {ageError}
+              </small>
+            ) : null}
+          </>
+        ) : null}
         {mode === "login" && <Link className="forgot-link" href="/forgot-password">Forgot password?</Link>}
         {visibleError && <p className="form-message form-error" role="alert">{visibleError}</p>}
         {message && <p className="form-message form-success" role="status">{message}</p>}

@@ -172,6 +172,7 @@ export function ProfileEditor({
             name="bio"
             rows={4}
             maxLength={1200}
+            placeholder="Tell people what you create and what they can expect from your work."
             value={form.bio}
             onChange={(event) => update("bio", event.target.value)}
             aria-describedby="bio-count"

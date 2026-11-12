@@ -1,7 +1,23 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowUp, Check, Copy, ExternalLink, GripVertical, Link2, LoaderCircle, Plus, Share2, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  CheckCircle2,
+  Copy,
+  ExternalLink,
+  GripVertical,
+  Link2,
+  LoaderCircle,
+  MessageCircle,
+  Plus,
+  Share2,
+  Trash2,
+  X,
+} from "lucide-react";
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
@@ -130,6 +146,9 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
   const [dialogAction, setDialogAction] = useState<DialogAction>(null);
   const [socialLinkPickerOpen, setSocialLinkPickerOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [publishedStoreUrl, setPublishedStoreUrl] = useState<string | null>(null);
+  const [publishedLinkCopied, setPublishedLinkCopied] = useState(false);
+  const [publishedLinkError, setPublishedLinkError] = useState("");
   const publishScrollPosition = useRef<number | null>(null);
   const [publishActionCompleted, setPublishActionCompleted] = useState(0);
   const [usernameManuallyEdited, setUsernameManuallyEdited] = useState(
@@ -145,6 +164,15 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
   );
   const completion = optionalCompletion(draft, activeProducts.length > 0);
   const publicUrl = `https://cloverloop.in/${draft.username || "your-store"}`;
+
+  useEffect(() => {
+    if (!publishedStoreUrl) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPublishedStoreUrl(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [publishedStoreUrl]);
 
   const previewStore = useMemo(() => ({
     store_name: draft.storeName || "Your store name",
@@ -281,6 +309,11 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
     setBusy(true);
     setError("");
     setFeedback("");
+    if (dialogAction === "publish") {
+      setPublishedStoreUrl(null);
+      setPublishedLinkCopied(false);
+      setPublishedLinkError("");
+    }
     try {
       if (dialogAction === "publish") {
         const saved = await saveDraft(false);
@@ -291,7 +324,9 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
           return;
         }
         setStatus("published");
-        setFeedback(result.url ? `Your storefront is live at ${result.url}` : result.message);
+        const publishedUrl = result.url ?? publicUrl;
+        setPublishedStoreUrl(publishedUrl);
+        setFeedback(`Your storefront is live at ${publishedUrl}`);
       } else if (dialogAction === "unpublish") {
         const result = await unpublishStorefrontAction();
         if (!result.ok) {
@@ -330,6 +365,19 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
     } catch (copyError) {
       console.error("Could not copy the storefront URL.", copyError);
       setError("The URL could not be copied. Select and copy it manually.");
+    }
+  }
+
+  async function copyPublishedStorefrontUrl() {
+    if (!publishedStoreUrl) return;
+    try {
+      await navigator.clipboard.writeText(publishedStoreUrl);
+      setPublishedLinkCopied(true);
+      setPublishedLinkError("");
+      window.setTimeout(() => setPublishedLinkCopied(false), 2200);
+    } catch (copyError) {
+      console.error("Could not copy the published storefront URL.", copyError);
+      setPublishedLinkError("Copy was unavailable. Select the URL and copy it manually.");
     }
   }
 
@@ -634,12 +682,26 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                       <ul className="storefront-active-products">
                         {activeProducts.map((product) => (
                           <li key={product.id}>
-                            <span>
-                              <strong>{product.name}</strong>
-                              {product.category ? <small>{product.category}</small> : null}
+                            <span className="storefront-active-product-info">
+                              {product.coverImageUrl ? (
+                                <Image
+                                  className="storefront-active-product-thumb"
+                                  src={product.coverImageUrl}
+                                  alt=""
+                                  width={56}
+                                  height={44}
+                                  unoptimized
+                                />
+                              ) : (
+                                <span className="storefront-active-product-thumb storefront-active-product-thumb-empty" aria-hidden="true" />
+                              )}
+                              <span>
+                                <strong>{product.name}</strong>
+                                {product.category ? <small>{product.category}</small> : null}
+                              </span>
                             </span>
                             <strong>{product.isFree
-                              ? "Free"
+                              ? "Lead Magnet"
                               : new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(product.pricePaise / 100)}
                             </strong>
                           </li>
@@ -891,6 +953,80 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                   <span>{platform}</span>
                 </button>
               ))}
+            </div>
+          </section>
+        </div>
+      ) : null}
+      {publishedStoreUrl ? (
+        <div
+          className="storefront-published-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setPublishedStoreUrl(null);
+          }}
+        >
+          <section
+            className="storefront-published-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="storefront-published-title"
+          >
+            <button
+              type="button"
+              className="storefront-published-close"
+              aria-label="Close storefront published confirmation"
+              onClick={() => setPublishedStoreUrl(null)}
+            >
+              <X size={19} aria-hidden="true" />
+            </button>
+            <div className="storefront-published-success-icon"><CheckCircle2 size={30} aria-hidden="true" /></div>
+            <span className="dashboard-card-label">Published successfully</span>
+            <h2 id="storefront-published-title">Your storefront is live!</h2>
+            <p className="storefront-published-intro">
+              Your storefront is ready. Share your link with your audience and start showcasing your products.
+            </p>
+
+            <div className="storefront-published-link">
+              <div>
+                <span>Your public storefront link</span>
+                <a href={publishedStoreUrl} target="_blank" rel="noopener noreferrer">{publishedStoreUrl}</a>
+              </div>
+              <button type="button" className={publishedLinkCopied ? "copied" : ""} onClick={() => void copyPublishedStorefrontUrl()}>
+                {publishedLinkCopied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
+                {publishedLinkCopied ? "Copied" : "Copy link"}
+              </button>
+            </div>
+            {publishedLinkError ? <p className="storefront-published-copy-error" role="status">{publishedLinkError}</p> : null}
+
+            <div className="storefront-published-summary">
+              {profileUrl ? (
+                <Image src={profileUrl} alt="" width={54} height={54} unoptimized />
+              ) : (
+                <span className="storefront-published-summary-avatar" aria-hidden="true">{(draft.storeName.trim()[0] ?? "C").toUpperCase()}</span>
+              )}
+              <div>
+                <strong>{draft.storeName || "Your storefront"}</strong>
+                <span>{publishedStoreUrl}</span>
+              </div>
+              <span className="storefront-published-count">{activeProducts.length} {activeProducts.length === 1 ? "product" : "products"}</span>
+            </div>
+
+            <div className="storefront-published-sharing">
+              <h3>Share your new storefront</h3>
+              <div className="storefront-published-sharing-grid">
+                <article><SocialPlatformIcon platform="Instagram" /><div><strong>Instagram</strong><p>Add your storefront link to your Instagram bio.</p></div></article>
+                <article><MessageCircle size={19} aria-hidden="true" /><div><strong>WhatsApp</strong><p>Share your storefront with your audience and customers.</p></div></article>
+                <article><SocialPlatformIcon platform="YouTube" /><div><strong>YouTube</strong><p>Add your storefront link to your video descriptions.</p></div></article>
+              </div>
+            </div>
+
+            <div className="storefront-published-actions">
+              <a className="button" href={publishedStoreUrl} target="_blank" rel="noopener noreferrer">
+                Open storefront <ExternalLink size={16} aria-hidden="true" />
+              </a>
+              <Link className="button button-secondary" href="/dashboard" onClick={() => setPublishedStoreUrl(null)}>
+                Go to dashboard
+              </Link>
             </div>
           </section>
         </div>

@@ -42,7 +42,7 @@ const CALLOUT_ICONS: Record<CalloutKind, LucideIcon> = {
   note: Info,
 };
 
-const INLINE_RE = /\[([^\]]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]*)\)|(https?:\/\/[^\s)]+)|\*\*([^*]+)\*\*/g;
+const INLINE_RE = /\[([^\]]+)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+|\/[^)\s]*)\)|(https?:\/\/[^\s)]+)|\*\*([^*]+)\*\*/g;
 
 function ExternalOrInternal({ href, children }: { href: string; children: ReactNode }) {
   const external = /^https?:\/\//.test(href);

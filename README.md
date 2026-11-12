@@ -59,15 +59,33 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Before launch | Confirmed CloverLoop support address. The Contact page shows a setup notice until provided. |
 | `RESEND_API_KEY` | For launch checklist, creator feedback, free product delivery, and programme reminders | Server-only Resend API key used for transactional email delivery. |
 | `RESEND_FROM_EMAIL` | For launch checklist, creator feedback, free product delivery, and programme reminders | Verified sender address for transactional email. |
-| `CRON_SECRET` | For Vercel production schedule | Long, random bearer secret used to authorize the Founding Creator expiry and reminder route. Configure it as a Vercel production environment variable. |
+| `CRON_SECRET` | For Vercel production schedule | Long, random bearer secret used to authorize scheduled Founding Creator expiry/reminders and Razorpay token refresh. Configure it as a Vercel production environment variable. |
 | `FREE_PRODUCT_LINK_EXPIRY_HOURS` | No | Free product download link expiry in hours (1–168; default 48). |
 | `FREE_PRODUCT_MAX_DOWNLOADS` | No | Maximum successful download redirects per claim (1–20; default 3). |
+| `RAZORPAY_OAUTH_ENABLED` | No | Must be explicitly set to `true` to enable creator account connections; defaults to `false`. |
+| `RAZORPAY_OAUTH_CLIENT_ID` | For Razorpay OAuth | Server-side Razorpay Technology Partner client ID for the configured environment. |
+| `RAZORPAY_OAUTH_CLIENT_SECRET` | For Razorpay OAuth | Server-only Razorpay Technology Partner client secret. Never expose it to browser code. |
+| `RAZORPAY_OAUTH_MODE` | For Razorpay OAuth | Explicit `test` or `live` mode. Configure the matching development or production client per deployment environment. |
+| `RAZORPAY_TOKEN_ENCRYPTION_KEY` | For Razorpay OAuth | Server-only base64-encoded 32-byte AES-256-GCM key, separate from the Razorpay client secret. |
+| `RAZORPAY_CHECKOUT_ENABLED` | No | Paid checkout feature gate; keep `false`. Razorpay OAuth connection does not activate payments. |
 
 The launch-checklist email uses the branded HTML in `src/lib/launch-checklist-email.ts`. Its PDF attachment is `public/downloads/cloverloop-link-in-bio-launch-checklist.pdf`, also served as the fallback download link.
 
 The launch-checklist form continues to use Resend for delivery. When a visitor separately opts in to updates, their email and consent timestamp are stored in the private Supabase `email_subscriptions` table. Apply the migration in `supabase/migrations` before enabling this opt-in.
 
 Set the same environment variables in the Vercel project. Keep `.env.local` private; it is ignored by Git.
+
+### Razorpay Technology Partner OAuth
+
+The authenticated **Dashboard → Settings → Razorpay account** section connects a creator's existing merchant account using Technology Partner OAuth. To test it:
+
+1. Complete Technology Partner application setup with Razorpay and create a development OAuth client.
+2. Register the exact development callback URI `${NEXT_PUBLIC_SITE_URL}/api/razorpay/callback`. Razorpay documents `https://localhost` for its Preview flow; verify the exact local redirect URI against your development client's allowlist.
+3. Configure `RAZORPAY_OAUTH_ENABLED=true`, the development client ID and secret, `RAZORPAY_OAUTH_MODE=test`, and a separate `RAZORPAY_TOKEN_ENCRYPTION_KEY` in `.env.local`.
+4. Generate the encryption key with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`. Store it in a secret manager; do not commit it or share it in chat.
+5. Apply Supabase migrations and use **Dashboard → Settings → Connect Razorpay**.
+
+For production, use the separate production client and an exact HTTPS callback registered with Razorpay. Keep `RAZORPAY_CHECKOUT_ENABLED=false`; checkout, payments, paid-product delivery and settlement are not implemented or enabled by this OAuth phase. Never share credentials with CloverLoop users or place private values in `NEXT_PUBLIC_*` variables. Access and refresh tokens are encrypted server-side; daily token refresh uses the existing Vercel Cron/`CRON_SECRET` pattern. The access token expires after 90 days and Razorpay's OAuth documentation says the rotating refresh token expires after 180 days.
 
 ## Supabase and Google OAuth setup
 
@@ -163,6 +181,40 @@ The minimal admin page is `/dashboard/admin/founding-creators`. To grant an admi
 
 **Pro Creator billing is not operational.** This repository has no payment provider integration, and no provider was selected or configured. Subscription/webhook tables and the entitlement model are prepared, but the Pro upgrade endpoint explicitly refuses to start billing and no Pro entitlement can activate. Do not mark a subscription active from a browser redirect. Completing Pro billing requires choosing a provider, its merchant approval and server-only credentials, then implementing and verifying provider subscription creation, signed/idempotent webhook processing, renewals, failures, cancellation, and expiry.
 
+## Instagram Comment-to-DM Automations
+
+**This implementation is on hold for the current Vercel plan.** Do not connect accounts or enable automations in production: without the every-minute worker, queued comments will not be processed and no private replies will be sent.
+
+The authenticated dashboard at `/dashboard/instagram-automations` supports Instagram Professional accounts through Meta's official [Instagram API with Instagram Login](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/). It requests only `instagram_business_basic`, `instagram_business_manage_comments`, and `instagram_business_manage_messages`; API calls use `graph.instagram.com` and the explicitly configured Graph API version. The integration does not publish content, automate Live comments, or send follow-up messages.
+
+### Meta app setup
+
+1. Create/configure a Meta Business app with Instagram API using Instagram Login and set the approved OAuth redirect URI to `https://cloverloop.in/api/instagram/callback` (use the corresponding local URI during development).
+2. Request the three permissions above. Configure the Instagram Webhooks callback as `https://cloverloop.in/api/instagram/webhook`, provide the same high-entropy verify token set in `META_INSTAGRAM_WEBHOOK_VERIFY_TOKEN`, and subscribe the app to the `comments` field. Enable the webhook's value payloads. CloverLoop subscribes each connected account to `comments` after OAuth succeeds.
+3. Configure the Meta app secret, app ID, selected currently supported Graph API version, and a new 32-byte encryption key as environment variables below. Do not reuse the app secret as the encryption key.
+4. **On hold:** do not apply the migration or enable this integration in production until a supported background scheduler is available.
+
+### Environment variables
+
+| Variable | Purpose |
+| --- | --- |
+| `META_INSTAGRAM_APP_ID` | Meta app ID for Instagram Login. |
+| `META_INSTAGRAM_APP_SECRET` | Server-only secret used for OAuth and webhook signature verification. |
+| `META_INSTAGRAM_WEBHOOK_VERIFY_TOKEN` | Random token configured identically in the Meta webhook dashboard and Vercel. |
+| `META_GRAPH_API_VERSION` | Current supported version in `vNN.N` format; select/update it from Meta's versioning documentation rather than relying on a code default. |
+| `INSTAGRAM_TOKEN_ENCRYPTION_KEY` | Base64 encoding of a randomly generated 32-byte AES-256-GCM key. Generate with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`. Keep it server-only and back it up securely; changing it requires reconnecting accounts unless old tokens are re-encrypted first. |
+| `NEXT_PUBLIC_SITE_URL` | Canonical app origin used for OAuth callback and CloverLoop links. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Existing server-only key used to access RLS-protected integration records. |
+| `CRON_SECRET` | Existing bearer secret authorizing the automation worker cron. |
+
+### Privacy, delivery and production access
+
+The migration `20261112100000_instagram_comment_automations.sql` creates RLS-enabled connection, automation, event, and rate-limit tables; browser roles receive no table privileges. Server handlers authenticate the creator and apply ownership filters before every change. Access tokens are encrypted with AES-256-GCM; webhook comment IDs are unique per connected account to deduplicate delivery. Comment text and commenter IDs are retained for 30 days, then cleared while aggregate delivery counts remain. Private replies use the comment ID as the recipient, confirm success only after Meta returns a message ID, and are limited to one reply within seven days. When invoked, the worker processes at most 20 events and retries explicit retryable Meta errors with bounded exponential delay.
+
+**Implementation is on hold.** The current Vercel plan does not support the required every-minute worker schedule, so this repository does not configure or run the Instagram worker cron. Without a compatible scheduler, webhook events can queue but automations will not be processed or replies sent. Do not connect accounts or activate automations in a deployed environment until a supported scheduler is configured and tested. The public webhook and duplicate-event safeguards are implemented, but are not a substitute for the worker.
+
+Once a compatible scheduler is available, configure the worker at `/api/cron/instagram-automations` with the existing `CRON_SECRET`, apply the migration, and complete Meta's production approval process before enabling this feature. Instagram Login supports testing with app-role accounts; external creators require the app in Live mode and Advanced Access/App Review for the permissions and comment webhook access. Meta may also require business verification as part of review. Test OAuth, account webhook subscription, real comment delivery and private replies with Meta-approved production access. Development approval does not imply access for external creators. See Meta's current [permissions](https://developers.facebook.com/docs/permissions/reference), [webhook setup](https://developers.facebook.com/docs/instagram-platform/webhooks/setup), [private reply](https://developers.facebook.com/docs/instagram-platform/private-replies), and [App Review](https://developers.facebook.com/docs/instagram-platform/app-review) guides.
+
 ## Routes
 
 ### Public
@@ -212,6 +264,7 @@ The minimal admin page is `/dashboard/admin/founding-creators`. To grant an admi
 - `/forgot-password`
 - `/auth/callback`
 - `/dashboard`
+- `/dashboard/instagram-automations` for connected Instagram accounts and comment automations
 - `/dashboard/storefront`
 - `/dashboard/admin/founding-creators` for administrators with the trusted Supabase app metadata role
 
@@ -250,6 +303,6 @@ The sitemap uses the production canonical origin and excludes authentication, ut
 
 ## Product scope and launch configuration
 
-Creators can manage real product listings and upload private product files. Active products appear in the public storefront catalogue; inactive products do not. Free products can be claimed and delivered through expiring, limited-use email links. Paid checkout and paid product delivery remain disabled. The app does **not** implement Razorpay connectivity, payment verification, paid order creation, earnings, sales analytics, operational Pro subscription billing, monthly commission invoicing, or paid order management. Subscription tables and entitlement fields are scaffolding only until a provider is selected and its trusted webhook flow is implemented.
+Creators can manage real product listings and upload private product files. Active products appear in the public storefront catalogue; inactive products do not. Free products can be claimed and delivered through expiring, limited-use email links. Razorpay creator OAuth account connection is available only when explicitly configured; paid checkout and paid product delivery remain disabled. The app does **not** implement payment verification, paid order creation, earnings, paid sales analytics, operational Pro subscription billing, commission reconciliation, or paid order management. Subscription tables and entitlement fields are scaffolding only until their provider flows are implemented.
 
 Before launch, configure Supabase and Google OAuth, apply all migrations, set the cron and Resend variables, verify the support email, and obtain legal review of the Terms and Privacy drafts. Pricing is presented as the agreed intended pricing model; Pro subscription billing and paid checkout are not operational in this implementation.

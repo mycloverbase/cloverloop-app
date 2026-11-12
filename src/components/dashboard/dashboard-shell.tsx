@@ -6,8 +6,10 @@ import { usePathname } from "next/navigation";
 import {
   ChevronDown,
   CircleHelp,
+  MoreHorizontal,
   LayoutDashboard,
   LogOut,
+  MessageCircle,
   Package,
   Settings,
   Store,
@@ -44,6 +46,7 @@ const navigation = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/storefront", label: "Storefront", icon: Store },
   { href: "/dashboard/products", label: "Products", icon: Package },
+  { href: "/dashboard/instagram-automations", label: "Instagram Automations", icon: MessageCircle },
   { href: "/dashboard/profile", label: "My Profile", icon: UserRound },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
   { href: "/dashboard/help", label: "Help & Support", icon: CircleHelp },
@@ -67,6 +70,7 @@ function initials(name: string) {
 export function DashboardShell({ creatorName, email, avatarUrl, children }: DashboardShellProps) {
   const pathname = usePathname();
   const accountMenuRef = useRef<HTMLDetailsElement>(null);
+  const mobileMoreMenuRef = useRef<HTMLDetailsElement>(null);
   const [unsavedSources, setUnsavedSources] = useState<Set<string>>(() => new Set());
   const setUnsavedChanges = useCallback((source: string, value: boolean) => {
     setUnsavedSources((current) => {
@@ -83,6 +87,7 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
 
   useEffect(() => {
     if (accountMenuRef.current) accountMenuRef.current.open = false;
+    if (mobileMoreMenuRef.current) mobileMoreMenuRef.current.open = false;
   }, [pathname]);
 
   useEffect(() => {
@@ -183,6 +188,48 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
             {children}
           </main>
         </div>
+        <nav className="dashboard-mobile-nav" aria-label="Primary creator dashboard">
+          {navigation
+            .filter(({ href }) => ["/dashboard", "/dashboard/products", "/dashboard/storefront"].includes(href))
+            .map(({ href, label, icon: Icon }) => {
+              const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={active ? "dashboard-mobile-nav-link active" : "dashboard-mobile-nav-link"}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <Icon size={20} aria-hidden="true" />
+                  <span>{label}</span>
+                </Link>
+              );
+            })}
+          <details className="dashboard-mobile-more" ref={mobileMoreMenuRef}>
+            <summary className={
+              navigation.some(({ href }) => href !== "/dashboard" && !["/dashboard/products", "/dashboard/storefront"].includes(href) &&
+                (href === "/pricing" ? pathname === href : pathname.startsWith(href)))
+                ? "dashboard-mobile-nav-link active"
+                : "dashboard-mobile-nav-link"
+            }>
+              <MoreHorizontal size={20} aria-hidden="true" />
+              <span>More</span>
+            </summary>
+            <div className="dashboard-mobile-more-menu">
+              {navigation
+                .filter(({ href }) => !["/dashboard", "/dashboard/products", "/dashboard/storefront"].includes(href))
+                .map(({ href, label, icon: Icon }) => {
+                  const active = href === "/pricing" ? pathname === href : pathname.startsWith(href);
+                  return (
+                    <Link key={href} href={href} aria-current={active ? "page" : undefined}>
+                      <Icon size={18} aria-hidden="true" />
+                      {label}
+                    </Link>
+                  );
+                })}
+            </div>
+          </details>
+        </nav>
       </div>
     </UnsavedChangesContext.Provider>
   );

@@ -3,6 +3,7 @@
 import sharp from "sharp";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { StorefrontActionResult } from "@/lib/storefront/types";
 import { parseStorefrontDraft, safeImageCrop } from "@/lib/storefront/validation";
@@ -24,6 +25,12 @@ async function getStorefrontAuth(): Promise<StorefrontAuth> {
   if (error || !user) {
     if (error) console.error("Could not verify a storefront action.", error);
     return { ok: false, result: { ok: false, message: "Please sign in again to continue." } };
+  }
+  if (!(await creatorAgreementIsAccepted(supabase))) {
+    return {
+      ok: false,
+      result: { ok: false, message: "Accept the Creator Agreement before managing your storefront." },
+    };
   }
   return { ok: true, supabase, userId: user.id };
 }

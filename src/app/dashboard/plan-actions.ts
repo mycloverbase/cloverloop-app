@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
 import type { ActionResult } from "@/lib/account/types";
 
 async function getAuthenticatedClient() {
@@ -13,6 +14,12 @@ async function getAuthenticatedClient() {
   if (error || !user) {
     if (error) console.error("Could not verify a plan change.", error);
     return { ok: false as const, result: { ok: false as const, message: "Please sign in again to continue." } };
+  }
+  if (!(await creatorAgreementIsAccepted(supabase))) {
+    return {
+      ok: false as const,
+      result: { ok: false as const, message: "Accept the Creator Agreement before managing your plan." },
+    };
   }
   return { ok: true as const, supabase };
 }

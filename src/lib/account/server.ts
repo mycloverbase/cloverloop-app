@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
 import type { CreatorProfile, SocialLink } from "@/lib/account/types";
 
 type AccountSupabaseClient = NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>;
@@ -137,6 +138,9 @@ export async function requireCreatorContext() {
   if (error) {
     console.error("Could not verify the creator session.", error);
     throw new Error("Your session could not be verified. Please sign in again.");
+  }
+  if (!(await creatorAgreementIsAccepted(supabase))) {
+    redirect("/creator-agreement/accept?next=%2Fdashboard");
   }
 
   const profile = await ensureCreatorProfile(supabase, user);

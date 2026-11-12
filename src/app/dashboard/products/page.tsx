@@ -65,12 +65,12 @@ export default async function CreatorProductsPage() {
     getMyPlanEntitlements(supabase),
   ]);
   if (claimStatsResponse.error) {
-    console.error("Could not load creator free product claim statistics.", claimStatsResponse.error);
-    throw new Error("Your free product claim statistics could not be loaded. Please try again.");
+    console.error("Could not load creator Lead Magnet claim statistics.", claimStatsResponse.error);
+    throw new Error("Your Lead Magnet claim statistics could not be loaded. Please try again.");
   }
   if (recentClaimsResponse.error) {
-    console.error("Could not load recent creator free product claims.", recentClaimsResponse.error);
-    throw new Error("Your recent free product claims could not be loaded. Please try again.");
+    console.error("Could not load recent creator Lead Magnet claims.", recentClaimsResponse.error);
+    throw new Error("Your recent Lead Magnet claims could not be loaded. Please try again.");
   }
   const claimStats = (claimStatsResponse.data ?? []) as ClaimStat[];
   const productNames = new Map(claimStats.map((row) => [row.product_id, row.product_name]));
@@ -89,7 +89,7 @@ export default async function CreatorProductsPage() {
       />
       <section className="free-product-claims-section" aria-labelledby="free-product-claims-title">
         <div>
-          <span className="dashboard-card-label">Free products</span>
+          <span className="dashboard-card-label">Lead Magnets</span>
           <h2 id="free-product-claims-title">Claims and downloads</h2>
         </div>
         {claimStats.length ? (
@@ -103,14 +103,14 @@ export default async function CreatorProductsPage() {
             ))}
           </div>
         ) : (
-          <p className="product-manager-note">Free product claims will appear here when customers claim an available product.</p>
+          <p className="product-manager-note">Lead Magnet claims will appear here when customers claim an available product.</p>
         )}
         {recentClaims.length ? (
-          <div className="free-product-claim-list" aria-label="Recent free product claims">
+          <div className="free-product-claim-list" aria-label="Recent Lead Magnet claims">
             {recentClaims.map((claim) => (
               <article className="free-product-claim-row" key={claim.id}>
                 <div>
-                  <strong>{productNames.get(claim.product_id) ?? "Free product"}</strong>
+                  <strong>{productNames.get(claim.product_id) ?? "Lead Magnet"}</strong>
                   <p>{claim.customer_email}</p>
                 </div>
                 <span>

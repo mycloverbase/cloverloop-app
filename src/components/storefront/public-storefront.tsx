@@ -77,10 +77,10 @@ export function StorefrontProductCard({
   claimLinkExpiryHours?: number;
 }) {
   const price = product.isFree
-    ? "Free"
+    ? "No cost"
     : new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(product.pricePaise / 100);
   return (
-    <article className="storefront-product-card">
+    <article className="storefront-product-card" id={`product-${product.id}`}>
       {product.coverImageUrl ? (
         <Image
           src={product.coverImageUrl}
@@ -99,7 +99,7 @@ export function StorefrontProductCard({
         <p>{product.description}</p>
         <div className="storefront-product-price-row">
           <strong>{price}</strong>
-          <span>{product.isFree ? "Free product" : "Digital product"}</span>
+          <span>{product.isFree ? "Lead Magnet" : "Digital product"}</span>
         </div>
         {product.isFree && storefrontUsername ? (
           <FreeProductClaim
@@ -110,7 +110,7 @@ export function StorefrontProductCard({
           />
         ) : (
           <button className="storefront-product-action" type="button" disabled>
-            {product.isFree ? "Free download coming soon" : "Payments coming soon"}
+            {product.isFree ? "Lead Magnet delivery coming soon" : "Payments coming soon"}
           </button>
         )}
       </div>

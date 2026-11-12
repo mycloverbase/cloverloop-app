@@ -1,9 +1,39 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowDown, ArrowUpRight, Menu, UserRound } from "lucide-react";
 import { TrackLink } from "@/components/track-link";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function SiteHeader() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
+
+    const supabase = createSupabaseBrowserClient();
+    let active = true;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(Boolean(session?.user));
+    });
+
+    void supabase.auth.getSession().then(({ data, error }) => {
+      if (!active) return;
+      if (error) {
+        console.error("Could not check the current CloverLoop sign-in state.", error);
+        return;
+      }
+      setIsAuthenticated(Boolean(data.session?.user));
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <header className="site-header">
       <div className="page-width header-inner">
@@ -32,16 +62,24 @@ export function SiteHeader() {
           <Link href="/about">About</Link>
         </nav>
         <div className="header-actions">
-          <TrackLink href="/login" event="login_click" className="login-link">
-            Login
-          </TrackLink>
-          <TrackLink
-            href="/signup"
-            event="signup_click"
-            className="button header-cta"
-          >
-            Get Started for Free <ArrowUpRight size={16} />
-          </TrackLink>
+          {isAuthenticated ? (
+            <Link href="/dashboard" className="button header-cta">
+              <UserRound size={16} aria-hidden="true" /> Profile
+            </Link>
+          ) : (
+            <>
+              <TrackLink href="/login" event="login_click" className="login-link">
+                Login
+              </TrackLink>
+              <TrackLink
+                href="/signup"
+                event="signup_click"
+                className="button header-cta"
+              >
+                Get Started for Free <ArrowUpRight size={16} />
+              </TrackLink>
+            </>
+          )}
         </div>
         <details className="mobile-nav">
           <summary aria-label="Open menu">
@@ -53,10 +91,16 @@ export function SiteHeader() {
             <Link href="/pricing">Pricing</Link>
             <Link href="/resources">Resources</Link>
             <Link href="/about">About</Link>
-            <TrackLink href="/login" event="login_click">Login</TrackLink>
-            <TrackLink href="/signup" event="signup_click" className="button">
-              Get Started for Free
-            </TrackLink>
+            {isAuthenticated ? (
+              <Link href="/dashboard" className="button"><UserRound size={17} aria-hidden="true" /> Profile</Link>
+            ) : (
+              <>
+                <TrackLink href="/login" event="login_click">Login</TrackLink>
+                <TrackLink href="/signup" event="signup_click" className="button">
+                  Get Started for Free
+                </TrackLink>
+              </>
+            )}
           </nav>
         </details>
       </div>

@@ -26,6 +26,17 @@ export async function proxy(request: NextRequest) {
   });
 
   const pathname = request.nextUrl.pathname;
+  if (pathname === "/" && request.nextUrl.searchParams.has("code")) {
+    const callback = new URL("/auth/callback", request.url);
+    callback.searchParams.set("code", request.nextUrl.searchParams.get("code") ?? "");
+    callback.searchParams.set("next", "/dashboard");
+    const marketingConsent = request.nextUrl.searchParams.get("marketing_consent");
+    if (marketingConsent === "1" || marketingConsent === "0") {
+      callback.searchParams.set("marketing_consent", marketingConsent);
+    }
+    return NextResponse.redirect(callback);
+  }
+
   const storefrontUsername = /^\/([^/.]+)$/.exec(pathname)?.[1];
   if (storefrontUsername) {
     const { data: redirectUsername, error } = await supabase.rpc("storefront_redirect_target", {
@@ -74,5 +85,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/signup", "/:username"],
+  matcher: ["/", "/dashboard/:path*", "/login", "/signup", "/:username"],
 };

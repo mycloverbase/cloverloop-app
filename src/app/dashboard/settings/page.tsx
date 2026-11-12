@@ -7,7 +7,10 @@ import {
   NotificationPreferencesForm,
   PasswordChangeForm,
 } from "@/components/dashboard/settings-forms";
+import { RazorpayConnectionCard } from "@/components/dashboard/razorpay-connection-card";
 import { requireCreatorContext } from "@/lib/account/server";
+import { getRazorpayOAuthReadiness } from "@/lib/razorpay/oauth";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
   title: "Account settings | CloverLoop",
@@ -33,8 +36,48 @@ function connectedProviders(user: User) {
   return [...providers].sort();
 }
 
-export default async function AccountSettingsPage() {
+export default async function AccountSettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ razorpay?: string | string[] }>;
+}) {
+  const { razorpay: razorpayStatusValue } = await searchParams;
   const { user, profile } = await requireCreatorContext();
+  const razorpayStatus = Array.isArray(razorpayStatusValue)
+    ? razorpayStatusValue[0]
+    : razorpayStatusValue;
+  const readiness = getRazorpayOAuthReadiness();
+  const admin = createSupabaseAdminClient();
+  let razorpayConnection = null;
+  let razorpayStatusServiceAvailable = Boolean(admin);
+  if (admin) {
+    const { data, error } = await admin
+      .from("creator_razorpay_connections")
+      .select("razorpay_account_id,environment,connection_status,token_expires_at,last_refreshed_at")
+      .eq("creator_id", user.id)
+      .maybeSingle();
+    if (error) {
+      console.error("Could not load the creator's Razorpay connection status.", { code: error.code });
+      razorpayStatusServiceAvailable = false;
+    } else if (data) {
+      if (
+        typeof data.razorpay_account_id === "string" &&
+        (data.environment === "test" || data.environment === "live") &&
+        ["connected", "reconnect_required", "revoked", "disconnected"].includes(data.connection_status)
+      ) {
+        razorpayConnection = {
+          accountId: data.razorpay_account_id,
+          environment: data.environment,
+          status: data.connection_status as "connected" | "reconnect_required" | "revoked" | "disconnected",
+          tokenExpiresAt: typeof data.token_expires_at === "string" ? data.token_expires_at : null,
+          lastRefreshedAt: typeof data.last_refreshed_at === "string" ? data.last_refreshed_at : null,
+        };
+      } else {
+        console.error("The Razorpay connection status returned by Supabase was invalid.");
+        razorpayStatusServiceAvailable = false;
+      }
+    }
+  }
   const createdAt = new Intl.DateTimeFormat("en-IN", {
     dateStyle: "long",
     timeZone: "Asia/Kolkata",
@@ -51,6 +94,12 @@ export default async function AccountSettingsPage() {
       </header>
 
       <div className="dashboard-stack">
+        <RazorpayConnectionCard
+          readiness={readiness}
+          connection={razorpayConnection}
+          statusMessage={razorpayStatus}
+          statusServiceAvailable={razorpayStatusServiceAvailable}
+        />
         <AccountBasicsForm email={user.email ?? ""} />
         <PasswordChangeForm email={user.email ?? ""} providers={connectedProviders(user)} />
         <NotificationPreferencesForm profile={profile} />

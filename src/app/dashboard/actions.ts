@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
 import type { ActionResult, SocialLink } from "@/lib/account/types";
 
 type AuthenticatedClient =
@@ -14,7 +15,7 @@ type AuthenticatedClient =
     }
   | { ok: false; result: ActionResult };
 
-async function getAuthenticatedClient(): Promise<AuthenticatedClient> {
+async function getAuthenticatedClient(requireAgreement = true): Promise<AuthenticatedClient> {
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
     return { ok: false, result: { ok: false, message: "Account services are not configured." } };
@@ -23,6 +24,12 @@ async function getAuthenticatedClient(): Promise<AuthenticatedClient> {
   if (error || !user) {
     if (error) console.error("Could not verify an account action.", error);
     return { ok: false, result: { ok: false, message: "Please sign in again to continue." } };
+  }
+  if (requireAgreement && !(await creatorAgreementIsAccepted(supabase))) {
+    return {
+      ok: false,
+      result: { ok: false, message: "Accept the Creator Agreement before using creator features." },
+    };
   }
   return { ok: true, supabase, userId: user.id, userEmail: user.email ?? null };
 }
@@ -348,7 +355,7 @@ export async function deleteCreatorAccountAction(confirmation: string): Promise<
   if (confirmation !== "DELETE") {
     return { ok: false, message: "Type DELETE to confirm account deletion." };
   }
-  const auth = await getAuthenticatedClient();
+  const auth = await getAuthenticatedClient(false);
   if (!auth.ok) return auth.result;
   const { data: storefront, error: storefrontError } = await auth.supabase
     .from("creator_storefronts")
