@@ -54,7 +54,7 @@ export const legalPolicyPages = [
     lastUpdated: "12 November 2026",
     documentVersion: "1.0",
     effectiveDate: "12 November 2026",
-    documentSha256: "78f03248f8228ec9d5d2ad880d6f3d5d20a24fdd9a0f63b0b63f3a9d6f034337",
+    documentSha256: "01355e7aa82abdb264556fe9572a4675d70f7b1c055fdac02b2fd213a00f986c",
     documentPath: "creator-agreement-v1.0.md",
   },
 ] as const;
@@ -69,7 +69,7 @@ export function getLegalPolicy(slug: string): LegalPolicy | undefined {
   const contentPath = "documentPath" in policy ? policy.documentPath : `${policy.slug}.md`;
   const content = readFileSync(path.join(process.cwd(), "content", "legal", contentPath), "utf8");
   if ("documentSha256" in policy) {
-    const actualDigest = createHash("sha256").update(content).digest("hex");
+    const actualDigest = createHash("sha256").update(content.replace(/\r\n/g, "\n")).digest("hex");
     if (actualDigest !== policy.documentSha256) {
       throw new Error(`The immutable legal document ${contentPath} does not match its registered SHA-256 digest.`);
     }
