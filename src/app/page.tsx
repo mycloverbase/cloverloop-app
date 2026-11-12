@@ -53,6 +53,20 @@ export default function HomePage() {
               <Link href="/pricing" className="button button-secondary">
                 Explore Pricing
               </Link>
+              <a
+                className="launchbase-badge"
+                href="https://www.launchbase.in/products/cloverloop"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://www.launchbase.in/badges/featured.svg"
+                  alt="Featured on Launchbase"
+                  width="250"
+                  height="54"
+                />
+              </a>
             </div>
           </div>
         </div>

@@ -392,6 +392,18 @@ a {
   margin-top: 28px;
 }
 
+.launchbase-badge {
+  display: inline-block;
+  width: 180px;
+  height: 39px;
+}
+
+.launchbase-badge img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .section-heading {
   max-width: 740px;
   margin: 0 auto 42px;
