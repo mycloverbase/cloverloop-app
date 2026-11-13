@@ -1952,6 +1952,7 @@ a {
 }
 
 .auth-form .auth-legal-consent a,
+.auth-form .auth-agreement-link,
 .creator-agreement-checkbox a {
   color: #236449;
   font-weight: 650;
@@ -1960,9 +1961,62 @@ a {
   text-underline-offset: 3px;
 }
 
+.auth-form .auth-agreement-link {
+  display: inline;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
 .auth-form .auth-legal-consent a:hover,
+.auth-form .auth-agreement-link:hover,
 .creator-agreement-checkbox a:hover {
   color: var(--forest);
+}
+
+.auth-agreement-dialog {
+  position: relative;
+  width: min(820px, calc(100vw - 32px));
+  max-width: none;
+  max-height: 84vh;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 24px 80px rgb(13 35 25 / 28%);
+}
+
+.auth-agreement-dialog::backdrop {
+  background: rgb(16 29 22 / 58%);
+}
+
+.auth-agreement-dialog iframe {
+  display: block;
+  width: 100%;
+  height: 84vh;
+  max-height: 840px;
+  border: 0;
+  background: white;
+}
+
+.auth-agreement-dialog-close {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #dbe1dc;
+  border-radius: 50%;
+  background: white;
+  color: var(--forest);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .auth-consent-error {
@@ -7077,6 +7131,28 @@ a {
 
 .storefront-product-action:not(:disabled):hover {
   filter: brightness(1.08);
+}
+
+.storefront-product-checkout,
+.storefront-product-checkout-form {
+  display: grid;
+  width: 100%;
+  gap: 8px;
+}
+
+.storefront-product-checkout-email {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #d5ddd7;
+  border-radius: 6px;
+  padding: 0 10px;
+  color: #23332a;
+  font: inherit;
+}
+
+.storefront-product-checkout p {
+  margin: 0;
+  font-size: 0.78rem;
 }
 
 .free-product-modal-backdrop {

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { PaidProductCheckout } from "@/components/storefront/paid-product-checkout";
 import {
   Mail,
 } from "lucide-react";
@@ -108,10 +109,22 @@ export function StorefrontProductCard({
             storefrontUsername={storefrontUsername}
             linkExpiryHours={claimLinkExpiryHours ?? 48}
           />
-        ) : (
+        ) : product.isFree ? (
           <button className="storefront-product-action" type="button" disabled>
-            {product.isFree ? "Lead Magnet delivery coming soon" : "Payments coming soon"}
+            Lead Magnet delivery coming soon
           </button>
+        ) : (
+          <PaidProductCheckout
+            productId={product.id}
+            storefrontUsername={storefrontUsername ?? ""}
+            storefrontName={storefrontUsername ?? "Creator store"}
+            productName={product.name}
+            productDescription={product.description}
+            enabled={
+              process.env.RAZORPAY_CHECKOUT_ENABLED === "true" &&
+              process.env.RAZORPAY_OAUTH_MODE === "test"
+            }
+          />
         )}
       </div>
     </article>

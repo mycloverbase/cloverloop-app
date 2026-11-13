@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, LoaderCircle } from "lucide-react";
@@ -8,6 +8,7 @@ import { track } from "@/lib/analytics";
 import { safeInternalPath } from "@/lib/auth-redirect";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
+  acceptCreatorAgreementAction,
   issueCreatorAgreementAcceptanceProofAction,
   recordCreatorAgreementAcceptanceAction,
 } from "@/app/creator-agreement/actions";
@@ -40,7 +41,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [agreementOpen, setAgreementOpen] = useState(false);
+  const agreementDialogRef = useRef<HTMLDialogElement>(null);
   const callbackError = searchParams.get("error");
+  const consentRequired = searchParams.get("consent") === "required";
   const accountDeleted = mode === "login" && searchParams.get("account") === "deleted";
   const sessionClearFailed = searchParams.get("session") === "clear-failed";
   const requestedUsername = searchParams.get("username")?.trim() ?? "";
@@ -52,6 +56,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const onboardingPath = storefrontUsername
     ? `/dashboard?username=${encodeURIComponent(storefrontUsername)}`
     : "/dashboard";
+
+  useEffect(() => {
+    const dialog = agreementDialogRef.current;
+    if (!dialog) return;
+    if (agreementOpen && !dialog.open) dialog.showModal();
+    if (!agreementOpen && dialog.open) dialog.close();
+  }, [agreementOpen]);
 
   function validateCreatorConsent() {
     const hasAgreement = agreementAccepted;
@@ -71,6 +82,25 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (consentRequired) {
+      if (!validateCreatorConsent()) return;
+      setPending(true);
+      try {
+        const acceptance = await acceptCreatorAgreementAction(agreementAccepted, ageConfirmed);
+        if (!acceptance.ok) {
+          setError(acceptance.message);
+          return;
+        }
+        router.replace(safeInternalPath(searchParams.get("next")));
+        router.refresh();
+      } catch (acceptanceError) {
+        console.error("Could not complete Creator Agreement acceptance after Google sign-in.", acceptanceError);
+        setError("Agreement acceptance could not be recorded. Please try again.");
+      } finally {
+        setPending(false);
+      }
+      return;
+    }
     if (mode === "signup" && !validateCreatorConsent()) return;
     setPending(true);
     setError("");
@@ -210,47 +240,59 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           Your selected store address: <strong>cloverloop.in/{storefrontUsername}</strong>
         </p>
       )}
-      <button type="button" className="google-button" disabled={pending} onClick={signInWithGoogle}>
-        <GoogleMark /> Continue with Google
-      </button>
-      <div className="auth-divider"><span>or continue with email</span></div>
+      {!consentRequired ? (
+        <>
+          <button type="button" className="google-button" disabled={pending} onClick={signInWithGoogle}>
+            <GoogleMark /> Continue with Google
+          </button>
+          <div className="auth-divider"><span>or continue with email</span></div>
+        </>
+      ) : (
+        <p className="form-message">
+          Confirm your agreement and age to finish setting up your account.
+        </p>
+      )}
       <form className="auth-form" onSubmit={submit}>
-        <label htmlFor="email">Email address</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-        />
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete={mode === "signup" ? "new-password" : "current-password"}
-          minLength={8}
-          required
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          aria-describedby={mode === "signup" ? "password-hint" : undefined}
-        />
-        {mode === "signup" && <span id="password-hint" className="field-hint">Use at least 8 characters.</span>}
-        <label className="auth-marketing-consent">
-          <input
-            type="checkbox"
-            name="marketing_consent"
-            checked={marketingConsent}
-            onChange={(event) => {
-              setMarketingConsent(event.target.checked);
-              setMarketingConsentTouched(true);
-            }}
-          />
-          <span>Opt in for news about CloverLoop plans, updates and resources.</span>
-        </label>
-        {mode === "signup" ? (
+        {!consentRequired ? (
+          <>
+            <label htmlFor="email">Email address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              minLength={8}
+              required
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              aria-describedby={mode === "signup" ? "password-hint" : undefined}
+            />
+            {mode === "signup" && <span id="password-hint" className="field-hint">Use at least 8 characters.</span>}
+            <label className="auth-marketing-consent">
+              <input
+                type="checkbox"
+                name="marketing_consent"
+                checked={marketingConsent}
+                onChange={(event) => {
+                  setMarketingConsent(event.target.checked);
+                  setMarketingConsentTouched(true);
+                }}
+              />
+              <span>Opt in for news about CloverLoop plans, updates and resources.</span>
+            </label>
+          </>
+        ) : null}
+        {mode === "signup" || consentRequired ? (
           <>
             <label className="auth-legal-consent">
               <input
@@ -266,9 +308,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               />
               <span>
                 I agree to the{" "}
-                <Link href="/creator-agreement" target="_blank" rel="noopener noreferrer">
+                <button
+                  type="button"
+                  className="auth-agreement-link"
+                  onClick={() => setAgreementOpen(true)}
+                >
                   CloverLoop Creator Agreement
-                </Link>.
+                </button>.
               </span>
             </label>
             {agreementError ? (
@@ -297,14 +343,30 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             ) : null}
           </>
         ) : null}
-        {mode === "login" && <Link className="forgot-link" href="/forgot-password">Forgot password?</Link>}
+        {!consentRequired && mode === "login" && <Link className="forgot-link" href="/forgot-password">Forgot password?</Link>}
         {visibleError && <p className="form-message form-error" role="alert">{visibleError}</p>}
         {message && <p className="form-message form-success" role="status">{message}</p>}
         <button type="submit" className="button auth-submit" disabled={pending}>
           {pending ? <LoaderCircle className="spin" size={18} /> : null}
-          {mode === "signup" ? "Create account" : "Log in"} <ArrowRight size={17} />
+          {consentRequired ? "Continue" : mode === "signup" ? "Create account" : "Log in"} <ArrowRight size={17} />
         </button>
       </form>
+      <dialog
+        ref={agreementDialogRef}
+        className="auth-agreement-dialog"
+        aria-label="CloverLoop Creator Agreement"
+        onClose={() => setAgreementOpen(false)}
+      >
+        <button
+          type="button"
+          className="auth-agreement-dialog-close"
+          aria-label="Close Creator Agreement"
+          onClick={() => agreementDialogRef.current?.close()}
+        >
+          ×
+        </button>
+        <iframe title="CloverLoop Creator Agreement" src="/creator-agreement" />
+      </dialog>
     </div>
   );
 }

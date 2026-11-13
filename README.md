@@ -68,6 +68,7 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `RAZORPAY_OAUTH_MODE` | For Razorpay OAuth | Explicit `test` or `live` mode. Configure the matching development or production client per deployment environment. |
 | `RAZORPAY_TOKEN_ENCRYPTION_KEY` | For Razorpay OAuth | Server-only base64-encoded 32-byte AES-256-GCM key, separate from the Razorpay client secret. |
 | `RAZORPAY_CHECKOUT_ENABLED` | No | Paid checkout feature gate; keep `false`. Razorpay OAuth connection does not activate payments. |
+| `RAZORPAY_TEST_WEBHOOK_SECRET` | For Test Mode checkout | Server-only secret used to sign account-scoped Razorpay payment webhooks. Never expose it to browser code. |
 
 The launch-checklist email uses the branded HTML in `src/lib/launch-checklist-email.ts`. Its PDF attachment is `public/downloads/cloverloop-link-in-bio-launch-checklist.pdf`, also served as the fallback download link.
 
@@ -85,7 +86,31 @@ The authenticated **Dashboard → Settings → Razorpay account** section connec
 4. Generate the encryption key with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`. Store it in a secret manager; do not commit it or share it in chat.
 5. Apply Supabase migrations and use **Dashboard → Settings → Connect Razorpay**.
 
-For production, use the separate production client and an exact HTTPS callback registered with Razorpay. Keep `RAZORPAY_CHECKOUT_ENABLED=false`; checkout, payments, paid-product delivery and settlement are not implemented or enabled by this OAuth phase. Never share credentials with CloverLoop users or place private values in `NEXT_PUBLIC_*` variables. Access and refresh tokens are encrypted server-side; daily token refresh uses the existing Vercel Cron/`CRON_SECRET` pattern. The access token expires after 90 days and Razorpay's OAuth documentation says the rotating refresh token expires after 180 days.
+To test OAuth from the production deployment before going live, set these variables in the Vercel **Production** environment:
+
+| Variable | Production test value |
+| --- | --- |
+| `RAZORPAY_OAUTH_ENABLED` | `true` |
+| `RAZORPAY_OAUTH_CLIENT_ID` | Razorpay **Development Client ID** |
+| `RAZORPAY_OAUTH_CLIENT_SECRET` | Matching **Development Client Secret** (server-only) |
+| `RAZORPAY_OAUTH_MODE` | `test` |
+| `NEXT_PUBLIC_SITE_URL` | `https://cloverloop.in` |
+| `RAZORPAY_TOKEN_ENCRYPTION_KEY` | Existing base64-encoded 32-byte key; keep it stable for stored tokens |
+| `RAZORPAY_CHECKOUT_ENABLED` | `false` |
+
+The callback URI is derived from `NEXT_PUBLIC_SITE_URL`; there is no separate redirect-URI environment variable. It must be registered exactly as `https://cloverloop.in/api/razorpay/callback` on the Development Client. The application uses `https://auth.razorpay.com/authorize` and `https://auth.razorpay.com/token`; the token exchange sends `mode: "test"`.
+
+Do not put Razorpay Production Client credentials in the Vercel Production environment while testing. Keep them out of this deployment's configuration; during an explicitly approved live cutover, replace the client ID and secret together and change the mode to `live`. Redeploy after changing environment variables so the production server uses the updated configuration. The Development Client supports test mode; a Production Client is for live mode. OAuth connection alone does not enable checkout or payments.
+
+Never share credentials with CloverLoop users or place private values in `NEXT_PUBLIC_*` variables. Access and refresh tokens are encrypted server-side; daily token refresh uses the existing Vercel Cron/`CRON_SECRET` pattern.
+
+### Razorpay Test Mode checkout
+
+Test Mode checkout is implemented behind the server-only `RAZORPAY_CHECKOUT_ENABLED` gate. Keep it set to `false` until the Test Mode OAuth connection, webhook secret, database migration, and mocked test suite have been reviewed. Apply `supabase/migrations/20261113120000_razorpay_test_checkout.sql` through the established Supabase migration workflow before enabling checkout; this code change does not apply it to any database. The server rejects checkout unless `RAZORPAY_OAUTH_MODE=test`, the creator has a connected Test Mode account created with the configured Development Client, and the account-scoped webhook is registered.
+
+Configure `RAZORPAY_TEST_WEBHOOK_SECRET` as a long, random Vercel Production secret and keep `RAZORPAY_CHECKOUT_ENABLED=false` while preparing the integration. The app registers `https://cloverloop.in/api/webhooks/razorpay` on a creator's connected Razorpay test account when checkout is first requested, using that creator's OAuth access token. The webhook signature is verified against the configured secret; payment/order state is independently fetched through the creator's OAuth token before an order is marked paid. Only a captured Test Mode payment can create a purchase entitlement.
+
+When checkout is explicitly approved for a controlled Test Mode run, set `RAZORPAY_CHECKOUT_ENABLED=true` in the intended Vercel environment and redeploy. Do not change `RAZORPAY_OAUTH_MODE` to `live`, do not configure Production Client credentials, and do not initiate Live Mode payments. Test checkout uses the creator's Razorpay `public_token` in Checkout.js and the creator's OAuth access token for server-side APIs; CloverLoop does not collect the payment or add a second platform-commission deduction. Paid downloads use the private `product-files` bucket, a short-lived signed URL, and the existing download-count/link-expiry settings. Free-product claims/downloads remain on their separate existing flow.
 
 ## Supabase and Google OAuth setup
 
@@ -303,6 +328,6 @@ The sitemap uses the production canonical origin and excludes authentication, ut
 
 ## Product scope and launch configuration
 
-Creators can manage real product listings and upload private product files. Active products appear in the public storefront catalogue; inactive products do not. Free products can be claimed and delivered through expiring, limited-use email links. Razorpay creator OAuth account connection is available only when explicitly configured; paid checkout and paid product delivery remain disabled. The app does **not** implement payment verification, paid order creation, earnings, paid sales analytics, operational Pro subscription billing, commission reconciliation, or paid order management. Subscription tables and entitlement fields are scaffolding only until their provider flows are implemented.
+Creators can manage real product listings and upload private product files. Active products appear in the public storefront catalogue; inactive products do not. Free products can be claimed and delivered through expiring, limited-use email links. Razorpay creator OAuth and Test Mode checkout are implemented, but paid checkout remains disabled until `RAZORPAY_CHECKOUT_ENABLED=true` is explicitly approved. Refunds, operational Pro subscription billing, commission reconciliation, paid sales analytics, and creator order-management screens are not implemented. Subscription tables and entitlement fields are scaffolding only until their provider flows are implemented.
 
 Before launch, configure Supabase and Google OAuth, apply all migrations, set the cron and Resend variables, verify the support email, and obtain legal review of the Terms and Privacy drafts. Pricing is presented as the agreed intended pricing model; Pro subscription billing and paid checkout are not operational in this implementation.

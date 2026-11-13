@@ -129,9 +129,10 @@ export async function GET(request: NextRequest) {
     }
   }
   if (!agreementAccepted) {
-    const acceptanceUrl = new URL("/creator-agreement/accept", request.url);
-    acceptanceUrl.searchParams.set("next", nextPath);
-    response.headers.set("Location", acceptanceUrl.toString());
+    const signupUrl = new URL("/signup", request.url);
+    signupUrl.searchParams.set("consent", "required");
+    signupUrl.searchParams.set("next", nextPath);
+    response.headers.set("Location", signupUrl.toString());
   }
   response.headers.set("X-Robots-Tag", "noindex, nofollow");
   return clearAcceptanceProof(response);

@@ -7,6 +7,7 @@ import {
   type RazorpayOAuthEnvironment,
   type RazorpayOAuthReadiness,
 } from "@/lib/razorpay/oauth";
+import { RazorpayActionButton } from "@/components/dashboard/razorpay-action-button";
 
 type RazorpayConnectionSummary = {
   accountId: string;
@@ -150,18 +151,25 @@ export function RazorpayConnectionCard({
       <div className="dashboard-form-actions">
         {!tokenIsCurrent ? (
           <form action={startRazorpayConnectionAction}>
-            <button className="button" type="submit" disabled={!readiness.available || !statusServiceAvailable}>
-              {connection?.status === "reconnect_required" || connection?.status === "revoked"
+            <RazorpayActionButton
+              className="button"
+              disabled={!readiness.available || !statusServiceAvailable}
+              label={connection?.status === "reconnect_required" || connection?.status === "revoked"
                 ? "Reconnect Razorpay"
                 : "Connect Razorpay"}
-            </button>
+              pendingLabel={connection?.status === "reconnect_required" || connection?.status === "revoked"
+                ? "Reconnecting..."
+                : "Connecting..."}
+            />
           </form>
         ) : null}
         {canDisconnect ? (
           <form action={disconnectRazorpayConnectionAction}>
-            <button className="subtle-link-button danger" type="submit">
-              Disconnect Razorpay
-            </button>
+            <RazorpayActionButton
+              className="subtle-link-button danger"
+              label="Disconnect Razorpay"
+              pendingLabel="Disconnecting..."
+            />
           </form>
         ) : null}
       </div>
