@@ -113,6 +113,52 @@ describe("Razorpay checkout helpers", () => {
     expect(mocks.decryptRazorpayToken).not.toHaveBeenCalled();
   });
 
+  it("decrypts only the connected creator's Test Mode access token for the configured OAuth client", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
+
+    const query = {
+      select: vi.fn(),
+      eq: vi.fn(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: {
+          creator_id: "creator-a",
+          razorpay_account_id: "acc_ABC123",
+          client_id: "development-client",
+          environment: "test",
+          public_token: "rzp_test_public",
+          access_token_encrypted: "encrypted-access",
+          token_expires_at: "2099-01-01T00:00:00.000Z",
+          connection_status: "connected",
+        },
+        error: null,
+      }),
+    };
+    query.select.mockReturnValue(query);
+    query.eq.mockReturnValue(query);
+    mocks.createSupabaseAdminClient.mockReturnValue({
+      from: vi.fn().mockReturnValue(query),
+    });
+    mocks.decryptRazorpayToken.mockReturnValue("decrypted-test-access");
+
+    await expect(getRazorpayCheckoutConnection("creator-a")).resolves.toEqual({
+      creatorId: "creator-a",
+      accountId: "acc_ABC123",
+      environment: "test",
+      publicToken: "rzp_test_public",
+      accessToken: "decrypted-test-access",
+    });
+    expect(query.eq).toHaveBeenCalledWith("creator_id", "creator-a");
+    expect(query.eq).toHaveBeenCalledWith("environment", "test");
+    expect(query.eq).toHaveBeenCalledWith("connection_status", "connected");
+    expect(mocks.decryptRazorpayToken).toHaveBeenCalledWith(
+      "encrypted-access",
+      "creator-a",
+      "access",
+    );
+  });
+
   it("rejects a Live connection even when the query mock returns it", async () => {
     vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");

@@ -269,6 +269,7 @@ function logWebhookRegistrationError(
     creatorId: connection.creatorId,
     accountId: connection.accountId,
     operation,
+    authScheme: "oauth_bearer",
     razorpayError: details,
   });
 }
@@ -620,7 +621,7 @@ async function razorpayPartnerApiRequest<T>(
     const response = await fetch(`${RAZORPAY_API_BASE}${path}`, {
       ...init,
       headers: {
-        Authorization: `Basic ${Buffer.from(`${connection.accessToken}:`).toString("base64")}`,
+        Authorization: `Bearer ${connection.accessToken}`,
         "Content-Type": "application/json",
         ...init.headers,
       },

@@ -98,7 +98,7 @@ afterEach(() => {
 });
 
 describe("ensureRazorpayAccountWebhook", () => {
-  it("creates and persists the documented account webhook using Basic OAuth auth", async () => {
+  it("creates and persists the account webhook using OAuth Bearer auth", async () => {
     const admin = makeAdmin();
     mocks.createSupabaseAdminClient.mockReturnValue(admin.client);
     const requests: Array<{ url: string; init?: RequestInit }> = [];
@@ -118,12 +118,12 @@ describe("ensureRazorpayAccountWebhook", () => {
       "https://api.razorpay.com/v2/accounts/acc_ABC123/webhooks",
     );
     expect(requests[1].url).toBe(requests[0].url);
+    expect(requests[0].init?.method).toBe("GET");
     expect(requests[1].init?.method).toBe("POST");
-    const headers = new Headers(requests[1].init?.headers);
-    expect(headers.get("Authorization")).toBe(
-      `Basic ${Buffer.from(`${connection.accessToken}:`).toString("base64")}`,
-    );
-    expect(headers.get("Authorization")).not.toContain("Bearer");
+    for (const request of requests) {
+      const headers = new Headers(request.init?.headers);
+      expect(headers.get("Authorization")).toBe(`Bearer ${connection.accessToken}`);
+    }
     expect(JSON.parse(String(requests[1].init?.body))).toEqual({
       url: "https://cloverloop.test/api/webhooks/razorpay",
       secret: "test-webhook-root-secret",
