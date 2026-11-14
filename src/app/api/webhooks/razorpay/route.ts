@@ -5,6 +5,7 @@ import {
   getRazorpayCheckoutConnection,
   getRazorpayPartnerTestWebhookSecret,
   getRazorpayTestWebhookSecret,
+  isRazorpayPartnerWebhookDiagnosticsEnabled,
   razorpayApiRequest,
   verifyRazorpayWebhookSignature,
 } from "@/lib/razorpay/checkout";
@@ -57,7 +58,12 @@ function diagnosticIdentifier(value: unknown, prefix: "acc" | "pay" | "order"): 
 function logApplicationWebhookDiagnostic(
   rawBody: string,
   signatureVerified: boolean,
-): void {
+): {
+  eventType: string | null;
+  accountId: string | null;
+  paymentId: string | null;
+  orderId: string | null;
+} {
   let event: Record<string, unknown> | null = null;
   try {
     const parsed: unknown = JSON.parse(rawBody);
@@ -89,6 +95,33 @@ function logApplicationWebhookDiagnostic(
   } else {
     console.warn("Razorpay webhook signature verification failed.", fields);
   }
+  return fields;
+}
+
+async function matchesConnectedTestCreatorAccount(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  accountId: string,
+): Promise<boolean | null> {
+  const { data, error } = await admin
+    .from("creator_razorpay_connections")
+    .select("creator_id")
+    .eq("razorpay_account_id", accountId)
+    .eq("environment", "test")
+    .eq("connection_status", "connected")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Razorpay partner webhook account mapping could not be checked.");
+    return null;
+  }
+  if (!data || typeof data.creator_id !== "string") return false;
+
+  const connection = await getRazorpayCheckoutConnection(data.creator_id);
+  return Boolean(
+    connection &&
+      connection.environment === "test" &&
+      connection.accountId === accountId,
+  );
 }
 
 async function setEventStatus(
@@ -112,7 +145,15 @@ export async function POST(request: Request) {
   const admin = createSupabaseAdminClient();
   const accountWebhookSecret = getRazorpayTestWebhookSecret();
   const partnerWebhookSecret = getRazorpayPartnerTestWebhookSecret();
-  if ((!admin && !partnerWebhookSecret) || (!accountWebhookSecret && !partnerWebhookSecret)) {
+  const diagnosticsRequested =
+    process.env.RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS === "true";
+  const partnerDiagnosticsEnabled =
+    isRazorpayPartnerWebhookDiagnosticsEnabled();
+  if (
+    (diagnosticsRequested && !partnerDiagnosticsEnabled) ||
+    (!admin && !partnerDiagnosticsEnabled) ||
+    (!accountWebhookSecret && !partnerDiagnosticsEnabled)
+  ) {
     return response(503);
   }
 
@@ -130,12 +171,29 @@ export async function POST(request: Request) {
   const accountSignatureValid = accountWebhookSecret
     ? verifyRazorpayWebhookSignature(rawBody, signature, accountWebhookSecret)
     : false;
-  const partnerSignatureValid = partnerWebhookSecret
+  const partnerSignatureValid =
+    partnerDiagnosticsEnabled && partnerWebhookSecret
     ? verifyRazorpayWebhookSignature(rawBody, signature, partnerWebhookSecret)
     : false;
 
   if (!accountSignatureValid && partnerSignatureValid) {
-    logApplicationWebhookDiagnostic(rawBody, true);
+    const fields = logApplicationWebhookDiagnostic(rawBody, true);
+    if (!fields.accountId) return response(400);
+    if (!admin) return response(503);
+    try {
+      const accountMatches = await matchesConnectedTestCreatorAccount(
+        admin,
+        fields.accountId,
+      );
+      if (accountMatches === null) return response(503);
+      if (!accountMatches) {
+        console.warn("Razorpay partner webhook account is not a connected Test Mode creator.");
+        return response(400);
+      }
+    } catch {
+      console.error("Razorpay partner webhook account mapping could not be checked.");
+      return response(503);
+    }
     return response(200);
   }
   if (!accountSignatureValid) {

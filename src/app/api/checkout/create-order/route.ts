@@ -6,6 +6,7 @@ import {
   getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection,
   hashCheckoutToken,
+  isRazorpayPartnerWebhookDiagnosticsEnabled,
   isRazorpayCheckoutEnabled,
   isValidCheckoutToken,
   normalizeCustomerEmail,
@@ -73,6 +74,17 @@ export async function POST(request: Request) {
 
   if (process.env.RAZORPAY_OAUTH_MODE !== "test") {
     return jsonResponse({ error: "Test Mode checkout is not configured." }, 503);
+  }
+
+  const diagnosticsRequested =
+    process.env.RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS === "true";
+  const partnerDiagnosticsEnabled =
+    isRazorpayPartnerWebhookDiagnosticsEnabled();
+  if (diagnosticsRequested && !partnerDiagnosticsEnabled) {
+    return jsonResponse(
+      { error: "Partner webhook diagnostics are not configured." },
+      503,
+    );
   }
 
   const admin = createSupabaseAdminClient();
@@ -179,7 +191,10 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!(await ensureRazorpayAccountWebhook(connection))) {
+  if (
+    !partnerDiagnosticsEnabled &&
+    !(await ensureRazorpayAccountWebhook(connection))
+  ) {
     await releaseProviderCreationClaim(admin, order.order_id);
     return jsonResponse(
       { error: "Secure payment notifications are not configured for this creator." },

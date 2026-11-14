@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   getRazorpayCheckoutConnection: vi.fn(),
   hashCheckoutToken: vi.fn(),
   isRazorpayCheckoutEnabled: vi.fn(),
+  isRazorpayPartnerWebhookDiagnosticsEnabled: vi.fn(),
   isValidCheckoutToken: vi.fn(),
   normalizeCustomerEmail: vi.fn(),
   razorpayApiRequest: vi.fn(),
@@ -27,6 +28,8 @@ vi.mock("@/lib/razorpay/checkout", () => ({
   getRazorpayCheckoutConnection: mocks.getRazorpayCheckoutConnection,
   hashCheckoutToken: mocks.hashCheckoutToken,
   isRazorpayCheckoutEnabled: mocks.isRazorpayCheckoutEnabled,
+  isRazorpayPartnerWebhookDiagnosticsEnabled:
+    mocks.isRazorpayPartnerWebhookDiagnosticsEnabled,
   isValidCheckoutToken: mocks.isValidCheckoutToken,
   normalizeCustomerEmail: mocks.normalizeCustomerEmail,
   razorpayApiRequest: mocks.razorpayApiRequest,
@@ -86,7 +89,9 @@ function makeRequest(body: Record<string, unknown>) {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
+  vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
   mocks.isRazorpayCheckoutEnabled.mockReturnValue(true);
+  mocks.isRazorpayPartnerWebhookDiagnosticsEnabled.mockReturnValue(false);
   mocks.checkFreeProductRateLimit.mockResolvedValue(true);
   mocks.ensureRazorpayAccountWebhook.mockResolvedValue(true);
   mocks.getFreeProductDeliveryConfig.mockReturnValue({
@@ -169,6 +174,88 @@ describe("POST /api/checkout/create-order", () => {
     );
 
     expect(response.status).toBe(409);
+    expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
+  });
+
+  it("creates a creator-scoped Test Mode order without account webhook registration in diagnostics mode", async () => {
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "true");
+    mocks.isRazorpayPartnerWebhookDiagnosticsEnabled.mockReturnValue(true);
+    mocks.ensureRazorpayAccountWebhook.mockResolvedValue(false);
+
+    const response = await POST(
+      makeRequest({
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "buyer@example.com",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.ensureRazorpayAccountWebhook).not.toHaveBeenCalled();
+    expect(mocks.getRazorpayCheckoutConnection).toHaveBeenCalledWith("creator-a");
+    expect(mocks.razorpayApiRequest).toHaveBeenCalledWith(
+      "server-only-access-token",
+      "/v1/orders",
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect((await response.json()).publicKey).toBe("rzp_test_public");
+  });
+
+  it("still requires the creator's Test Mode OAuth connection in diagnostics mode", async () => {
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "true");
+    mocks.isRazorpayPartnerWebhookDiagnosticsEnabled.mockReturnValue(true);
+    mocks.getRazorpayCheckoutConnection.mockResolvedValue(null);
+
+    const response = await POST(
+      makeRequest({
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "buyer@example.com",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(409);
+    expect(mocks.ensureRazorpayAccountWebhook).not.toHaveBeenCalled();
+    expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
+  });
+
+  it("does not bypass webhook registration when diagnostics configuration is incomplete", async () => {
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "true");
+
+    const response = await POST(
+      makeRequest({
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "buyer@example.com",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(503);
+    expect(mocks.createSupabaseAdminClient).not.toHaveBeenCalled();
+    expect(mocks.ensureRazorpayAccountWebhook).not.toHaveBeenCalled();
+    expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
+  });
+
+  it("never permits the diagnostic bypass in Live Mode", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "true");
+    mocks.isRazorpayPartnerWebhookDiagnosticsEnabled.mockReturnValue(true);
+
+    const response = await POST(
+      makeRequest({
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "buyer@example.com",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(503);
+    expect(mocks.createSupabaseAdminClient).not.toHaveBeenCalled();
+    expect(mocks.ensureRazorpayAccountWebhook).not.toHaveBeenCalled();
     expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
   });
 
