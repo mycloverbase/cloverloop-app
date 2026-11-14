@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/razorpay-token-refresh",
       "schedule": "0 4 * * 1"
+    },
+    {
+      "path": "/api/cron/razorpay-webhook-process",
+      "schedule": "0 5 * * *"
     }
   ]
 }

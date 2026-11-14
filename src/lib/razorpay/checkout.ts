@@ -40,11 +40,14 @@ export function getRazorpayPartnerTestWebhookSecret(): string | null {
   return process.env.RAZORPAY_PARTNER_TEST_WEBHOOK_SECRET?.trim() || null;
 }
 
-export function isRazorpayPartnerWebhookDiagnosticsEnabled(): boolean {
+export function isRazorpayPartnerWebhookFulfillmentEnabled(): boolean {
   const partnerSecret = getRazorpayPartnerTestWebhookSecret();
   return (
-    process.env.RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS === "true" &&
+    process.env.RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED === "true" &&
+    process.env.RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS !== "true" &&
+    process.env.RAZORPAY_OAUTH_ENABLED === "true" &&
     process.env.RAZORPAY_OAUTH_MODE === "test" &&
+    Boolean(process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim()) &&
     Boolean(partnerSecret) &&
     partnerSecret !== getRazorpayTestWebhookSecret()
   );
@@ -136,9 +139,10 @@ export async function razorpayApiRequest<T>(
   accessToken: string,
   path: string,
   init: RequestInit = {},
+  timeoutMs = 12_000,
 ): Promise<T> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12_000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(`${RAZORPAY_API_BASE}${path}`, {

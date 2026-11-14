@@ -2,11 +2,10 @@ import { NextResponse } from "next/server";
 import { checkFreeProductRateLimit } from "@/lib/free-products/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
-  ensureRazorpayAccountWebhook,
   getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection,
   hashCheckoutToken,
-  isRazorpayPartnerWebhookDiagnosticsEnabled,
+  isRazorpayPartnerWebhookFulfillmentEnabled,
   isRazorpayCheckoutEnabled,
   isValidCheckoutToken,
   normalizeCustomerEmail,
@@ -76,13 +75,9 @@ export async function POST(request: Request) {
     return jsonResponse({ error: "Test Mode checkout is not configured." }, 503);
   }
 
-  const diagnosticsRequested =
-    process.env.RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS === "true";
-  const partnerDiagnosticsEnabled =
-    isRazorpayPartnerWebhookDiagnosticsEnabled();
-  if (diagnosticsRequested && !partnerDiagnosticsEnabled) {
+  if (!isRazorpayPartnerWebhookFulfillmentEnabled()) {
     return jsonResponse(
-      { error: "Partner webhook diagnostics are not configured." },
+      { error: "Test Mode payment notifications are not configured." },
       503,
     );
   }
@@ -188,17 +183,6 @@ export async function POST(request: Request) {
     return jsonResponse(
       { error: "The creator's Razorpay Test Mode connection is unavailable." },
       409,
-    );
-  }
-
-  if (
-    !partnerDiagnosticsEnabled &&
-    !(await ensureRazorpayAccountWebhook(connection))
-  ) {
-    await releaseProviderCreationClaim(admin, order.order_id);
-    return jsonResponse(
-      { error: "Secure payment notifications are not configured for this creator." },
-      503,
     );
   }
 

@@ -16,7 +16,7 @@ vi.mock("@/lib/razorpay/oauth", () => ({
 
 import {
   getFreeProductDeliveryConfig,
-  isRazorpayPartnerWebhookDiagnosticsEnabled,
+  isRazorpayPartnerWebhookFulfillmentEnabled,
   getRazorpayCheckoutConnection,
   hashCheckoutToken,
   isRazorpayCheckoutEnabled,
@@ -41,23 +41,30 @@ describe("Razorpay checkout helpers", () => {
     expect(isRazorpayCheckoutEnabled()).toBe(false);
   });
 
-  it("enables partner webhook diagnostics only with a distinct Test Mode secret and explicit flag", () => {
+  it("enables partner webhook fulfillment only with explicit Test Mode OAuth and a distinct secret", () => {
+    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
-    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "true");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED", "true");
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
     vi.stubEnv("RAZORPAY_PARTNER_TEST_WEBHOOK_SECRET", "partner-secret");
     vi.stubEnv("RAZORPAY_TEST_WEBHOOK_SECRET", "account-secret");
-    expect(isRazorpayPartnerWebhookDiagnosticsEnabled()).toBe(true);
-
-    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
-    expect(isRazorpayPartnerWebhookDiagnosticsEnabled()).toBe(false);
+    expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(true);
 
     vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "true");
+    expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(false);
+
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED", "false");
+    expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(false);
+
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
-    expect(isRazorpayPartnerWebhookDiagnosticsEnabled()).toBe(false);
+    expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(false);
 
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
     vi.stubEnv("RAZORPAY_TEST_WEBHOOK_SECRET", "partner-secret");
-    expect(isRazorpayPartnerWebhookDiagnosticsEnabled()).toBe(false);
+    expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(false);
   });
 
   it("hashes and validates opaque checkout tokens without accepting short values", () => {
