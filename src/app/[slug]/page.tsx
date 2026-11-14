@@ -15,7 +15,6 @@ import { LegalPolicyPage } from "@/components/legal-policy-page";
 import { legalPolicyPages } from "@/lib/legal-policies";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { getPublishedStorefront } from "@/lib/storefront/server";
-import { getFreeProductConfig } from "@/lib/free-products/server";
 
 const slugs = [
   ...featurePages.map((item) => item.slug),
@@ -308,12 +307,7 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
     const storefront = await getPublishedStorefront(supabase, slug);
     if (!storefront) notFound();
     return (
-      <PublicStorefront
-        store={{
-          ...storefront,
-          claimLinkExpiryHours: getFreeProductConfig()?.linkExpiryHours ?? 48,
-        }}
-      />
+      <PublicStorefront store={storefront} />
     );
   }
   let content = null;

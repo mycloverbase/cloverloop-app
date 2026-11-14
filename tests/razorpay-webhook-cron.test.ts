@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   createSupabaseAdminClient: vi.fn(),
   isRazorpayPartnerWebhookFulfillmentEnabled: vi.fn(),
   processRazorpayPartnerWebhookQueue: vi.fn(),
+  processRazorpayPurchaseEmailQueue: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/admin", () => ({
@@ -19,6 +20,10 @@ vi.mock("@/lib/razorpay/webhook-fulfillment", () => ({
   processRazorpayPartnerWebhookQueue: mocks.processRazorpayPartnerWebhookQueue,
 }));
 
+vi.mock("@/lib/razorpay/purchase-email", () => ({
+  processRazorpayPurchaseEmailQueue: mocks.processRazorpayPurchaseEmailQueue,
+}));
+
 import { GET } from "@/app/api/cron/razorpay-webhook-process/route";
 
 beforeEach(() => {
@@ -31,6 +36,11 @@ beforeEach(() => {
     processed: 1,
     ignored: 0,
     failed: 1,
+  });
+  mocks.processRazorpayPurchaseEmailQueue.mockResolvedValue({
+    claimed: 1,
+    accepted: 1,
+    failed: 0,
   });
 });
 
@@ -58,12 +68,24 @@ describe("GET /api/cron/razorpay-webhook-process", () => {
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
-      claimed: 2,
-      processed: 1,
-      ignored: 0,
-      failed: 1,
+      webhooks: {
+        claimed: 2,
+        processed: 1,
+        ignored: 0,
+        failed: 1,
+      },
+      purchaseEmails: {
+        claimed: 1,
+        accepted: 1,
+        failed: 0,
+      },
     });
     expect(mocks.processRazorpayPartnerWebhookQueue).toHaveBeenCalledWith(
+      admin,
+      null,
+      5,
+    );
+    expect(mocks.processRazorpayPurchaseEmailQueue).toHaveBeenCalledWith(
       admin,
       null,
       5,

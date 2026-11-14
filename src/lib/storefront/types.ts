@@ -29,6 +29,12 @@ export type StorefrontProductDisplay = {
   coverImageUrl: string | null;
 };
 
+export type PublishedStorefrontProduct = StorefrontProductDisplay & {
+  fileName: string | null;
+  fileSize: number | null;
+  fileMimeType: string | null;
+};
+
 export type CreatorStorefrontProduct = StorefrontProductDisplay & {
   storefrontId: string;
   coverImagePath: string | null;

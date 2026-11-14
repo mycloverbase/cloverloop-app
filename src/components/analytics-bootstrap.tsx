@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 declare global {
   interface Window {
     __cloverloopDownloadTokenCleared?: boolean;
+    __cloverloopPurchaseTicketCleared?: boolean;
     __cloverloopAnalyticsBootstrapLoaded?: boolean;
   }
 }
@@ -31,21 +32,29 @@ export function AnalyticsBootstrap({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (pathname !== "/free-product-download") {
+    const isFreeDownload = pathname === "/free-product-download";
+    const isPurchaseDownload = pathname === "/purchase-download";
+    if (!isFreeDownload && !isPurchaseDownload) {
       loadAnalyticsBootstrap(gtmId, consentKey);
       return;
     }
 
-    function onDownloadTokenCleared() {
+    function onDownloadSecretCleared() {
       loadAnalyticsBootstrap(gtmId, consentKey);
     }
 
-    if (window.__cloverloopDownloadTokenCleared) {
-      onDownloadTokenCleared();
+    const secretCleared = isFreeDownload
+      ? window.__cloverloopDownloadTokenCleared
+      : window.__cloverloopPurchaseTicketCleared;
+    if (secretCleared) {
+      onDownloadSecretCleared();
       return;
     }
-    window.addEventListener("cloverloop-download-token-cleared", onDownloadTokenCleared, { once: true });
-    return () => window.removeEventListener("cloverloop-download-token-cleared", onDownloadTokenCleared);
+    const eventName = isFreeDownload
+      ? "cloverloop-download-token-cleared"
+      : "cloverloop-purchase-ticket-cleared";
+    window.addEventListener(eventName, onDownloadSecretCleared, { once: true });
+    return () => window.removeEventListener(eventName, onDownloadSecretCleared);
   }, [consentKey, gtmId, pathname]);
 
   return null;

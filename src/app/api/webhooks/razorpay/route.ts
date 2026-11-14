@@ -11,6 +11,7 @@ import {
   verifyRazorpayWebhookSignature,
 } from "@/lib/razorpay/checkout";
 import { processRazorpayPartnerWebhookQueue } from "@/lib/razorpay/webhook-fulfillment";
+import { processRazorpayPurchaseEmailQueue } from "@/lib/razorpay/purchase-email";
 
 type ProviderOrder = {
   id: string;
@@ -44,6 +45,39 @@ function response(status: number) {
     status,
     headers: { "Cache-Control": "no-store" },
   });
+}
+
+async function deliverPurchaseEmailForEvent(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  eventId: string,
+) {
+  const { data: event, error: eventError } = await admin
+    .from("razorpay_checkout_events")
+    .select("razorpay_order_id")
+    .eq("event_id", eventId)
+    .maybeSingle();
+  if (eventError) {
+    console.error("Razorpay event order could not be loaded for purchase email delivery.", {
+      code: eventError.code,
+    });
+    return;
+  }
+  if (!event || typeof event.razorpay_order_id !== "string") return;
+
+  const { data: order, error: orderError } = await admin
+    .from("razorpay_checkout_orders")
+    .select("id")
+    .eq("razorpay_order_id", event.razorpay_order_id)
+    .eq("environment", "test")
+    .maybeSingle();
+  if (orderError) {
+    console.error("Razorpay order could not be loaded for purchase email delivery.", {
+      code: orderError.code,
+    });
+    return;
+  }
+  if (!order || typeof order.id !== "string") return;
+  await processRazorpayPurchaseEmailQueue(admin, order.id, 1);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -242,7 +276,10 @@ async function enqueuePartnerPaymentEvent(
   if (shouldSchedule) {
     try {
       after(async () => {
-        await processRazorpayPartnerWebhookQueue(admin, eventId, 1);
+        const result = await processRazorpayPartnerWebhookQueue(admin, eventId, 1);
+        if (result.processed > 0) {
+          await deliverPurchaseEmailForEvent(admin, eventId);
+        }
       });
     } catch {
       console.error("Razorpay partner webhook background processing could not be scheduled.");

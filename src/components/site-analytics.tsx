@@ -5,6 +5,6 @@ import { Analytics } from "@vercel/analytics/next";
 
 export function SiteAnalytics() {
   const pathname = usePathname();
-  if (pathname === "/free-product-download") return null;
+  if (pathname === "/free-product-download" || pathname === "/purchase-download") return null;
   return <Analytics />;
 }

@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   getRazorpayTestWebhookSecret: vi.fn(),
   isRazorpayPartnerWebhookFulfillmentEnabled: vi.fn(),
   processRazorpayPartnerWebhookQueue: vi.fn(),
+  processRazorpayPurchaseEmailQueue: vi.fn(),
   razorpayApiRequest: vi.fn(),
   verifyRazorpayWebhookSignature: vi.fn(),
   scheduled: [] as Array<() => Promise<void>>,
@@ -36,6 +37,10 @@ vi.mock("@/lib/razorpay/checkout", () => ({
 
 vi.mock("@/lib/razorpay/webhook-fulfillment", () => ({
   processRazorpayPartnerWebhookQueue: mocks.processRazorpayPartnerWebhookQueue,
+}));
+
+vi.mock("@/lib/razorpay/purchase-email", () => ({
+  processRazorpayPurchaseEmailQueue: mocks.processRazorpayPurchaseEmailQueue,
 }));
 
 import { POST } from "@/app/api/webhooks/razorpay/route";
@@ -193,6 +198,11 @@ beforeEach(() => {
     claimed: 1,
     processed: 1,
     ignored: 0,
+    failed: 0,
+  });
+  mocks.processRazorpayPurchaseEmailQueue.mockResolvedValue({
+    claimed: 0,
+    accepted: 0,
     failed: 0,
   });
   mocks.verifyRazorpayWebhookSignature.mockReturnValue(false);

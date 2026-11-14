@@ -44,9 +44,20 @@ export async function GET(request: Request) {
     return jsonResponse({ error: "Purchase status could not be found." }, 404);
   }
 
+  const { data: purchaseEmail, error: emailError } = await admin
+    .from("razorpay_purchase_emails")
+    .select("status")
+    .eq("order_id", orderId)
+    .maybeSingle();
+  if (emailError) {
+    console.error("Razorpay purchase email status could not be loaded.");
+    return jsonResponse({ error: "Purchase status is temporarily unavailable." }, 503);
+  }
+
   return jsonResponse({
     orderStatus: order.order_status,
     paymentStatus: order.payment_status,
     fulfillmentStatus: order.fulfillment_status,
+    purchaseEmailStatus: purchaseEmail?.status ?? "pending",
   });
 }

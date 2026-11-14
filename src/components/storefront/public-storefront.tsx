@@ -1,6 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { CSSProperties } from "react";
-import { PaidProductCheckout } from "@/components/storefront/paid-product-checkout";
 import {
   Mail,
 } from "lucide-react";
@@ -11,7 +11,6 @@ import type {
   StorefrontSection,
   StorefrontTheme,
 } from "@/lib/storefront/types";
-import { FreeProductClaim } from "@/components/storefront/free-product-claim";
 
 type StorefrontView = {
   store_name: string;
@@ -20,7 +19,6 @@ type StorefrontView = {
   profileImageUrl: string | null;
   bannerImageUrl: string | null;
   theme: StorefrontTheme;
-  claimLinkExpiryHours?: number;
   products: StorefrontProductDisplay[];
   customization: StorefrontCustomization & {
     products: (StorefrontCustomization["products"][number] & { coverImageUrl?: string | null })[];
@@ -57,7 +55,6 @@ function ProductsSection({ store }: { store: StorefrontView }) {
               key={product.id}
               product={product}
               storefrontUsername={store.username}
-              claimLinkExpiryHours={store.claimLinkExpiryHours ?? 48}
             />
           ))}
         </div>
@@ -71,11 +68,9 @@ function ProductsSection({ store }: { store: StorefrontView }) {
 export function StorefrontProductCard({
   product,
   storefrontUsername,
-  claimLinkExpiryHours,
 }: {
   product: StorefrontProductDisplay;
   storefrontUsername?: string;
-  claimLinkExpiryHours?: number;
 }) {
   const price = product.isFree
     ? "No cost"
@@ -102,29 +97,21 @@ export function StorefrontProductCard({
           <strong>{price}</strong>
           <span>{product.isFree ? "Lead Magnet" : "Digital product"}</span>
         </div>
-        {product.isFree && storefrontUsername ? (
-          <FreeProductClaim
-            productId={product.id}
-            productName={product.name}
-            storefrontUsername={storefrontUsername}
-            linkExpiryHours={claimLinkExpiryHours ?? 48}
-          />
+        {storefrontUsername ? (
+          <Link
+            className="storefront-product-action"
+            href={`/${encodeURIComponent(storefrontUsername ?? "")}/product/${product.id}`}
+          >
+            View Product
+          </Link>
         ) : product.isFree ? (
           <button className="storefront-product-action" type="button" disabled>
             Lead Magnet delivery coming soon
           </button>
         ) : (
-          <PaidProductCheckout
-            productId={product.id}
-            storefrontUsername={storefrontUsername ?? ""}
-            storefrontName={storefrontUsername ?? "Creator store"}
-            productName={product.name}
-            productDescription={product.description}
-            enabled={
-              process.env.RAZORPAY_CHECKOUT_ENABLED === "true" &&
-              process.env.RAZORPAY_OAUTH_MODE === "test"
-            }
-          />
+          <span className="storefront-product-action" aria-disabled="true">
+            Product unavailable
+          </span>
         )}
       </div>
     </article>

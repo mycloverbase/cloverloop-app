@@ -112,6 +112,7 @@ function claimRequest(overrides: Record<string, unknown> = {}) {
     body: JSON.stringify({
       productId,
       storefrontUsername: "test-creator",
+      customerName: "Buyer Name",
       email: "  Buyer@Example.com ",
       termsAccepted: true,
       ...overrides,
@@ -154,6 +155,7 @@ describe("free product claim and download routes", () => {
     expect(response.status).toBe(200);
     expect(result).toEqual({ ok: true, emailSent: true, reused: false });
     expect(claimCall?.args.requested_customer_email).toBe("buyer@example.com");
+    expect(resendBody.html).toContain("Hi Buyer Name,");
     expect(claimCall?.args.requested_claim_token_hash).toMatch(/^[0-9a-f]{64}$/);
     expect(claimCall?.args.requested_claim_token_hash).not.toBe(token);
     expect(resendBody.to).toEqual(["buyer@example.com"]);
@@ -163,6 +165,14 @@ describe("free product claim and download routes", () => {
     expect(resendBody.text).toContain("https://cloverloop.in/free-product-download#token=");
     expect(JSON.stringify(result)).not.toContain("#token=");
     expect(client.rpcCalls.some((call) => call.name === "mark_free_product_claim_email_sent")).toBe(true);
+  });
+
+  it("requires the claimant's name before creating a free-product claim", async () => {
+    const client = createSupabaseFake();
+    const response = await createClaim(claimRequest({ customerName: "  " }));
+
+    expect(response.status).toBe(400);
+    expect(client.rpcCalls.some((call) => call.name === "claim_free_product")).toBe(false);
   });
 
   it("preserves the claim and records a retryable state when Resend rejects delivery", async () => {

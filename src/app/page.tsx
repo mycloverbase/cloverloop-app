@@ -29,6 +29,32 @@ const benefits = [
   },
 ];
 
+const launchBadges = [
+  {
+    name: "Launchbase",
+    href: "https://www.launchbase.in/products/cloverloop",
+    image: "https://www.launchbase.in/badges/featured.svg",
+    alt: "Featured on Launchbase",
+    width: 180,
+    height: 39,
+  },
+  {
+    name: "Fazier",
+    href: "https://fazier.com/launches/cloverloop.in",
+    image: "https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=neutral",
+    alt: "Featured on Fazier",
+    width: 250,
+  },
+  {
+    name: "StartupBase",
+    href: "https://startupbase.io/products/cloverloop?utm_source=startupbase&utm_medium=badge&utm_campaign=featured-badge-neutral",
+    image: "https://statics.startupbase.io/site/badges/featured-on-sb-neutral.svg",
+    alt: "Featured on StartupBase",
+    height: 55,
+    style: { height: "55px", width: "auto" },
+  },
+];
+
 export default function HomePage() {
   return (
     <PublicLayout>
@@ -53,20 +79,6 @@ export default function HomePage() {
               <Link href="/pricing" className="button button-secondary">
                 Explore Pricing
               </Link>
-              <a
-                className="launchbase-badge"
-                href="https://www.launchbase.in/products/cloverloop"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="https://www.launchbase.in/badges/featured.svg"
-                  alt="Featured on Launchbase"
-                  width="250"
-                  height="54"
-                />
-              </a>
             </div>
           </div>
         </div>
@@ -298,6 +310,29 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+      <section className="launch-badges-section" aria-label="CloverLoop launch badges">
+        <div className="page-width launch-badges-row">
+          {launchBadges.map((badge) => (
+            <a
+              className="launch-badge-link"
+              href={badge.href}
+              key={badge.name}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={badge.image}
+                alt={badge.alt}
+                width={badge.width}
+                height={badge.height}
+                style={badge.style}
+                loading="lazy"
+              />
+            </a>
+          ))}
         </div>
       </section>
       <PublicCta title="Build a dedicated home for your digital products." />

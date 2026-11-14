@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { checkFreeProductRateLimit } from "@/lib/free-products/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { isRazorpayPurchaseEmailDeliveryConfigured } from "@/lib/razorpay/purchase-email";
 import {
   getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection,
@@ -82,6 +83,10 @@ export async function POST(request: Request) {
     );
   }
 
+  if (!isRazorpayPurchaseEmailDeliveryConfigured()) {
+    return jsonResponse({ error: "Purchase email delivery is not configured." }, 503);
+  }
+
   const admin = createSupabaseAdminClient();
   const deliveryConfig = getFreeProductDeliveryConfig();
   if (!admin || !deliveryConfig) {
@@ -105,8 +110,6 @@ export async function POST(request: Request) {
   const checkoutToken = body.checkoutToken;
   const customerName =
     typeof body.customerName === "string" ? body.customerName.trim() : "";
-  const customerPhone =
-    typeof body.customerPhone === "string" ? body.customerPhone.trim() : "";
 
   if (
     typeof productId !== "string" ||
@@ -117,8 +120,8 @@ export async function POST(request: Request) {
     !/^[a-z0-9][a-z0-9-]{0,78}[a-z0-9]$/i.test(storefrontUsername) ||
     !email ||
     !isValidCheckoutToken(checkoutToken) ||
-    customerName.length > 120 ||
-    customerPhone.length > 32
+    customerName.length < 1 ||
+    customerName.length > 120
   ) {
     return jsonResponse({ error: "Invalid checkout details." }, 400);
   }
@@ -147,8 +150,8 @@ export async function POST(request: Request) {
       p_product_id: productId,
       p_storefront_username: storefrontUsername,
       p_customer_email: email,
-      p_customer_name: customerName || null,
-      p_customer_phone: customerPhone || null,
+      p_customer_name: customerName,
+      p_customer_phone: null,
       p_checkout_token_hash: hashCheckoutToken(checkoutToken),
     },
   );
@@ -273,5 +276,6 @@ export async function POST(request: Request) {
     productDescription: order.product_description,
     storefrontName: order.storefront_name,
     customerEmail: email,
+    customerName,
   });
 }

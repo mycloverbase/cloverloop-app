@@ -32,11 +32,15 @@ export async function POST(request: Request) {
   }
 
   const email = normalizeCustomerEmail(body.email);
+  const customerName = typeof body.customerName === "string" ? body.customerName.trim() : "";
   const productId = body.productId;
   const storefrontUsername = typeof body.storefrontUsername === "string"
     ? body.storefrontUsername.trim().toLowerCase()
     : "";
   if (!email) return jsonError("Enter a valid email address.", 400);
+  if (!customerName || customerName.length > 120) {
+    return jsonError("Enter your full name.", 400);
+  }
   if (!isUuid(productId) || !usernamePattern.test(storefrontUsername)) {
     return jsonError("This product is no longer available.", 404);
   }
@@ -113,8 +117,27 @@ export async function POST(request: Request) {
     return jsonError("Free product delivery is temporarily unavailable. Please try again later.", 503);
   }
 
+  const { data: namedClaim, error: nameError } = await supabase
+    .from("product_claims")
+    .update({ customer_name: customerName })
+    .eq("id", claim.claim_id)
+    .eq("claim_token_hash", tokenHash)
+    .eq("status", "pending")
+    .select("id")
+    .maybeSingle();
+  if (nameError || !namedClaim) {
+    console.error("Could not save the free product claimant name.", { code: nameError?.code ?? "not_found" });
+    const { error: statusError } = await supabase.rpc("mark_free_product_claim_email_failed", {
+      requested_claim_id: claim.claim_id,
+      requested_claim_token_hash: tokenHash,
+    });
+    if (statusError) console.error("Could not record a failed free product email attempt.", statusError);
+    return jsonError("Free product delivery is temporarily unavailable. Please try again later.", 503);
+  }
+
   const emailAccepted = await sendFreeProductEmail({
     email,
+    customerName,
     creatorName: claim.creator_name,
     productName: claim.product_name,
     token,

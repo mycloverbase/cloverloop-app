@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type FormEvent, useRef, useState } from "react";
 
 type CheckoutDetails = {
@@ -12,6 +13,7 @@ type CheckoutDetails = {
   productDescription: string | null;
   storefrontName: string;
   customerEmail: string;
+  customerName: string;
 };
 
 type RazorpayCheckoutResult = {
@@ -27,7 +29,7 @@ type RazorpayCheckoutOptions = {
   name: string;
   description: string;
   order_id: string;
-  prefill: { email: string };
+  prefill: { name: string; email: string };
   theme: { color: string };
   handler: (result: RazorpayCheckoutResult) => void | Promise<void>;
   modal: { ondismiss: () => void };
@@ -47,8 +49,13 @@ type Props = {
   storefrontName: string;
   productName: string;
   productDescription: string | null;
+  storefrontUrl: string;
+  supportEmail: string | null;
+  pricePaise: number;
   enabled: boolean;
 };
+
+type PurchaseEmailStatus = "pending" | "processing" | "accepted" | "delivered" | "failed" | "suppressed";
 
 function isCheckoutDetails(value: unknown): value is CheckoutDetails {
   if (!value || typeof value !== "object") return false;
@@ -61,7 +68,8 @@ function isCheckoutDetails(value: unknown): value is CheckoutDetails {
     typeof result.publicKey === "string" &&
     typeof result.productName === "string" &&
     typeof result.storefrontName === "string" &&
-    typeof result.customerEmail === "string"
+    typeof result.customerEmail === "string" &&
+    typeof result.customerName === "string"
   );
 }
 
@@ -75,6 +83,16 @@ function getErrorMessage(value: unknown, fallback: string): string {
     return value.error;
   }
   return fallback;
+}
+
+function isPurchaseEmailStatus(value: unknown): value is PurchaseEmailStatus {
+  return ["pending", "processing", "accepted", "delivered", "failed", "suppressed"].includes(String(value));
+}
+
+function maskEmail(email: string): string {
+  const [localPart, domain] = email.split("@");
+  if (!localPart || !domain) return "your email address";
+  return `${localPart.slice(0, 1)}${"*".repeat(Math.min(Math.max(localPart.length - 1, 2), 6))}@${domain}`;
 }
 
 async function loadCheckoutScript(): Promise<boolean> {
@@ -121,16 +139,20 @@ export function PaidProductCheckout({
   storefrontName,
   productName,
   productDescription,
+  storefrontUrl,
+  supportEmail,
+  pricePaise,
   enabled,
 }: Props) {
   const checkoutTokenRef = useRef<string | null>(null);
+  const [customerName, setCustomerName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [checkout, setCheckout] = useState<CheckoutDetails | null>(null);
   const [paid, setPaid] = useState(false);
-  const [downloadLoading, setDownloadLoading] = useState(false);
+  const [purchaseEmailStatus, setPurchaseEmailStatus] = useState<PurchaseEmailStatus>("pending");
 
   function getCheckoutToken(): string {
     if (!checkoutTokenRef.current) {
@@ -149,11 +171,10 @@ export function PaidProductCheckout({
       amount: order.amount,
       currency: order.currency,
       name: order.storefrontName || storefrontName,
-      description:
-        order.productDescription || productDescription || productName,
+      description: order.productDescription || productDescription || productName,
       order_id: order.razorpayOrderId,
-      prefill: { email: order.customerEmail },
-      theme: { color: "#635bff" },
+      prefill: { name: order.customerName, email: order.customerEmail },
+      theme: { color: "#1b4332" },
       handler: async (result) => {
         try {
           await verifyPayment(result, order, token);
@@ -161,7 +182,7 @@ export function PaidProductCheckout({
           setError(
             caught instanceof Error
               ? caught.message
-              : "Payment verification could not complete.",
+              : "Payment status could not be checked. Please retry.",
           );
         }
       },
@@ -175,6 +196,7 @@ export function PaidProductCheckout({
   }
 
   async function pollOrderStatus(order: CheckoutDetails, token: string) {
+    let orderPaid = paid;
     for (let attempt = 0; attempt < 30; attempt += 1) {
       const response = await fetch(
         `/api/checkout/order-status?orderId=${encodeURIComponent(order.orderId)}`,
@@ -188,23 +210,35 @@ export function PaidProductCheckout({
         const status = result as {
           orderStatus?: string;
           fulfillmentStatus?: string;
+          purchaseEmailStatus?: unknown;
         };
-        if (status.orderStatus === "paid" && status.fulfillmentStatus === "ready") {
+        if (status.orderStatus === "paid") {
+          orderPaid = true;
           setPaid(true);
-          setStatusMessage("Payment confirmed. Your download is ready.");
-          return;
-        }
-        if (status.orderStatus === "paid" && status.fulfillmentStatus === "blocked") {
-          setStatusMessage(
-            "Payment was received, but this product is no longer available. Please contact the creator.",
-          );
-          return;
+          if (status.fulfillmentStatus === "blocked") {
+            setStatusMessage(
+              "Payment was received, but this product is no longer available. Please contact support.",
+            );
+            return;
+          }
+          if (status.fulfillmentStatus === "ready") {
+            const emailStatus = isPurchaseEmailStatus(status.purchaseEmailStatus)
+              ? status.purchaseEmailStatus
+              : "pending";
+            setPurchaseEmailStatus(emailStatus);
+            if (emailStatus === "delivered" || emailStatus === "failed" || emailStatus === "suppressed") {
+              return;
+            }
+            setStatusMessage("Payment verified. We are confirming delivery of your download email.");
+          }
         }
       }
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
     setStatusMessage(
-      "Razorpay is still confirming your payment. You can check again shortly.",
+      orderPaid
+        ? "Your payment is confirmed. Email delivery is still being processed; check back shortly."
+        : "Razorpay is still confirming your payment. You can check again shortly.",
     );
   }
 
@@ -257,7 +291,8 @@ export function PaidProductCheckout({
         body: JSON.stringify({
           productId,
           storefrontUsername,
-          email,
+          customerName: customerName.trim(),
+          email: email.trim().toLowerCase(),
           checkoutToken: token,
         }),
       });
@@ -268,14 +303,10 @@ export function PaidProductCheckout({
       if (!isCheckoutDetails(data)) {
         throw new Error("Checkout returned an invalid response.");
       }
-      const order = data;
-
-      setCheckout(order);
-      await openCheckout(order, token);
+      setCheckout(data);
+      await openCheckout(data, token);
     } catch (caught) {
-      setError(
-        caught instanceof Error ? caught.message : "Unable to start checkout.",
-      );
+      setError(caught instanceof Error ? caught.message : "Unable to start checkout.");
     } finally {
       setLoading(false);
     }
@@ -289,9 +320,7 @@ export function PaidProductCheckout({
     try {
       await openCheckout(checkout, checkoutTokenRef.current);
     } catch (caught) {
-      setError(
-        caught instanceof Error ? caught.message : "Unable to reopen checkout.",
-      );
+      setError(caught instanceof Error ? caught.message : "Unable to reopen checkout.");
     } finally {
       setLoading(false);
     }
@@ -303,95 +332,107 @@ export function PaidProductCheckout({
     try {
       await pollOrderStatus(checkout, checkoutTokenRef.current);
     } catch {
-      setError("Unable to check payment status. Please retry shortly.");
+      setError("Unable to check purchase status. Please retry shortly.");
     }
   }
 
-  async function downloadPurchase() {
-    if (!checkoutTokenRef.current || downloadLoading) return;
-    setDownloadLoading(true);
-    setError("");
-    try {
-      const response = await fetch("/api/purchase-download", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ checkoutToken: checkoutTokenRef.current }),
-      });
-      const data: unknown = await response.json();
-      if (!response.ok || !data || typeof data !== "object" || !("downloadUrl" in data)) {
-        throw new Error(getErrorMessage(data, "Unable to prepare the download."));
-      }
-      const downloadUrl = (data as { downloadUrl: string }).downloadUrl;
-      if (typeof downloadUrl !== "string") {
-        throw new Error("Unable to prepare the download.");
-      }
-      window.location.assign(downloadUrl);
-    } catch (caught) {
-      setError(
-        caught instanceof Error ? caught.message : "Unable to prepare the download.",
-      );
-    } finally {
-      setDownloadLoading(false);
-    }
-  }
+  const formattedPrice = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  }).format(pricePaise / 100);
 
   return (
     <div className="storefront-product-checkout">
-      {!enabled ? (
-        <button className="storefront-product-action" type="button" disabled>
-          Payments coming soon
-        </button>
-      ) : paid ? (
-        <button
-          className="storefront-product-action"
-          type="button"
-          onClick={downloadPurchase}
-          disabled={downloadLoading}
-        >
-          {downloadLoading ? "Preparing download..." : "Download product"}
-        </button>
-      ) : checkout ? (
-        <button
-          className="storefront-product-action"
-          type="button"
-          onClick={() => void reopenCheckout()}
-          disabled={loading}
-        >
-          {loading ? "Preparing checkout..." : "Retry payment"}
-        </button>
+      {paid ? (
+        <section className="product-purchase-confirmation" role="status" aria-live="polite">
+          <span className="storefront-eyebrow">Payment successful</span>
+          <h2>{statusMessage.includes("no longer available") ? "We need to help with this order" : "Thank you for your purchase"}</h2>
+          <p><strong>{productName}</strong></p>
+          {purchaseEmailStatus === "delivered" ? (
+            <p>
+              Your secure download link has been sent to <strong>{checkout ? maskEmail(checkout.customerEmail) : "your email address"}</strong>.
+              Check your inbox and spam folder.
+            </p>
+          ) : purchaseEmailStatus === "failed" || purchaseEmailStatus === "suppressed" ? (
+            <p>
+              {purchaseEmailStatus === "suppressed"
+                ? "The payment is verified, but the email provider could not deliver the message. Automated retries are paused."
+                : "The payment is verified, but the download email could not be delivered. Our system will retry."}
+              {supportEmail ? <> If it does not arrive, contact <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.</> : " Please contact the creator for help."}
+            </p>
+          ) : statusMessage.includes("no longer available") ? (
+            <p>{statusMessage}</p>
+          ) : (
+            <p>{statusMessage || "Your download email is being processed. Check back shortly."}</p>
+          )}
+          {purchaseEmailStatus !== "delivered" && !statusMessage.includes("no longer available") ? (
+            <button type="button" className="product-checkout-status-button" onClick={() => void checkStatusAgain()}>
+              Check email status
+            </button>
+          ) : null}
+          <Link className="product-checkout-store-link" href={storefrontUrl}>Return to {storefrontName}</Link>
+        </section>
       ) : (
-        <form className="storefront-product-checkout-form" onSubmit={startCheckout}>
-          <label className="sr-only" htmlFor={`checkout-email-${productId}`}>
-            Email address
-          </label>
-          <input
-            className="storefront-product-checkout-email"
-            id={`checkout-email-${productId}`}
-            type="email"
-            autoComplete="email"
-            required
-            maxLength={254}
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="Your email"
-            disabled={loading}
-          />
-          <button
-            className="storefront-product-action"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Preparing checkout..." : `Buy ${productName}`}
-          </button>
-        </form>
+        <>
+          {!enabled ? (
+            <button className="storefront-product-action" type="button" disabled>
+              Payments coming soon
+            </button>
+          ) : checkout ? (
+            <>
+              <button
+                className="storefront-product-action"
+                type="button"
+                onClick={() => void reopenCheckout()}
+                disabled={loading}
+              >
+                {loading ? "Preparing checkout..." : `Pay ${formattedPrice} securely`}
+              </button>
+              <button type="button" className="product-checkout-status-button" onClick={() => void checkStatusAgain()}>
+                Check payment status
+              </button>
+            </>
+          ) : (
+            <form className="storefront-product-checkout-form" onSubmit={startCheckout}>
+              <label htmlFor={`checkout-name-${productId}`}>Full name</label>
+              <input
+                className="storefront-product-checkout-input"
+                id={`checkout-name-${productId}`}
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                maxLength={120}
+                value={customerName}
+                onChange={(event) => setCustomerName(event.target.value)}
+                placeholder="Your full name"
+                disabled={loading}
+              />
+              <label htmlFor={`checkout-email-${productId}`}>Email address</label>
+              <input
+                className="storefront-product-checkout-input"
+                id={`checkout-email-${productId}`}
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                maxLength={254}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                disabled={loading}
+              />
+              <button className="storefront-product-action" type="submit" disabled={loading}>
+                {loading ? "Preparing checkout..." : `Pay ${formattedPrice} securely`}
+              </button>
+              <p className="product-checkout-security">Secure payment processed by Razorpay. Your download link will be emailed after payment verification.</p>
+              <p className="product-checkout-disclaimer">Digital products are delivered electronically. Please review the product details before purchasing.</p>
+            </form>
+          )}
+          {error ? <p role="alert">{error}</p> : null}
+          {statusMessage ? <p aria-live="polite">{statusMessage}</p> : null}
+        </>
       )}
-      {error ? <p role="alert">{error}</p> : null}
-      {statusMessage ? <p aria-live="polite">{statusMessage}</p> : null}
-      {checkout && !paid && statusMessage.includes("check again") ? (
-        <button type="button" onClick={() => void checkStatusAgain()}>
-          Check payment status
-        </button>
-      ) : null}
     </div>
   );
 }

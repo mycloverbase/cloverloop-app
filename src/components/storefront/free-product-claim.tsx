@@ -18,6 +18,7 @@ export function FreeProductClaim({
   linkExpiryHours,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [customerName, setCustomerName] = useState("");
   const [email, setEmail] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -46,6 +47,7 @@ export function FreeProductClaim({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          customerName: customerName.trim(),
           email,
           productId,
           storefrontUsername,
@@ -117,8 +119,19 @@ export function FreeProductClaim({
               <>
                 <span className="storefront-eyebrow">Lead Magnet</span>
                 <h2 id="free-product-modal-title">Get {productName}</h2>
-                <p>Enter your email and we&apos;ll send you a secure download link.</p>
+                <p>Enter your name and email and we&apos;ll send you a secure download link.</p>
                 <form className="free-product-claim-form" onSubmit={submit}>
+                  <label htmlFor={`claim-name-${productId}`}>Full name</label>
+                  <input
+                    id={`claim-name-${productId}`}
+                    type="text"
+                    name="name"
+                    autoComplete="name"
+                    maxLength={120}
+                    required
+                    value={customerName}
+                    onChange={(event) => setCustomerName(event.target.value)}
+                  />
                   <label htmlFor={`claim-email-${productId}`}>Email address</label>
                   <input
                     id={`claim-email-${productId}`}

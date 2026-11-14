@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   hashCheckoutToken: vi.fn(),
   isRazorpayCheckoutEnabled: vi.fn(),
   isRazorpayPartnerWebhookFulfillmentEnabled: vi.fn(),
+  isRazorpayPurchaseEmailDeliveryConfigured: vi.fn(),
   isValidCheckoutToken: vi.fn(),
   normalizeCustomerEmail: vi.fn(),
   razorpayApiRequest: vi.fn(),
@@ -31,6 +32,11 @@ vi.mock("@/lib/razorpay/checkout", () => ({
   isValidCheckoutToken: mocks.isValidCheckoutToken,
   normalizeCustomerEmail: mocks.normalizeCustomerEmail,
   razorpayApiRequest: mocks.razorpayApiRequest,
+}));
+
+vi.mock("@/lib/razorpay/purchase-email", () => ({
+  isRazorpayPurchaseEmailDeliveryConfigured:
+    mocks.isRazorpayPurchaseEmailDeliveryConfigured,
 }));
 
 import { POST } from "@/app/api/checkout/create-order/route";
@@ -80,7 +86,7 @@ function makeRequest(body: Record<string, unknown>) {
       "Content-Type": "application/json",
       "x-forwarded-for": "192.0.2.10",
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ customerName: "Test Buyer", ...body }),
   });
 }
 
@@ -90,6 +96,7 @@ beforeEach(() => {
   vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
   mocks.isRazorpayCheckoutEnabled.mockReturnValue(true);
   mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(true);
+  mocks.isRazorpayPurchaseEmailDeliveryConfigured.mockReturnValue(true);
   mocks.checkFreeProductRateLimit.mockResolvedValue(true);
   mocks.getFreeProductDeliveryConfig.mockReturnValue({
     maxDownloads: 3,
@@ -132,8 +139,16 @@ describe("POST /api/checkout/create-order", () => {
     expect(providerBody.amount).toBe(29900);
     expect(providerBody.currency).toBe("INR");
     expect(body.publicKey).toBe("rzp_test_public");
+    expect(body.customerName).toBe("Test Buyer");
     expect(body).not.toHaveProperty("accessToken");
     expect(body).not.toHaveProperty("refreshToken");
+    expect(mocks.createSupabaseAdminClient.mock.results[0].value.rpc).toHaveBeenCalledWith(
+      "create_razorpay_checkout_order",
+      expect.objectContaining({
+        p_customer_name: "Test Buyer",
+        p_customer_phone: null,
+      }),
+    );
   });
 
   it("reuses an existing provider order for the same checkout token", async () => {
@@ -277,5 +292,36 @@ describe("POST /api/checkout/create-order", () => {
     expect(response.status).toBe(503);
     expect(mocks.createSupabaseAdminClient).not.toHaveBeenCalled();
     expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
+  });
+
+  it("does not create payable orders without configured email delivery", async () => {
+    mocks.isRazorpayPurchaseEmailDeliveryConfigured.mockReturnValue(false);
+    const response = await POST(makeRequest({
+      productId: orderRow.product_id,
+      storefrontUsername: orderRow.storefront_username,
+      email: "buyer@example.com",
+      checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+    }));
+
+    expect(response.status).toBe(503);
+    expect(mocks.createSupabaseAdminClient).not.toHaveBeenCalled();
+    expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
+  });
+
+  it("requires a full name and never forwards a phone number", async () => {
+    const response = await POST(
+      makeRequest({
+        customerName: "   ",
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "buyer@example.com",
+        customerPhone: "+1-555-555-5555",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(mocks.createSupabaseAdminClient).toHaveBeenCalledOnce();
+    expect(mocks.createSupabaseAdminClient.mock.results[0].value.rpc).not.toHaveBeenCalled();
   });
 });

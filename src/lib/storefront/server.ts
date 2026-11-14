@@ -2,6 +2,7 @@ import type { createSupabasePublicClient } from "@/lib/supabase/public";
 import {
   type PublicStorefront,
   type PublicStorefrontDisplay,
+  type PublishedStorefrontProduct,
   type CreatorStorefrontProduct,
   type StorefrontProductDisplay,
   type StorefrontCustomization,
@@ -260,4 +261,45 @@ export async function getPublishedStorefront(
   const bannerImageUrl = storefrontImageUrl(supabase, publicStorefront.banner_image_path);
   const customization = addCustomizationImageUrls(supabase, { ...publicStorefront.customization, products: [] });
   return { ...publicStorefront, profileImageUrl, bannerImageUrl, products, customization };
+}
+
+export async function getPublishedStorefrontProduct(
+  supabase: StorefrontSupabaseClient,
+  username: string,
+  productId: string,
+): Promise<{ storefront: PublicStorefrontDisplay; product: PublishedStorefrontProduct } | null> {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(productId)) {
+    return null;
+  }
+  const storefront = await getPublishedStorefront(supabase, username);
+  if (!storefront) return null;
+
+  const { data, error } = await supabase
+    .from("published_storefront_products")
+    .select("id,name,description,category,product_type,is_free,price_paise,cover_image_path,file_name,file_size,file_mime_type")
+    .eq("username", storefront.username)
+    .eq("id", productId)
+    .maybeSingle();
+  if (error) {
+    console.error("Could not load the published storefront product.", error);
+    throw new Error("The product could not be loaded. Please try again.");
+  }
+  if (!data) return null;
+
+  const product = parsePublicProduct(data);
+  const fileSize = data.file_size === null ? null : safeInteger(data.file_size);
+  if (!product || (data.file_size !== null && fileSize === null)) {
+    throw new Error("The published product data returned by Supabase is invalid.");
+  }
+  const coverImagePath = typeof data.cover_image_path === "string" ? data.cover_image_path : null;
+  return {
+    storefront,
+    product: {
+      ...product,
+      coverImageUrl: storefrontImageUrl(supabase, coverImagePath),
+      fileName: typeof data.file_name === "string" ? data.file_name : null,
+      fileSize,
+      fileMimeType: typeof data.file_mime_type === "string" ? data.file_mime_type : null,
+    },
+  };
 }

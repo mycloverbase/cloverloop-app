@@ -14,6 +14,7 @@ function escapeHtml(value: string): string {
 
 export type FreeProductEmailInput = {
   email: string;
+  customerName?: string;
   creatorName: string;
   productName: string;
   token: string;
@@ -33,9 +34,11 @@ export function getFreeProductEmail(input: FreeProductEmailInput): {
   const productName = input.productName.trim();
   const subjectProductName = productName.replace(/[\r\n\t]+/g, " ").slice(0, 100);
   const creatorName = input.creatorName.trim();
+  const customerName = input.customerName?.trim() || "";
   const downloadLink = getFreeProductDownloadLink(input.token);
   const safeProductName = escapeHtml(productName);
   const safeCreatorName = escapeHtml(creatorName);
+  const safeCustomerName = escapeHtml(customerName);
   const safeDownloadLink = escapeHtml(downloadLink);
   const expiryText = `${input.expiryHours} ${input.expiryHours === 1 ? "hour" : "hours"}`;
 
@@ -53,7 +56,7 @@ export function getFreeProductEmail(input: FreeProductEmailInput): {
 <tr><td bgcolor="#fbfaf5" style="background:#fbfaf5;border:1px solid #d3dbc8;border-top:4px solid #a8c5a0;border-radius:14px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr><td class="pad" style="padding:32px 36px 8px"><h1 style="margin:0 0 16px;font-size:30px;line-height:1.15;font-weight:600;color:#14382b">Your free product is ready</h1>
-<p style="margin:0 0 14px;font-size:16px;line-height:1.55">Hi,</p>
+<p style="margin:0 0 14px;font-size:16px;line-height:1.55">${safeCustomerName ? `Hi ${safeCustomerName},` : "Hi,"}</p>
 <p style="margin:0 0 14px;font-size:16px;line-height:1.55">You&apos;ve successfully claimed <strong>${safeProductName}</strong> from ${safeCreatorName}.</p>
 <p style="margin:0 0 14px;font-size:16px;line-height:1.55">Your download is ready.</p></td></tr>
 <tr><td class="pad" style="padding:18px 36px 12px"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#1b4332" style="background:#1b4332;border-radius:10px"><a href="${safeDownloadLink}" style="display:inline-block;padding:14px 26px;color:#f3f1e4;font-size:16px;font-weight:600;text-decoration:none">Download Your Product</a></td></tr></table></td></tr>
@@ -61,7 +64,7 @@ export function getFreeProductEmail(input: FreeProductEmailInput): {
 </table></td></tr>
 <tr><td class="pad" align="center" style="padding:22px 24px 0;font-size:12px;line-height:1.6;color:#4f6157">You&apos;re receiving this email because you requested a free product on <a href="https://cloverloop.in" style="color:#4f6157">cloverloop.in</a>.<br>CloverLoop, info@cloverloop.in</td></tr>
 </table></td></tr></table></body></html>`,
-    text: `Hi,
+    text: `Hi${customerName ? ` ${customerName}` : ""},
 
 You've successfully claimed ${productName} from ${creatorName}.
 
