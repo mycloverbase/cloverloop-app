@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   createSupabaseAdminClient: vi.fn(),
   getFreeProductDeliveryConfig: vi.fn(),
   getRazorpayCheckoutConnection: vi.fn(),
+  getRazorpayPartnerTestWebhookSecret: vi.fn(),
   getRazorpayTestWebhookSecret: vi.fn(),
   razorpayApiRequest: vi.fn(),
   verifyRazorpayWebhookSignature: vi.fn(),
@@ -16,6 +17,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 vi.mock("@/lib/razorpay/checkout", () => ({
   getFreeProductDeliveryConfig: mocks.getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection: mocks.getRazorpayCheckoutConnection,
+  getRazorpayPartnerTestWebhookSecret: mocks.getRazorpayPartnerTestWebhookSecret,
   getRazorpayTestWebhookSecret: mocks.getRazorpayTestWebhookSecret,
   razorpayApiRequest: mocks.razorpayApiRequest,
   verifyRazorpayWebhookSignature: mocks.verifyRazorpayWebhookSignature,
@@ -26,6 +28,7 @@ import { POST } from "@/app/api/webhooks/razorpay/route";
 beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
+  mocks.getRazorpayPartnerTestWebhookSecret.mockReturnValue(null);
   mocks.getRazorpayTestWebhookSecret.mockReturnValue("server-webhook-secret");
   mocks.verifyRazorpayWebhookSignature.mockReturnValue(false);
 });
@@ -35,6 +38,139 @@ afterEach(() => {
 });
 
 describe("POST /api/webhooks/razorpay", () => {
+  it("logs verified partner application events without touching payment records", async () => {
+    const admin = { from: vi.fn(), rpc: vi.fn() };
+    const diagnosticLog = vi.spyOn(console, "info").mockImplementation(() => {});
+    mocks.createSupabaseAdminClient.mockReturnValue(admin);
+    mocks.getRazorpayPartnerTestWebhookSecret.mockReturnValue("partner-webhook-secret");
+    mocks.verifyRazorpayWebhookSignature.mockImplementation(
+      (_body: string, signature: string | null, secret: string) =>
+        signature === "partner-signature" && secret === "partner-webhook-secret",
+    );
+
+    const response = await POST(
+      new Request("https://cloverloop.test/api/webhooks/razorpay", {
+        method: "POST",
+        headers: { "x-razorpay-signature": "partner-signature" },
+        body: JSON.stringify({
+          event: "payment.captured",
+          account_id: "acc_ABC123",
+          payload: {
+            payment: {
+              entity: {
+                id: "pay_TEST123",
+                order_id: "order_TEST123",
+                email: "buyer@example.test",
+              },
+            },
+          },
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.verifyRazorpayWebhookSignature).toHaveBeenNthCalledWith(
+      1,
+      expect.any(String),
+      "partner-signature",
+      "server-webhook-secret",
+    );
+    expect(mocks.verifyRazorpayWebhookSignature).toHaveBeenNthCalledWith(
+      2,
+      expect.any(String),
+      "partner-signature",
+      "partner-webhook-secret",
+    );
+    expect(diagnosticLog).toHaveBeenCalledWith(
+      "Razorpay application-level Test Mode webhook diagnostic.",
+      {
+        eventType: "payment.captured",
+        accountId: "acc_ABC123",
+        paymentId: "pay_TEST123",
+        orderId: "order_TEST123",
+        signatureVerified: true,
+      },
+    );
+    expect(JSON.stringify(diagnosticLog.mock.calls)).not.toContain("buyer@example.test");
+    expect(admin.from).not.toHaveBeenCalled();
+    expect(admin.rpc).not.toHaveBeenCalled();
+    expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid partner signatures without processing or logging payload data", async () => {
+    const admin = { from: vi.fn(), rpc: vi.fn() };
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+    mocks.createSupabaseAdminClient.mockReturnValue(admin);
+    mocks.getRazorpayPartnerTestWebhookSecret.mockReturnValue("partner-webhook-secret");
+
+    const response = await POST(
+      new Request("https://cloverloop.test/api/webhooks/razorpay", {
+        method: "POST",
+        headers: { "x-razorpay-signature": "invalid-signature" },
+        body: JSON.stringify({
+          event: "payment.captured",
+          account_id: "acc_ABC123",
+          payload: { payment: { entity: { id: "pay_TEST123" } } },
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(warning).toHaveBeenCalledWith(
+      "Razorpay webhook signature verification failed.",
+      {
+        eventType: "payment.captured",
+        accountId: "acc_ABC123",
+        paymentId: "pay_TEST123",
+        orderId: null,
+        signatureVerified: false,
+      },
+    );
+    expect(JSON.stringify(warning.mock.calls)).not.toContain("buyer@example.test");
+    expect(admin.from).not.toHaveBeenCalled();
+    expect(admin.rpc).not.toHaveBeenCalled();
+  });
+
+  it("logs missing account_id as null for a verified partner diagnostic event", async () => {
+    const admin = { from: vi.fn(), rpc: vi.fn() };
+    const diagnosticLog = vi.spyOn(console, "info").mockImplementation(() => {});
+    mocks.createSupabaseAdminClient.mockReturnValue(admin);
+    mocks.getRazorpayPartnerTestWebhookSecret.mockReturnValue("partner-webhook-secret");
+    mocks.verifyRazorpayWebhookSignature.mockImplementation(
+      (_body: string, _signature: string | null, secret: string) =>
+        secret === "partner-webhook-secret",
+    );
+
+    const response = await POST(
+      new Request("https://cloverloop.test/api/webhooks/razorpay", {
+        method: "POST",
+        headers: { "x-razorpay-signature": "valid-partner-signature" },
+        body: JSON.stringify({
+          event: "payment.captured",
+          payload: {
+            payment: {
+              entity: { id: "pay_TEST123", order_id: "order_TEST123" },
+            },
+          },
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(diagnosticLog).toHaveBeenCalledWith(
+      "Razorpay application-level Test Mode webhook diagnostic.",
+      {
+        eventType: "payment.captured",
+        accountId: null,
+        paymentId: "pay_TEST123",
+        orderId: "order_TEST123",
+        signatureVerified: true,
+      },
+    );
+    expect(admin.from).not.toHaveBeenCalled();
+    expect(admin.rpc).not.toHaveBeenCalled();
+  });
+
   it("rejects an invalid signature before reading or writing payment records", async () => {
     const admin = { from: vi.fn() };
     mocks.createSupabaseAdminClient.mockReturnValue(admin);

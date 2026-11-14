@@ -3,6 +3,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection,
+  getRazorpayPartnerTestWebhookSecret,
   getRazorpayTestWebhookSecret,
   razorpayApiRequest,
   verifyRazorpayWebhookSignature,
@@ -46,6 +47,50 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === "object" && !Array.isArray(value));
 }
 
+function diagnosticIdentifier(value: unknown, prefix: "acc" | "pay" | "order"): string | null {
+  return typeof value === "string" &&
+    new RegExp(`^${prefix}_[A-Za-z0-9]+$`).test(value)
+    ? value
+    : null;
+}
+
+function logApplicationWebhookDiagnostic(
+  rawBody: string,
+  signatureVerified: boolean,
+): void {
+  let event: Record<string, unknown> | null = null;
+  try {
+    const parsed: unknown = JSON.parse(rawBody);
+    if (isRecord(parsed)) event = parsed;
+  } catch {
+    // Keep diagnostics limited to safely parsed identifiers.
+  }
+
+  const payload = event && isRecord(event.payload) ? event.payload : {};
+  const paymentEntity =
+    isRecord(payload.payment) && isRecord(payload.payment.entity)
+      ? payload.payment.entity
+      : {};
+  const eventType =
+    typeof event?.event === "string" &&
+    /^[a-z][a-z0-9._]{0,99}$/.test(event.event)
+      ? event.event
+      : null;
+  const fields = {
+    eventType,
+    accountId: diagnosticIdentifier(event?.account_id, "acc"),
+    paymentId: diagnosticIdentifier(paymentEntity.id, "pay"),
+    orderId: diagnosticIdentifier(paymentEntity.order_id, "order"),
+    signatureVerified,
+  };
+
+  if (signatureVerified) {
+    console.info("Razorpay application-level Test Mode webhook diagnostic.", fields);
+  } else {
+    console.warn("Razorpay webhook signature verification failed.", fields);
+  }
+}
+
 async function setEventStatus(
   admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
   eventId: string,
@@ -65,19 +110,41 @@ async function setEventStatus(
 export async function POST(request: Request) {
   if (process.env.RAZORPAY_OAUTH_MODE !== "test") return response(503);
   const admin = createSupabaseAdminClient();
-  const secret = getRazorpayTestWebhookSecret();
-  if (!admin || !secret) return response(503);
+  const accountWebhookSecret = getRazorpayTestWebhookSecret();
+  const partnerWebhookSecret = getRazorpayPartnerTestWebhookSecret();
+  if ((!admin && !partnerWebhookSecret) || (!accountWebhookSecret && !partnerWebhookSecret)) {
+    return response(503);
+  }
 
   const rawBody = await request.text();
+  const signature = request.headers.get("x-razorpay-signature");
   if (
-    !verifyRazorpayWebhookSignature(
-      rawBody,
-      request.headers.get("x-razorpay-signature"),
-      secret,
-    )
+    accountWebhookSecret &&
+    partnerWebhookSecret &&
+    accountWebhookSecret === partnerWebhookSecret
   ) {
+    console.error("Razorpay account and partner Test Mode webhook secrets must be distinct.");
+    return response(503);
+  }
+
+  const accountSignatureValid = accountWebhookSecret
+    ? verifyRazorpayWebhookSignature(rawBody, signature, accountWebhookSecret)
+    : false;
+  const partnerSignatureValid = partnerWebhookSecret
+    ? verifyRazorpayWebhookSignature(rawBody, signature, partnerWebhookSecret)
+    : false;
+
+  if (!accountSignatureValid && partnerSignatureValid) {
+    logApplicationWebhookDiagnostic(rawBody, true);
+    return response(200);
+  }
+  if (!accountSignatureValid) {
+    logApplicationWebhookDiagnostic(rawBody, false);
     return response(400);
   }
+  if (!admin) return response(503);
+  const secret = accountWebhookSecret;
+  if (!secret) return response(503);
 
   const eventId = request.headers.get("x-razorpay-event-id");
   if (!eventId || eventId.length > 200) return response(400);

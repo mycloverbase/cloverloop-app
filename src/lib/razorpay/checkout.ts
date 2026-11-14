@@ -36,6 +36,10 @@ export function getRazorpayTestWebhookSecret(): string | null {
   return process.env.RAZORPAY_TEST_WEBHOOK_SECRET?.trim() || null;
 }
 
+export function getRazorpayPartnerTestWebhookSecret(): string | null {
+  return process.env.RAZORPAY_PARTNER_TEST_WEBHOOK_SECRET?.trim() || null;
+}
+
 export function hashCheckoutToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
