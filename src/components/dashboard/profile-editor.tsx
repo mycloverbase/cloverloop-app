@@ -2,11 +2,16 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
-import { LoaderCircle, Plus, Trash2, Upload, UserRound, X } from "lucide-react";
+import { LoaderCircle, Trash2, Upload, UserRound, X } from "lucide-react";
 import { saveCreatorAvatarAction, saveCreatorProfileAction } from "@/app/dashboard/actions";
 import { useDashboardUnsavedChanges } from "@/components/dashboard/dashboard-shell";
+import { SocialLinksEditor } from "@/components/storefront/social-links-editor";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import type { CreatorProfile, SocialLink } from "@/lib/account/types";
+import type { CreatorProfile } from "@/lib/account/types";
+import {
+  STOREFRONT_SOCIAL_PLATFORMS,
+  type StorefrontSocialLink,
+} from "@/lib/storefront/types";
 
 type ProfileForm = {
   displayName: string;
@@ -14,7 +19,7 @@ type ProfileForm = {
   bio: string;
   location: string;
   contactNumber: string;
-  socialLinks: SocialLink[];
+  socialLinks: StorefrontSocialLink[];
 };
 
 function formFromProfile(profile: CreatorProfile): ProfileForm {
@@ -24,7 +29,17 @@ function formFromProfile(profile: CreatorProfile): ProfileForm {
     bio: profile.bio,
     location: profile.location ?? "",
     contactNumber: profile.contact_number ?? "",
-    socialLinks: profile.social_links,
+    socialLinks: profile.social_links.map((link, index) => {
+      const platform = STOREFRONT_SOCIAL_PLATFORMS.find(
+        (candidate) => candidate !== "Other" && candidate.toLowerCase() === link.label.toLowerCase(),
+      ) ?? "Other";
+      return {
+        id: `profile-social-${index}`,
+        platform,
+        label: platform === "Other" ? link.label : platform,
+        url: link.url,
+      };
+    }),
   };
 }
 
@@ -82,7 +97,10 @@ export function ProfileEditor({
     data.set("bio", form.bio);
     data.set("location", form.location);
     data.set("contact_number", form.contactNumber);
-    data.set("social_links", JSON.stringify(form.socialLinks));
+    data.set("social_links", JSON.stringify(form.socialLinks.map((link) => ({
+      label: link.platform === "Other" ? link.label : link.platform,
+      url: link.url,
+    }))));
     startTransition(async () => {
       try {
         const result = await saveCreatorProfileAction(data);
@@ -97,24 +115,6 @@ export function ProfileEditor({
         setError("Your profile could not be saved. Check your connection and try again.");
       }
     });
-  }
-
-  function addSocialLink() {
-    if (form.socialLinks.length >= 10) return;
-    update("socialLinks", [...form.socialLinks, { label: "", url: "" }]);
-  }
-
-  function updateSocialLink(index: number, key: keyof SocialLink, value: string) {
-    update(
-      "socialLinks",
-      form.socialLinks.map((link, currentIndex) =>
-        currentIndex === index ? { ...link, [key]: value } : link,
-      ),
-    );
-  }
-
-  function removeSocialLink(index: number) {
-    update("socialLinks", form.socialLinks.filter((_, currentIndex) => currentIndex !== index));
   }
 
   return (
@@ -209,55 +209,10 @@ export function ProfileEditor({
 
         <fieldset className="dashboard-fieldset">
           <legend>Social links</legend>
-          <div className="dashboard-social-links">
-            <div className="dashboard-social-heading">
-              <div>
-                <strong>Additional links</strong>
-                <small>Add up to ten social or portfolio links.</small>
-              </div>
-              <button
-                type="button"
-                className="dashboard-small-button"
-                onClick={addSocialLink}
-                disabled={form.socialLinks.length >= 10}
-              >
-                <Plus size={16} aria-hidden="true" /> Add link
-              </button>
-            </div>
-            {form.socialLinks.map((link, index) => (
-              <div className="dashboard-form-grid dashboard-social-row" key={`social-${index}`}>
-                <label className="dashboard-field">
-                  <span>Link label</span>
-                  <input
-                    maxLength={40}
-                    value={link.label}
-                    onChange={(event) => updateSocialLink(index, "label", event.target.value)}
-                    placeholder="Portfolio"
-                  />
-                </label>
-                <label className="dashboard-field dashboard-social-url">
-                  <span>URL</span>
-                  <div className="dashboard-input-with-button">
-                    <input
-                      type="url"
-                      inputMode="url"
-                      value={link.url}
-                      onChange={(event) => updateSocialLink(index, "url", event.target.value)}
-                      placeholder="https://example.com"
-                    />
-                    <button
-                      type="button"
-                      className="dashboard-icon-button"
-                      onClick={() => removeSocialLink(index)}
-                      aria-label={`Remove ${link.label || "additional"} link`}
-                    >
-                      <Trash2 size={16} aria-hidden="true" />
-                    </button>
-                  </div>
-                </label>
-              </div>
-            ))}
-          </div>
+          <SocialLinksEditor
+            links={form.socialLinks}
+            onChange={(socialLinks) => update("socialLinks", socialLinks)}
+          />
         </fieldset>
 
         {error && <p className="dashboard-message dashboard-message-error" role="alert">{error}</p>}

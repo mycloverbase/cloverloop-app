@@ -25,8 +25,66 @@ type StorefrontView = {
   };
 };
 
+type StorefrontHeaderView = Pick<
+  StorefrontView,
+  "store_name" | "username" | "profileImageUrl" | "bannerImageUrl" | "customization"
+>;
+
 function initials(name: string) {
   return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "C";
+}
+
+export function PublicStorefrontHeader({ store }: { store: StorefrontHeaderView }) {
+  const hidden = new Set(store.customization.hiddenSections);
+  return (
+    <header className={`storefront-hero${store.bannerImageUrl ? " storefront-hero-has-banner" : ""}`}>
+      {store.bannerImageUrl ? (
+        <Image
+          className="storefront-hero-banner"
+          src={store.bannerImageUrl}
+          alt=""
+          fill
+          unoptimized
+          priority
+          sizes="(max-width: 760px) 100vw, 1120px"
+        />
+      ) : null}
+      {store.profileImageUrl ? (
+        <Image
+          className="storefront-profile-image"
+          src={store.profileImageUrl}
+          alt={`${store.store_name} profile`}
+          width={176}
+          height={176}
+          unoptimized
+          priority
+        />
+      ) : (
+        <div className="storefront-profile-fallback" aria-hidden="true">{initials(store.store_name)}</div>
+      )}
+      <div className="storefront-hero-copy">
+        <h1>{store.store_name}</h1>
+        <p>@{store.username}</p>
+        {!hidden.has("social") && store.customization.socialLinks.length ? (
+          <nav className="storefront-social-icons" aria-label="Social links">
+            {store.customization.socialLinks.map((link) => (
+              <a
+                key={link.id}
+                className="storefront-social-icon-link"
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={link.label}
+                title={link.label}
+              >
+                <SocialIcon platform={link.platform} />
+              </a>
+            ))}
+          </nav>
+        ) : null}
+      </div>
+    </header>
+  );
 }
 
 function AboutSection({ store }: { store: StorefrontView }) {
@@ -163,53 +221,7 @@ export function PublicStorefront({ store }: { store: StorefrontView }) {
       style={style}
     >
       <div className="storefront-content">
-        <header className={`storefront-hero${store.bannerImageUrl ? " storefront-hero-has-banner" : ""}`}>
-          {store.bannerImageUrl ? (
-            <Image
-              className="storefront-hero-banner"
-              src={store.bannerImageUrl}
-              alt=""
-              fill
-              unoptimized
-              priority
-              sizes="(max-width: 760px) 100vw, 1120px"
-            />
-          ) : null}
-          {store.profileImageUrl ? (
-            <Image
-              className="storefront-profile-image"
-              src={store.profileImageUrl}
-              alt={`${store.store_name} profile`}
-              width={176}
-              height={176}
-              unoptimized
-              priority
-            />
-          ) : (
-            <div className="storefront-profile-fallback" aria-hidden="true">{initials(store.store_name)}</div>
-          )}
-          <div className="storefront-hero-copy">
-            <h1>{store.store_name}</h1>
-            <p>@{store.username}</p>
-            {!hidden.has("social") && store.customization.socialLinks.length ? (
-              <nav className="storefront-social-icons" aria-label="Social links">
-                {store.customization.socialLinks.map((link) => (
-                  <a
-                    key={link.id}
-                    className="storefront-social-icon-link"
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={link.label}
-                    title={link.label}
-                  >
-                    <SocialIcon platform={link.platform} />
-                  </a>
-                ))}
-              </nav>
-            ) : null}
-          </div>
-        </header>
+        <PublicStorefrontHeader store={store} />
 
         <div className="storefront-sections">
           {orderedSections.map((section) => {

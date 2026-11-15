@@ -282,6 +282,7 @@ a {
   min-height: 43px;
   padding-inline: 16px;
   font-size: 0.86rem;
+  white-space: nowrap;
 }
 
 .mobile-nav {
@@ -4777,7 +4778,18 @@ a {
   }
 }
 
-@media (max-width: 1100px) {
+@media (min-width: 981px) and (max-width: 1100px) {
+  .desktop-nav,
+  .header-actions {
+    display: none;
+  }
+
+  .mobile-nav {
+    display: block;
+  }
+}
+
+@media (max-width: 1280px) {
   .hero-section {
     min-height: 0;
     align-items: stretch;
@@ -10479,7 +10491,7 @@ a {
   gap: 8px;
 }
 
-.creator-dashboard .storefront-published-sharing-grid article {
+.creator-dashboard .storefront-published-sharing-grid a {
   display: flex;
   min-width: 0;
   align-items: flex-start;
@@ -10487,15 +10499,28 @@ a {
   border: 1px solid #e8eee8;
   border-radius: 10px;
   background: #fbfcfa;
+  color: inherit;
   padding: 10px;
+  text-decoration: none;
+  transition: background-color 140ms ease, border-color 140ms ease;
 }
 
-.creator-dashboard .storefront-published-sharing-grid article > svg {
+.creator-dashboard .storefront-published-sharing-grid a:hover {
+  border-color: #b8cfbd;
+  background: #f3f8f2;
+}
+
+.creator-dashboard .storefront-published-sharing-grid a:focus-visible {
+  outline: 2px solid #276347;
+  outline-offset: 2px;
+}
+
+.creator-dashboard .storefront-published-sharing-grid a > svg {
   flex: 0 0 auto;
   color: #3d7452;
 }
 
-.creator-dashboard .storefront-published-sharing-grid article > div {
+.creator-dashboard .storefront-published-sharing-grid a > div {
   min-width: 0;
 }
 
@@ -10708,7 +10733,7 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .creator-dashboard .storefront-published-sharing-grid article {
+  .creator-dashboard .storefront-published-sharing-grid a {
     align-items: center;
     padding: 9px 10px;
   }
@@ -10915,7 +10940,8 @@ a {
 }
 
 .product-detail-page {
-  width: min(100% - 40px, 1180px);
+  width: 100%;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 36px 0 96px;
   color: #173a2d;
@@ -11240,7 +11266,7 @@ a {
 
 @media (max-width: 760px) {
   .product-detail-page {
-    width: min(100% - 32px, 620px);
+    width: 100%;
     padding-top: 18px;
     padding-bottom: 64px;
   }

@@ -64,7 +64,7 @@ export function SiteHeader() {
         <div className="header-actions">
           {isAuthenticated ? (
             <Link href="/dashboard" className="button header-cta">
-              <UserRound size={16} aria-hidden="true" /> Profile
+              <UserRound size={16} aria-hidden="true" /> Creator Studio
             </Link>
           ) : (
             <>
@@ -92,7 +92,7 @@ export function SiteHeader() {
             <Link href="/resources">Resources</Link>
             <Link href="/about">About</Link>
             {isAuthenticated ? (
-              <Link href="/dashboard" className="button"><UserRound size={17} aria-hidden="true" /> Profile</Link>
+              <Link href="/dashboard" className="button"><UserRound size={17} aria-hidden="true" /> Creator Studio</Link>
             ) : (
               <>
                 <TrackLink href="/login" event="login_click">Login</TrackLink>

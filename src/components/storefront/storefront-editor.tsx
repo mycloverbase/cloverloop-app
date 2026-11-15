@@ -10,10 +10,8 @@ import {
   Copy,
   ExternalLink,
   GripVertical,
-  Link2,
   LoaderCircle,
   MessageCircle,
-  Plus,
   Share2,
   Trash2,
   X,
@@ -30,17 +28,16 @@ import {
 import { ImageCropUploader } from "@/components/storefront/image-crop-uploader";
 import { PublicStorefront } from "@/components/storefront/public-storefront";
 import { SocialPlatformIcon } from "@/components/storefront/social-platform-icon";
+import { SocialLinksEditor } from "@/components/storefront/social-links-editor";
 import { useDashboardUnsavedChanges } from "@/components/dashboard/dashboard-shell";
 import {
   DEFAULT_STOREFRONT_CUSTOMIZATION,
   STOREFRONT_SECTIONS,
-  STOREFRONT_SOCIAL_PLATFORMS,
   type StorefrontCustomization,
   type StorefrontDisplay,
   type StorefrontDraftInput,
   type StorefrontImageKind,
   type StorefrontSection,
-  type StorefrontSocialLink,
   type StorefrontTheme,
 } from "@/lib/storefront/types";
 import { parseStorefrontDraft } from "@/lib/storefront/validation";
@@ -48,21 +45,6 @@ import { storefrontUsernameFromName } from "@/lib/storefront/types";
 
 type DialogAction = "publish" | "unpublish" | "delete" | null;
 type DevicePreview = "desktop" | "mobile";
-
-function socialUrlPrefix(platform: string): string {
-  const prefixes: Record<string, string> = {
-    Instagram: "https://www.instagram.com/",
-    YouTube: "https://www.youtube.com/@",
-    Facebook: "https://www.facebook.com/",
-    LinkedIn: "https://www.linkedin.com/in/",
-    X: "https://x.com/",
-    TikTok: "https://www.tiktok.com/@",
-    Pinterest: "https://www.pinterest.com/",
-    Threads: "https://www.threads.net/@",
-    Twitch: "https://www.twitch.tv/",
-  };
-  return prefixes[platform] ?? "";
-}
 
 function draftFromStorefront(storefront: StorefrontDisplay | null): StorefrontDraftInput {
   if (!storefront) {
@@ -144,7 +126,6 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<DevicePreview>("desktop");
   const [dialogAction, setDialogAction] = useState<DialogAction>(null);
-  const [socialLinkPickerOpen, setSocialLinkPickerOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [publishedStoreUrl, setPublishedStoreUrl] = useState<string | null>(null);
   const [publishedLinkCopied, setPublishedLinkCopied] = useState(false);
@@ -409,28 +390,6 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
       changeDraft((current) => ({ ...current, bannerImagePath: path }));
       setBannerUrl(url);
     }
-  }
-
-  function addSocialLink(platform: string) {
-    if (draft.customization.socialLinks.length >= 10) return;
-    const link: StorefrontSocialLink = {
-      id: crypto.randomUUID(),
-      platform,
-      label: platform,
-      url: socialUrlPrefix(platform),
-    };
-    updateCustomization("socialLinks", [...draft.customization.socialLinks, link]);
-    setSocialLinkPickerOpen(false);
-  }
-
-  function updateSocialLink(id: string, key: "label" | "url", value: string) {
-    updateCustomization(
-      "socialLinks",
-      draft.customization.socialLinks.map((link) => {
-        if (link.id !== id) return link;
-        return { ...link, [key]: value };
-      }),
-    );
   }
 
   function moveSection(section: StorefrontSection, direction: -1 | 1) {
@@ -722,57 +681,11 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                   </div>
               </section>
 
-              <section className="storefront-step-fields" aria-labelledby="storefront-social-form-title">
-                  <div className="storefront-step-intro storefront-step-intro-row">
-                    <div>
-                      <h3 id="storefront-social-form-title">Link your social channels</h3>
-                      <p>Add up to ten links. External links open in a new tab.</p>
-                    </div>
-                    <button type="button" className="dashboard-small-button" onClick={() => setSocialLinkPickerOpen(true)} disabled={locked || draft.customization.socialLinks.length >= 10}>
-                      <Plus size={16} aria-hidden="true" /> Add social link
-                    </button>
-                  </div>
-                  {draft.customization.socialLinks.length ? (
-                    <div className="storefront-social-editor-list">
-                      {draft.customization.socialLinks.map((link, index) => (
-                        <div className="storefront-social-editor-row" key={link.id}>
-                          {link.platform === "Other" ? (
-                            <input
-                              className="storefront-social-name-input"
-                              aria-label="Social channel name"
-                              placeholder="Social channel name"
-                              maxLength={40}
-                              value={link.label}
-                              disabled={locked}
-                              onChange={(event) => updateSocialLink(link.id, "label", event.target.value)}
-                            />
-                          ) : null}
-                          <label className="storefront-social-link-field">
-                            <span className="storefront-social-link-icon">
-                              {link.platform === "Other"
-                                ? <Link2 size={19} aria-hidden="true" />
-                                : <SocialPlatformIcon platform={link.platform} />}
-                            </span>
-                            <input
-                              type="url"
-                              inputMode="url"
-                              aria-label={`${link.platform === "Other" ? link.label || "Social" : link.platform} profile link`}
-                              placeholder={socialUrlPrefix(link.platform) || "https://"}
-                              value={link.url}
-                              disabled={locked}
-                              onChange={(event) => updateSocialLink(link.id, "url", event.target.value)}
-                            />
-                          </label>
-                          <button type="button" className="dashboard-icon-button" aria-label={`Remove social link ${index + 1}`} onClick={() => updateCustomization("socialLinks", draft.customization.socialLinks.filter((item) => item.id !== link.id))} disabled={locked}>
-                            <Trash2 size={16} aria-hidden="true" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="storefront-empty-editor"><p>No social links added yet. This section is optional.</p></div>
-                  )}
-              </section>
+              <SocialLinksEditor
+                links={draft.customization.socialLinks}
+                onChange={(socialLinks) => updateCustomization("socialLinks", socialLinks)}
+                disabled={locked}
+              />
 
               <section className="storefront-step-fields" aria-labelledby="storefront-contact-form-title">
                   <div className="storefront-step-intro">
@@ -928,35 +841,6 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
           </section>
         </div>
       ) : null}
-      {socialLinkPickerOpen ? (
-        <div
-          className="storefront-dialog-backdrop"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setSocialLinkPickerOpen(false);
-          }}
-        >
-          <section className="storefront-social-picker" role="dialog" aria-modal="true" aria-labelledby="storefront-social-picker-title">
-            <div className="storefront-dialog-heading">
-              <div>
-                <span className="dashboard-card-label">Social links</span>
-                <h2 id="storefront-social-picker-title">Choose a social channel</h2>
-              </div>
-              <button type="button" className="dashboard-icon-button" onClick={() => setSocialLinkPickerOpen(false)} aria-label="Close social channel picker">×</button>
-            </div>
-            <div className="storefront-social-picker-options">
-              {STOREFRONT_SOCIAL_PLATFORMS.map((platform) => (
-                <button key={platform} type="button" onClick={() => addSocialLink(platform)}>
-                  {platform === "Other"
-                    ? <Link2 size={19} aria-hidden="true" />
-                    : <SocialPlatformIcon platform={platform} />}
-                  <span>{platform}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        </div>
-      ) : null}
       {publishedStoreUrl ? (
         <div
           className="storefront-published-backdrop"
@@ -1014,9 +898,34 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
             <div className="storefront-published-sharing">
               <h3>Share your new storefront</h3>
               <div className="storefront-published-sharing-grid">
-                <article><SocialPlatformIcon platform="Instagram" /><div><strong>Instagram</strong><p>Add your storefront link to your Instagram bio.</p></div></article>
-                <article><MessageCircle size={19} aria-hidden="true" /><div><strong>WhatsApp</strong><p>Share your storefront with your audience and customers.</p></div></article>
-                <article><SocialPlatformIcon platform="YouTube" /><div><strong>YouTube</strong><p>Add your storefront link to your video descriptions.</p></div></article>
+                <a
+                  className="storefront-published-share-card"
+                  href="https://www.instagram.com/accounts/edit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => void copyPublishedStorefrontUrl()}
+                >
+                  <SocialPlatformIcon platform="Instagram" />
+                  <div><strong>Instagram</strong><p>Copy your link and add it to your Instagram bio.</p></div>
+                </a>
+                <a
+                  className="storefront-published-share-card"
+                  href={`https://wa.me/?text=${encodeURIComponent(`Visit ${draft.storeName || "my storefront"} on CloverLoop: ${publishedStoreUrl}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle size={19} aria-hidden="true" />
+                  <div><strong>WhatsApp</strong><p>Share your storefront with your audience and customers.</p></div>
+                </a>
+                <a
+                  className="storefront-published-share-card"
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(publishedStoreUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <SocialPlatformIcon platform="Facebook" />
+                  <div><strong>Facebook</strong><p>Share your storefront with your Facebook audience.</p></div>
+                </a>
               </div>
             </div>
 
