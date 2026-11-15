@@ -5,6 +5,11 @@ import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+  copyProfilePhoto,
+  removeCreatorAvatar,
+  removeStorefrontAsset,
+} from "@/lib/account/profile-photo-storage";
 import type { StorefrontActionResult } from "@/lib/storefront/types";
 import { parseStorefrontDraft, safeImageCrop } from "@/lib/storefront/validation";
 
@@ -49,6 +54,44 @@ function databaseMessage(error: { code?: string; message?: string }): string {
   return "Your storefront could not be updated. Please try again.";
 }
 
+async function copyAvatarToStorefront(
+  supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
+  storageAdmin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  userId: string,
+  storefrontId: string,
+  avatarPath: string,
+): Promise<string> {
+  const imagePath = `${crypto.randomUUID()}.webp`;
+  await copyProfilePhoto(
+    storageAdmin,
+    "creator-avatars",
+    avatarPath,
+    "storefront-assets",
+    imagePath,
+  );
+  const { error } = await supabase.rpc("register_storefront_asset", {
+    requested_storefront_id: storefrontId,
+    requested_path: imagePath,
+  });
+  if (error) {
+    console.error("Could not register the synchronized storefront profile image.", error);
+    const { error: cleanupError } = await storageAdmin.storage
+      .from("storefront-assets")
+      .remove([imagePath]);
+    if (cleanupError) console.error("Could not clean up an unregistered storefront image.", cleanupError);
+    throw new Error("The profile image could not be synchronized with your storefront.");
+  }
+  return imagePath;
+}
+
+function revalidateStorefrontRoutes(previousUsername: string | null, username: string) {
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/profile");
+  revalidatePath("/dashboard/storefront");
+  if (previousUsername) revalidatePath(`/${previousUsername}`);
+  revalidatePath(`/${username}`);
+}
+
 export async function checkStorefrontUsernameAction(username: string): Promise<StorefrontActionResult> {
   const normalized = typeof username === "string" ? username.trim().toLowerCase() : "";
   if (!/^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/.test(normalized)) {
@@ -74,36 +117,168 @@ export async function saveStorefrontAction(input: unknown): Promise<StorefrontAc
   if (!parsed.ok) return parsed;
   const auth = await getStorefrontAuth();
   if (!auth.ok) return auth.result;
-  const storefront = parsed.value;
+  let storefront = parsed.value;
   const { data: previousStorefront, error: previousStorefrontError } = await auth.supabase
     .from("creator_storefronts")
-    .select("username")
+    .select("id,username,status,profile_image_path")
     .eq("user_id", auth.userId)
     .maybeSingle();
   if (previousStorefrontError) {
-    console.error("Could not load the previous storefront username.", previousStorefrontError);
+    console.error("Could not load the previous storefront for photo synchronization.", previousStorefrontError);
     return { ok: false, message: "Your storefront could not be updated. Please try again." };
   }
-  const { data, error } = await auth.supabase.rpc("save_my_storefront", {
-    requested_store_name: storefront.storeName,
-    requested_username: storefront.username,
-    requested_description: storefront.description,
-    requested_profile_image_path: storefront.profileImagePath,
-    requested_banner_image_path: storefront.bannerImagePath,
-    requested_theme: storefront.theme,
-    requested_customization: storefront.customization,
-  });
-  if (error) return { ok: false, message: databaseMessage(error) };
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/profile");
-  revalidatePath("/dashboard/storefront");
-  if (previousStorefront?.username) revalidatePath(`/${previousStorefront.username}`);
-  revalidatePath(`/${storefront.username}`);
-  return {
-    ok: true,
-    message: "Storefront changes saved.",
-    ...(typeof data === "string" ? { storefrontId: data } : {}),
-  };
+  const { data: profile, error: profileError } = await auth.supabase
+    .from("creator_profiles")
+    .select("avatar_path")
+    .eq("user_id", auth.userId)
+    .maybeSingle();
+  if (profileError || !profile) {
+    if (profileError) console.error("Could not load the creator photo for storefront synchronization.", profileError);
+    return { ok: false, message: "Your profile photo could not be synchronized. Reload and try again." };
+  }
+  if (previousStorefront?.status === "deletion_pending") {
+    return { ok: false, message: "This storefront is scheduled for permanent deletion and can no longer be changed." };
+  }
+
+  const shouldSeedStorefrontFromAvatar =
+    !storefront.profileImagePath &&
+    Boolean(profile.avatar_path) &&
+    !previousStorefront?.profile_image_path;
+  const needsNewAvatar =
+    Boolean(storefront.profileImagePath) &&
+    (storefront.profileImagePath !== previousStorefront?.profile_image_path || !profile.avatar_path);
+  const needsAvatarCleanup =
+    profile.avatar_path !== null &&
+    (needsNewAvatar || (!storefront.profileImagePath && !shouldSeedStorefrontFromAvatar));
+  const needsStorageAdmin = needsNewAvatar || needsAvatarCleanup || shouldSeedStorefrontFromAvatar;
+  const storageAdmin = needsStorageAdmin ? createSupabaseAdminClient() : null;
+  if (needsStorageAdmin && !storageAdmin) {
+    return { ok: false, message: "Profile-photo synchronization is not configured. Please contact support." };
+  }
+
+  let avatarPathToSave = profile.avatar_path;
+  let imagePathToSave = storefront.profileImagePath;
+  let copiedAvatarPath: string | null = null;
+  let copiedStorefrontPath: string | null = null;
+  let savedStorefrontId: string | null = null;
+
+  try {
+    if (needsNewAvatar && storefront.profileImagePath && storageAdmin) {
+      copiedAvatarPath = `${auth.userId}/${crypto.randomUUID()}.webp`;
+      await copyProfilePhoto(
+        storageAdmin,
+        "storefront-assets",
+        storefront.profileImagePath,
+        "creator-avatars",
+        copiedAvatarPath,
+      );
+      avatarPathToSave = copiedAvatarPath;
+    } else if (shouldSeedStorefrontFromAvatar && previousStorefront && storageAdmin && profile.avatar_path) {
+      copiedStorefrontPath = await copyAvatarToStorefront(
+        auth.supabase,
+        storageAdmin,
+        auth.userId,
+        previousStorefront.id,
+        profile.avatar_path,
+      );
+      imagePathToSave = copiedStorefrontPath;
+      storefront = { ...storefront, profileImagePath: copiedStorefrontPath };
+    } else if (!storefront.profileImagePath && !shouldSeedStorefrontFromAvatar) {
+      avatarPathToSave = null;
+    }
+
+    const { data, error } = await auth.supabase.rpc("save_my_storefront_with_avatar", {
+      requested_store_name: storefront.storeName,
+      requested_username: storefront.username,
+      requested_description: storefront.description,
+      requested_profile_image_path: imagePathToSave,
+      requested_banner_image_path: storefront.bannerImagePath,
+      requested_theme: storefront.theme,
+      requested_customization: storefront.customization,
+      requested_avatar_path: avatarPathToSave,
+    });
+    if (error) {
+      if (storageAdmin && copiedStorefrontPath && previousStorefront) {
+        await removeStorefrontAsset(storageAdmin, auth.userId, previousStorefront.id, copiedStorefrontPath);
+      }
+      if (storageAdmin && copiedAvatarPath) {
+        await removeCreatorAvatar(storageAdmin, copiedAvatarPath);
+      }
+      return { ok: false, message: databaseMessage(error) };
+    }
+    savedStorefrontId = typeof data === "string" ? data : null;
+
+    if (
+      shouldSeedStorefrontFromAvatar &&
+      !previousStorefront &&
+      savedStorefrontId &&
+      storageAdmin &&
+      profile.avatar_path
+    ) {
+      copiedStorefrontPath = await copyAvatarToStorefront(
+        auth.supabase,
+        storageAdmin,
+        auth.userId,
+        savedStorefrontId,
+        profile.avatar_path,
+      );
+      const { error: syncError } = await auth.supabase.rpc("sync_my_creator_photo", {
+        requested_avatar_path: profile.avatar_path,
+        requested_storefront_image_path: copiedStorefrontPath,
+      });
+      if (syncError) {
+        console.error("Could not synchronize the initial storefront profile image.", syncError);
+        await removeStorefrontAsset(storageAdmin, auth.userId, savedStorefrontId, copiedStorefrontPath);
+        revalidateStorefrontRoutes(null, storefront.username);
+        return {
+          ok: false,
+          message: "Your store was created, but its profile photo could not be synchronized. Save again to retry.",
+        };
+      }
+      imagePathToSave = copiedStorefrontPath;
+    }
+
+    let cleanupWarning = false;
+    if (storageAdmin && profile.avatar_path !== avatarPathToSave) {
+      cleanupWarning = !(await removeCreatorAvatar(storageAdmin, profile.avatar_path));
+    }
+    revalidateStorefrontRoutes(previousStorefront?.username ?? null, storefront.username);
+    const imageUrl = imagePathToSave
+      ? auth.supabase.storage.from("storefront-assets").getPublicUrl(imagePathToSave).data.publicUrl
+      : undefined;
+    return {
+      ok: true,
+      message: cleanupWarning
+        ? "Storefront changes and photo synchronization were saved, but the previous private profile image could not be deleted."
+        : "Storefront changes saved.",
+      ...(savedStorefrontId ? { storefrontId: savedStorefrontId } : {}),
+      ...(imagePathToSave !== parsed.value.profileImagePath && imagePathToSave
+        ? { path: imagePathToSave, imageUrl }
+        : {}),
+    };
+  } catch (syncError) {
+    console.error("Could not synchronize the creator and storefront profile photos.", syncError);
+    if (storageAdmin && copiedStorefrontPath && (savedStorefrontId || previousStorefront)) {
+      await removeStorefrontAsset(
+        storageAdmin,
+        auth.userId,
+        savedStorefrontId ?? previousStorefront!.id,
+        copiedStorefrontPath,
+      );
+    }
+    if (storageAdmin && copiedAvatarPath) {
+      await removeCreatorAvatar(storageAdmin, copiedAvatarPath);
+    }
+    if (savedStorefrontId && !previousStorefront) {
+      revalidateStorefrontRoutes(null, storefront.username);
+    }
+    return {
+      ok: false,
+      message: syncError instanceof Error
+        ? syncError.message
+        : "Your profile photo could not be synchronized. Please try again.",
+    };
+  }
 }
 
 export async function publishStorefrontAction(): Promise<StorefrontActionResult> {

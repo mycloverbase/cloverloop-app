@@ -85,23 +85,21 @@ function parseCreatorProduct(value: unknown): CreatorStorefrontProduct | null {
     typeof value.storefront_id !== "string" ||
     typeof value.name !== "string" ||
     typeof value.description !== "string" ||
+    typeof value.category !== "string" ||
+    value.category.trim().length === 0 ||
     typeof value.is_free !== "boolean" ||
     typeof value.is_active !== "boolean" ||
     value.product_type !== "digital"
   ) return null;
   const pricePaise = safeInteger(value.price_paise);
   const fileSize = value.file_size === null ? null : safeInteger(value.file_size);
-  if (
-    pricePaise === null ||
-    (value.file_size !== null && fileSize === null) ||
-    (value.category !== null && typeof value.category !== "string")
-  ) return null;
+  if (pricePaise === null || (value.file_size !== null && fileSize === null)) return null;
   return {
     id: value.id,
     storefrontId: value.storefront_id,
     name: value.name,
     description: value.description,
-    category: typeof value.category === "string" ? value.category : null,
+    category: value.category,
     productType: "digital",
     isFree: value.is_free,
     pricePaise,
@@ -124,9 +122,10 @@ function parsePublicProduct(value: unknown): StorefrontProductDisplay | null {
     typeof value.id !== "string" ||
     typeof value.name !== "string" ||
     typeof value.description !== "string" ||
+    typeof value.category !== "string" ||
+    value.category.trim().length === 0 ||
     typeof value.is_free !== "boolean" ||
-    value.product_type !== "digital" ||
-    (value.category !== null && typeof value.category !== "string")
+    value.product_type !== "digital"
   ) return null;
   const pricePaise = safeInteger(value.price_paise);
   if (pricePaise === null) return null;
@@ -134,7 +133,7 @@ function parsePublicProduct(value: unknown): StorefrontProductDisplay | null {
     id: value.id,
     name: value.name,
     description: value.description,
-    category: typeof value.category === "string" ? value.category : null,
+    category: value.category,
     productType: "digital",
     isFree: value.is_free,
     pricePaise,

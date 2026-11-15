@@ -96,6 +96,15 @@ describe("published storefront product lookup", () => {
     ).toBeNull();
   });
 
+  it("does not return published products with a missing or blank category", async () => {
+    for (const category of [null, "  "]) {
+      const { client } = makeSupabase({ product: { ...productRow, category } });
+      await expect(
+        getPublishedStorefrontProduct(client as never, "test-creator", productId),
+      ).rejects.toThrow("The published product data returned by Supabase is invalid.");
+    }
+  });
+
   it("rejects malformed product identifiers before querying Supabase", async () => {
     const { client } = makeSupabase();
     expect(await getPublishedStorefrontProduct(client as never, "test-creator", "not-a-uuid")).toBeNull();

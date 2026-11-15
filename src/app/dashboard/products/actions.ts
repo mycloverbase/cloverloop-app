@@ -13,7 +13,7 @@ export type ProductActionResult =
 type ProductInput = {
   name: string;
   description: string;
-  category: string | null;
+  category: string;
   isFree: boolean;
   pricePaise: number;
   coverImagePath: string | null;
@@ -72,8 +72,9 @@ function parseProductInput(value: unknown): ProductInput | null {
     typeof input.description !== "string" ||
     input.description.trim().length < 1 ||
     input.description.trim().length > 5000 ||
-    (input.category !== null && typeof input.category !== "string") ||
-    (typeof input.category === "string" && input.category.trim().length > 50) ||
+    typeof input.category !== "string" ||
+    input.category.trim().length < 1 ||
+    input.category.trim().length > 50 ||
     typeof input.isFree !== "boolean" ||
     typeof input.pricePaise !== "number" ||
     !Number.isSafeInteger(input.pricePaise) ||
@@ -90,7 +91,7 @@ function parseProductInput(value: unknown): ProductInput | null {
   return {
     name: input.name.trim(),
     description: input.description.trim(),
-    category: typeof input.category === "string" ? input.category.trim() || null : null,
+    category: input.category.trim(),
     isFree: input.isFree,
     pricePaise,
     coverImagePath: input.coverImagePath as string | null,
@@ -117,6 +118,9 @@ function productErrorMessage(error: { code?: string; message?: string }): string
   }
   if (message.includes("deletion_pending") || message.includes("Storefront not found")) {
     return "This storefront is scheduled for deletion and can no longer be changed.";
+  }
+  if (message.includes("storefront_products_category_required")) {
+    return "Choose a product category before saving.";
   }
   if (error.code === "23514" || message.includes("Invalid product")) {
     return "Some product details or file information are invalid. Review the form and try again.";
@@ -198,7 +202,7 @@ export async function createProductDraftAction(
 ): Promise<ProductActionResult> {
   if (!isUuid(storefrontId)) return { ok: false, message: "Save your storefront before adding products." };
   const product = parseProductInput(input);
-  if (!product) return { ok: false, message: "Enter a product name, description, and valid price." };
+  if (!product) return { ok: false, message: "Enter a product name, description, category, and valid price." };
   const auth = await getProductAuth();
   if (!auth.ok) return auth.result;
   const { data, error } = await auth.supabase.rpc("create_storefront_product_draft", {
@@ -254,7 +258,7 @@ export async function prepareProductFileUploadAction(
 export async function saveProductAction(productId: string, input: unknown): Promise<ProductActionResult> {
   if (!isUuid(productId)) return { ok: false, message: "Choose a valid product before saving." };
   const product = parseProductInput(input);
-  if (!product) return { ok: false, message: "Enter a product name, description, and valid price." };
+  if (!product) return { ok: false, message: "Enter a product name, description, category, and valid price." };
   const auth = await getProductAuth();
   if (!auth.ok) return auth.result;
   const paths = await getProductStoragePaths(auth.supabase, productId, auth.userId);

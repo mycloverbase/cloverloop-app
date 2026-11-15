@@ -22,7 +22,7 @@ export type StorefrontProductDisplay = {
   id: string;
   name: string;
   description: string;
-  category: string | null;
+  category: string;
   productType: "digital";
   isFree: boolean;
   pricePaise: number;

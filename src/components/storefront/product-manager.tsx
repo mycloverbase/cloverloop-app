@@ -60,7 +60,7 @@ type ProductForm = {
 };
 
 type ProductTypeOption = "digital" | "course" | "subscription" | "session";
-type ProductField = "name" | "description" | "price" | "file";
+type ProductField = "name" | "description" | "category" | "price" | "file";
 
 const productCategories = [
   "Education & Learning",
@@ -236,6 +236,7 @@ export function ProductManager({
       const next = { ...current };
       if ("name" in update) delete next.name;
       if ("description" in update) delete next.description;
+      if ("category" in update) delete next.category;
       if ("price" in update || "isFree" in update) delete next.price;
       if ("file" in update) delete next.file;
       return next;
@@ -280,6 +281,10 @@ export function ProductManager({
       rejectForm("Product description is required and must be 5,000 characters or fewer.", "description");
       return;
     }
+    if (!form.category.trim() || form.category.trim().length > 50) {
+      rejectForm("Product category is required. Choose a category before saving.", "category");
+      return;
+    }
     const pricePaise = form.isFree ? 0 : parsePrice(form.price);
     if (!form.isFree && pricePaise === null) {
       rejectForm("Enter a valid selling price in INR, greater than ₹0 with up to two decimal places.", "price");
@@ -316,7 +321,7 @@ export function ProductManager({
       const input = {
         name: form.name.trim(),
         description: form.description.trim(),
-        category: form.category.trim() || null,
+        category: form.category.trim(),
         isFree: form.isFree,
         pricePaise: pricePaise ?? 0,
         coverImagePath: form.coverImagePath,
@@ -550,15 +555,20 @@ export function ProductManager({
                 {fieldErrors.description ? <small id="product-description-error" className="product-field-error">{fieldErrors.description}</small> : null}
               </label>
               <label className="dashboard-field">
-                <span>Category <em>Optional</em></span>
+                <span>Category <em>Required</em></span>
                 <select
                   value={form.category}
                   onChange={(event) => patchForm({ category: event.target.value })}
                   disabled={busy}
+                  required
+                  data-product-field="category"
+                  aria-invalid={Boolean(fieldErrors.category)}
+                  aria-describedby={fieldErrors.category ? "product-category-error" : undefined}
                 >
                   <option value="">Select a category</option>
                   {productCategories.map((category) => <option key={category} value={category}>{category}</option>)}
                 </select>
+                {fieldErrors.category ? <small id="product-category-error" className="product-field-error">{fieldErrors.category}</small> : null}
               </label>
             </div>
           </section>

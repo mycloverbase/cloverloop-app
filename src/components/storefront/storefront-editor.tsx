@@ -192,7 +192,15 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
         return false;
       }
       if (result.storefrontId) setStorefrontId(result.storefrontId);
-      const savedSnapshot = JSON.stringify(input);
+      let savedInput = input;
+      if (result.path && input.profileImagePath === null && draftRef.current.profileImagePath === null) {
+        const nextDraft = { ...draftRef.current, profileImagePath: result.path };
+        draftRef.current = nextDraft;
+        setDraft(nextDraft);
+        setProfileUrl(result.imageUrl ?? null);
+        savedInput = { ...input, profileImagePath: result.path };
+      }
+      const savedSnapshot = JSON.stringify(savedInput);
       savedSnapshotRef.current = savedSnapshot;
       setSavedSnapshot(savedSnapshot);
       if (showFeedback) {
