@@ -13,6 +13,7 @@ import {
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { getFreeProductConfig } from "@/lib/free-products/server";
 import {
+  getPublishedStorefrontRazorpayConnectionStatus,
   isRazorpayCheckoutEnabled,
   isRazorpayPartnerWebhookFulfillmentEnabled,
 } from "@/lib/razorpay/checkout";
@@ -107,6 +108,9 @@ export default async function PublishedProductPage({
   if (!result) notFound();
 
   const { product, storefront } = result;
+  const creatorPaymentStatus = product.isFree
+    ? "connected"
+    : await getPublishedStorefrontRazorpayConnectionStatus(storefront.username);
   const productUrl = `/${encodeURIComponent(storefront.username)}/product/${product.id}`;
   const storeUrl = `/${encodeURIComponent(storefront.username)}`;
   const style = {
@@ -242,10 +246,12 @@ export default async function PublishedProductPage({
                 storefrontUrl={storeUrl}
                 supportEmail={supportEmail}
                 pricePaise={product.pricePaise}
+                creatorPaymentNotConfigured={creatorPaymentStatus === "not_connected"}
                 enabled={
                   isRazorpayCheckoutEnabled() &&
                   isRazorpayPartnerWebhookFulfillmentEnabled() &&
-                  isRazorpayPurchaseEmailDeliveryConfigured()
+                  isRazorpayPurchaseEmailDeliveryConfigured() &&
+                  creatorPaymentStatus === "connected"
                 }
               />
             )}

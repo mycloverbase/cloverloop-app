@@ -7215,6 +7215,16 @@ a {
   font-size: 0.78rem;
 }
 
+.storefront-product-payment-unavailable {
+  border: 1px solid #efc9c4;
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: #fff1ef;
+  color: #983b31;
+  font-size: 0.84rem !important;
+  line-height: 1.5;
+}
+
 .free-product-modal-backdrop {
   position: fixed;
   z-index: 1000;

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { ProductManager } from "@/components/storefront/product-manager";
+import { PaymentSetupWarning } from "@/components/dashboard/payment-setup-warning";
 import { requireCreatorContext } from "@/lib/account/server";
 import { getMyPlanEntitlements } from "@/lib/account/entitlements";
 import { getCreatorStorefront } from "@/lib/storefront/server";
+import { getRazorpayCheckoutConnectionStatus } from "@/lib/razorpay/checkout";
 
 export const metadata: Metadata = {
   title: "Products | CloverLoop creator dashboard",
@@ -51,6 +53,7 @@ export default async function CreatorProductsPage() {
     claimStatsResponse,
     recentClaimsResponse,
     entitlements,
+    paymentConnectionStatus,
   ] = await Promise.all([
     getCreatorStorefront(supabase, user.id),
     getListingCount(supabase, user.id, "counted_as_free"),
@@ -63,6 +66,7 @@ export default async function CreatorProductsPage() {
       .order("created_at", { ascending: false })
       .limit(50),
     getMyPlanEntitlements(supabase),
+    getRazorpayCheckoutConnectionStatus(user.id),
   ]);
   if (claimStatsResponse.error) {
     console.error("Could not load creator Lead Magnet claim statistics.", claimStatsResponse.error);
@@ -78,6 +82,7 @@ export default async function CreatorProductsPage() {
 
   return (
     <div className="dashboard-page-content">
+      {paymentConnectionStatus === "not_connected" ? <PaymentSetupWarning /> : null}
       <ProductManager
         storefrontId={storefront?.id ?? null}
         storefrontUsername={storefront?.username ?? null}

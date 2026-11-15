@@ -26,6 +26,8 @@ import {
   getFreeProductDeliveryConfig,
   isRazorpayPartnerWebhookFulfillmentEnabled,
   getRazorpayCheckoutConnection,
+  getRazorpayCheckoutConnectionStatus,
+  getPublishedStorefrontRazorpayConnectionStatus,
   hashCheckoutToken,
   isRazorpayCheckoutEnabled,
   isValidCheckoutToken,
@@ -115,6 +117,60 @@ describe("Razorpay checkout helpers", () => {
       "access",
       "live",
     );
+  });
+
+  it("reports creators without a usable connection as not connected", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
+    const query = {
+      select: vi.fn(),
+      eq: vi.fn(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+    };
+    query.select.mockReturnValue(query);
+    query.eq.mockReturnValue(query);
+    mocks.createSupabaseAdminClient.mockReturnValue({
+      from: vi.fn().mockReturnValue(query),
+    });
+
+    await expect(getRazorpayCheckoutConnectionStatus("creator-a")).resolves.toBe(
+      "not_connected",
+    );
+  });
+
+  it("finds the creator behind a published storefront before checking payments", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
+    const storefrontQuery = {
+      select: vi.fn(),
+      eq: vi.fn(),
+      is: vi.fn(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: { user_id: "creator-a" },
+        error: null,
+      }),
+    };
+    const connectionQuery = {
+      select: vi.fn(),
+      eq: vi.fn(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+    };
+    storefrontQuery.select.mockReturnValue(storefrontQuery);
+    storefrontQuery.eq.mockReturnValue(storefrontQuery);
+    storefrontQuery.is.mockReturnValue(storefrontQuery);
+    connectionQuery.select.mockReturnValue(connectionQuery);
+    connectionQuery.eq.mockReturnValue(connectionQuery);
+    mocks.createSupabaseAdminClient.mockReturnValue({
+      from: vi.fn((table: string) =>
+        table === "creator_storefronts" ? storefrontQuery : connectionQuery,
+      ),
+    });
+
+    await expect(
+      getPublishedStorefrontRazorpayConnectionStatus("creator-store"),
+    ).resolves.toBe("not_connected");
+    expect(storefrontQuery.eq).toHaveBeenCalledWith("username", "creator-store");
+    expect(connectionQuery.eq).toHaveBeenCalledWith("creator_id", "creator-a");
   });
 
   it("hashes and validates opaque checkout tokens without accepting short values", () => {

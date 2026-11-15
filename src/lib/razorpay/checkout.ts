@@ -22,6 +22,11 @@ export type RazorpayCheckoutConnection = {
   accessToken: string;
 };
 
+export type RazorpayCheckoutConnectionStatus =
+  | "connected"
+  | "not_connected"
+  | "unavailable";
+
 type StoredConnection = {
   creator_id: string;
   razorpay_account_id: string;
@@ -86,12 +91,61 @@ export async function getRazorpayCheckoutConnection(
 ): Promise<RazorpayCheckoutConnection | null> {
   const admin = createSupabaseAdminClient();
   if (!admin) return null;
+  const result = await loadRazorpayCheckoutConnection(admin, creatorId, environment);
+  return result.status === "connected" ? result.connection : null;
+}
 
-  if (!environment || environment !== getRazorpayOAuthMode()) return null;
+export async function getRazorpayCheckoutConnectionStatus(
+  creatorId: string,
+  environment = getRazorpayOAuthMode(),
+): Promise<RazorpayCheckoutConnectionStatus> {
+  const admin = createSupabaseAdminClient();
+  if (!admin) return "unavailable";
+  return (await loadRazorpayCheckoutConnection(admin, creatorId, environment)).status;
+}
+
+export async function getPublishedStorefrontRazorpayConnectionStatus(
+  username: string,
+  environment = getRazorpayOAuthMode(),
+): Promise<RazorpayCheckoutConnectionStatus> {
+  const admin = createSupabaseAdminClient();
+  if (!admin || !environment || environment !== getRazorpayOAuthMode() ||
+      !getRazorpayOAuthConfig(environment)) {
+    return "unavailable";
+  }
+  const { data: storefront, error } = await admin
+    .from("creator_storefronts")
+    .select("user_id")
+    .eq("username", username.toLowerCase())
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (error) {
+    console.error("Razorpay checkout storefront owner could not be loaded.");
+    return "unavailable";
+  }
+  if (!storefront || typeof storefront.user_id !== "string") return "unavailable";
+  return (await loadRazorpayCheckoutConnection(
+    admin,
+    storefront.user_id,
+    environment,
+  )).status;
+}
+
+async function loadRazorpayCheckoutConnection(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  creatorId: string,
+  environment: RazorpayOAuthEnvironment | null,
+): Promise<
+  | { status: "connected"; connection: RazorpayCheckoutConnection }
+  | { status: "not_connected" | "unavailable" }
+> {
+  if (!environment || environment !== getRazorpayOAuthMode()) {
+    return { status: "unavailable" };
+  }
   const config = getRazorpayOAuthConfig(environment);
-  if (!config) return null;
+  if (!config) return { status: "unavailable" };
   const clientId = config.clientId;
-
   const { data, error } = await admin
     .from("creator_razorpay_connections")
     .select(
@@ -104,11 +158,14 @@ export async function getRazorpayCheckoutConnection(
 
   if (error) {
     console.error("Razorpay checkout connection could not be loaded.");
-    return null;
+    return { status: "unavailable" };
   }
-  if (!data) return null;
+  if (!data) return { status: "not_connected" };
 
   const connection = data as StoredConnection;
+  const tokenExpiry = connection.token_expires_at
+    ? new Date(connection.token_expires_at).getTime()
+    : Number.NaN;
   if (
     connection.creator_id !== creatorId ||
     connection.client_id !== clientId ||
@@ -118,28 +175,31 @@ export async function getRazorpayCheckoutConnection(
     !connection.public_token ||
     !connection.public_token.startsWith(environment === "test" ? "rzp_test_" : "rzp_live_") ||
     !connection.access_token_encrypted ||
-    (connection.token_expires_at &&
-      new Date(connection.token_expires_at).getTime() <= Date.now())
+    !Number.isFinite(tokenExpiry) ||
+    tokenExpiry <= Date.now()
   ) {
-    return null;
+    return { status: "not_connected" };
   }
 
   try {
     return {
-      creatorId,
-      accountId: connection.razorpay_account_id,
-      environment,
-      publicToken: connection.public_token,
-      accessToken: decryptRazorpayToken(
-        connection.access_token_encrypted,
+      status: "connected",
+      connection: {
         creatorId,
-        "access",
+        accountId: connection.razorpay_account_id,
         environment,
-      ),
+        publicToken: connection.public_token,
+        accessToken: decryptRazorpayToken(
+          connection.access_token_encrypted,
+          creatorId,
+          "access",
+          environment,
+        ),
+      },
     };
   } catch {
     console.error("Razorpay checkout connection token could not be decrypted.");
-    return null;
+    return { status: "not_connected" };
   }
 }
 

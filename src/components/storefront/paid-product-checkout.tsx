@@ -53,6 +53,7 @@ type Props = {
   supportEmail: string | null;
   pricePaise: number;
   enabled: boolean;
+  creatorPaymentNotConfigured: boolean;
 };
 
 type PurchaseEmailStatus = "pending" | "processing" | "accepted" | "delivered" | "failed" | "suppressed";
@@ -143,6 +144,7 @@ export function PaidProductCheckout({
   supportEmail,
   pricePaise,
   enabled,
+  creatorPaymentNotConfigured,
 }: Props) {
   const checkoutTokenRef = useRef<string | null>(null);
   const [customerName, setCustomerName] = useState("");
@@ -375,9 +377,18 @@ export function PaidProductCheckout({
       ) : (
         <>
           {!enabled ? (
-            <button className="storefront-product-action" type="button" disabled>
-              Payments coming soon
-            </button>
+            <>
+              <button className="storefront-product-action" type="button" disabled>
+                {creatorPaymentNotConfigured
+                  ? `Pay ${formattedPrice} securely`
+                  : "Payments coming soon"}
+              </button>
+              {creatorPaymentNotConfigured ? (
+                <p className="storefront-product-payment-unavailable" role="status">
+                  Payments not configured by creator. Contact creator.
+                </p>
+              ) : null}
+            </>
           ) : checkout ? (
             <>
               <button
