@@ -32,7 +32,7 @@ export async function GET(request: Request) {
   }
   if (!isRazorpayPartnerWebhookFulfillmentEnabled()) {
     return jsonResponse(
-      { error: "Razorpay Test Mode webhook fulfillment is not configured." },
+      { error: "Razorpay webhook fulfillment is not configured for the active environment." },
       503,
     );
   }

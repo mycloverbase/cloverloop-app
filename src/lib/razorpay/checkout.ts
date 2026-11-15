@@ -5,7 +5,12 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { decryptRazorpayToken } from "@/lib/razorpay/oauth";
+import {
+  decryptRazorpayToken,
+  getRazorpayOAuthConfig,
+  getRazorpayOAuthMode,
+  type RazorpayOAuthEnvironment,
+} from "@/lib/razorpay/oauth";
 
 const RAZORPAY_API_BASE = "https://api.razorpay.com";
 
@@ -28,8 +33,34 @@ type StoredConnection = {
   connection_status: string;
 };
 
-export function isRazorpayCheckoutEnabled(): boolean {
-  return process.env.RAZORPAY_CHECKOUT_ENABLED === "true";
+export function isRazorpayCheckoutEnabled(
+  environment = getRazorpayOAuthMode(),
+): boolean {
+  return (
+    process.env.RAZORPAY_CHECKOUT_ENABLED === "true" &&
+    environment !== null &&
+    (environment !== "live" ||
+      (process.env.RAZORPAY_LIVE_CHECKOUT_ENABLED === "true" &&
+        (process.env.RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED === "true" ||
+          Boolean(getRazorpayLiveCheckoutTestEmails().length))))
+  );
+}
+
+function getRazorpayLiveCheckoutTestEmails(): string[] {
+  return (process.env.RAZORPAY_LIVE_CHECKOUT_TEST_EMAILS ?? "")
+    .split(",")
+    .map((email) => normalizeCustomerEmail(email))
+    .filter((email): email is string => email !== null);
+}
+
+export function isRazorpayLiveCheckoutBuyerAllowed(email: string): boolean {
+  if (
+    getRazorpayOAuthMode() !== "live" ||
+    process.env.RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED === "true"
+  ) {
+    return true;
+  }
+  return getRazorpayLiveCheckoutTestEmails().includes(email);
 }
 
 export function getRazorpayTestWebhookSecret(): string | null {
@@ -40,16 +71,31 @@ export function getRazorpayPartnerTestWebhookSecret(): string | null {
   return process.env.RAZORPAY_PARTNER_TEST_WEBHOOK_SECRET?.trim() || null;
 }
 
-export function isRazorpayPartnerWebhookFulfillmentEnabled(): boolean {
-  const partnerSecret = getRazorpayPartnerTestWebhookSecret();
+export function getRazorpayPartnerWebhookSecret(
+  environment: RazorpayOAuthEnvironment,
+): string | null {
+  return environment === "live"
+    ? process.env.RAZORPAY_PARTNER_LIVE_WEBHOOK_SECRET?.trim() || null
+    : getRazorpayPartnerTestWebhookSecret();
+}
+
+export function isRazorpayPartnerWebhookFulfillmentEnabled(
+  environment = getRazorpayOAuthMode(),
+): boolean {
+  if (!environment || environment !== getRazorpayOAuthMode()) return false;
+  const config = getRazorpayOAuthConfig(environment);
+  const partnerSecret = getRazorpayPartnerWebhookSecret(environment);
+  const otherPartnerSecret = getRazorpayPartnerWebhookSecret(
+    environment === "test" ? "live" : "test",
+  );
   return (
     process.env.RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED === "true" &&
     process.env.RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS !== "true" &&
-    process.env.RAZORPAY_OAUTH_ENABLED === "true" &&
-    process.env.RAZORPAY_OAUTH_MODE === "test" &&
-    Boolean(process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim()) &&
+    Boolean(config?.clientId) &&
     Boolean(partnerSecret) &&
-    partnerSecret !== getRazorpayTestWebhookSecret()
+    partnerSecret !== otherPartnerSecret &&
+    (environment === "live" ||
+      partnerSecret !== getRazorpayTestWebhookSecret())
   );
 }
 
@@ -72,18 +118,15 @@ export function normalizeCustomerEmail(email: unknown): string | null {
 
 export async function getRazorpayCheckoutConnection(
   creatorId: string,
+  environment = getRazorpayOAuthMode(),
 ): Promise<RazorpayCheckoutConnection | null> {
   const admin = createSupabaseAdminClient();
   if (!admin) return null;
 
-  const clientId = process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim();
-  if (
-    process.env.RAZORPAY_OAUTH_ENABLED !== "true" ||
-    process.env.RAZORPAY_OAUTH_MODE !== "test" ||
-    !clientId
-  ) {
-    return null;
-  }
+  if (!environment || environment !== getRazorpayOAuthMode()) return null;
+  const config = getRazorpayOAuthConfig(environment);
+  if (!config) return null;
+  const clientId = config.clientId;
 
   const { data, error } = await admin
     .from("creator_razorpay_connections")
@@ -91,7 +134,7 @@ export async function getRazorpayCheckoutConnection(
       "creator_id,razorpay_account_id,client_id,environment,public_token,access_token_encrypted,token_expires_at,connection_status",
     )
     .eq("creator_id", creatorId)
-    .eq("environment", "test")
+    .eq("environment", environment)
     .eq("connection_status", "connected")
     .maybeSingle();
 
@@ -105,11 +148,11 @@ export async function getRazorpayCheckoutConnection(
   if (
     connection.creator_id !== creatorId ||
     connection.client_id !== clientId ||
-    connection.environment !== "test" ||
+    connection.environment !== environment ||
     connection.connection_status !== "connected" ||
     !connection.razorpay_account_id ||
     !connection.public_token ||
-    !connection.public_token.startsWith("rzp_test_") ||
+    !connection.public_token.startsWith(environment === "test" ? "rzp_test_" : "rzp_live_") ||
     !connection.access_token_encrypted ||
     (connection.token_expires_at &&
       new Date(connection.token_expires_at).getTime() <= Date.now())
@@ -121,12 +164,13 @@ export async function getRazorpayCheckoutConnection(
     return {
       creatorId,
       accountId: connection.razorpay_account_id,
-      environment: "test",
+      environment,
       publicToken: connection.public_token,
       accessToken: decryptRazorpayToken(
         connection.access_token_encrypted,
         creatorId,
         "access",
+        environment,
       ),
     };
   } catch {

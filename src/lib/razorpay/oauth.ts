@@ -54,6 +54,22 @@ function encryptionKey(): Buffer {
   return key;
 }
 
+export function getRazorpayOAuthMode(): RazorpayOAuthEnvironment | null {
+  const mode = process.env.RAZORPAY_OAUTH_MODE?.trim();
+  return mode === "test" || mode === "live" ? mode : null;
+}
+
+function credentialsForEnvironment(environment: RazorpayOAuthEnvironment): {
+  clientId: string | null;
+  clientSecret: string | null;
+} {
+  const prefix = environment === "live" ? "RAZORPAY_LIVE_OAUTH" : "RAZORPAY_OAUTH";
+  return {
+    clientId: process.env[`${prefix}_CLIENT_ID`]?.trim() || null,
+    clientSecret: process.env[`${prefix}_CLIENT_SECRET`]?.trim() || null,
+  };
+}
+
 function siteOrigin(): string | null {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (!configured) return null;
@@ -73,22 +89,23 @@ function siteOrigin(): string | null {
   }
 }
 
-export function getRazorpayOAuthReadiness(): RazorpayOAuthReadiness {
+export function getRazorpayOAuthReadiness(
+  requestedEnvironment = getRazorpayOAuthMode(),
+): RazorpayOAuthReadiness {
   if (process.env.RAZORPAY_OAUTH_ENABLED !== "true") {
     return {
       available: false,
       message: "Razorpay account connections are disabled until Technology Partner setup is approved.",
     };
   }
-  const clientId = process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim();
-  const clientSecret = process.env.RAZORPAY_OAUTH_CLIENT_SECRET?.trim();
-  const environment = process.env.RAZORPAY_OAUTH_MODE?.trim();
+  const environment = requestedEnvironment;
+  const credentials = environment ? credentialsForEnvironment(environment) : null;
   const origin = siteOrigin();
   if (
-    !clientId ||
-    !clientSecret ||
-    !origin ||
-    (environment !== "test" && environment !== "live")
+    !environment ||
+    !credentials?.clientId ||
+    !credentials.clientSecret ||
+    !origin
   ) {
     return {
       available: false,
@@ -112,12 +129,14 @@ export function getRazorpayOAuthReadiness(): RazorpayOAuthReadiness {
   return { available: true, environment };
 }
 
-export function getRazorpayOAuthConfig(): RazorpayOAuthConfig | null {
-  const readiness = getRazorpayOAuthReadiness();
+export function getRazorpayOAuthConfig(
+  environment = getRazorpayOAuthMode(),
+): RazorpayOAuthConfig | null {
+  const readiness = getRazorpayOAuthReadiness(environment);
   if (!readiness.available) return null;
   const origin = siteOrigin();
-  const clientId = process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim();
-  const clientSecret = process.env.RAZORPAY_OAUTH_CLIENT_SECRET?.trim();
+  const credentials = credentialsForEnvironment(readiness.environment);
+  const { clientId, clientSecret } = credentials;
   if (!origin || !clientId || !clientSecret) return null;
   return {
     clientId,
@@ -150,13 +169,14 @@ export function encryptRazorpayToken(
   token: string,
   creatorId: string,
   purpose: "access" | "refresh",
+  environment: RazorpayOAuthEnvironment = "test",
 ): string {
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", encryptionKey(), iv);
-  cipher.setAAD(Buffer.from(`cloverloop-razorpay:${creatorId}:${purpose}:v1`));
+  cipher.setAAD(Buffer.from(`cloverloop-razorpay:${creatorId}:${environment}:${purpose}:v2`));
   const encrypted = Buffer.concat([cipher.update(token, "utf8"), cipher.final()]);
   return [
-    "v1",
+    "v2",
     iv.toString("base64url"),
     cipher.getAuthTag().toString("base64url"),
     encrypted.toString("base64url"),
@@ -167,9 +187,17 @@ export function decryptRazorpayToken(
   value: string,
   creatorId: string,
   purpose: "access" | "refresh",
+  environment: RazorpayOAuthEnvironment = "test",
 ): string {
   const [version, ivValue, tagValue, encryptedValue, extra] = value.split(".");
-  if (version !== "v1" || !ivValue || !tagValue || !encryptedValue || extra !== undefined) {
+  if (
+    (version !== "v1" && version !== "v2") ||
+    !ivValue ||
+    !tagValue ||
+    !encryptedValue ||
+    extra !== undefined ||
+    (version === "v1" && environment !== "test")
+  ) {
     throw new Error("Stored Razorpay token ciphertext is malformed.");
   }
   const iv = Buffer.from(ivValue, "base64url");
@@ -178,7 +206,11 @@ export function decryptRazorpayToken(
     throw new Error("Stored Razorpay token ciphertext is malformed.");
   }
   const decipher = createDecipheriv("aes-256-gcm", encryptionKey(), iv);
-  decipher.setAAD(Buffer.from(`cloverloop-razorpay:${creatorId}:${purpose}:v1`));
+  decipher.setAAD(Buffer.from(
+    version === "v1"
+      ? `cloverloop-razorpay:${creatorId}:${purpose}:v1`
+      : `cloverloop-razorpay:${creatorId}:${environment}:${purpose}:v2`,
+  ));
   decipher.setAuthTag(tag);
   return Buffer.concat([
     decipher.update(Buffer.from(encryptedValue, "base64url")),

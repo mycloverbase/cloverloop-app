@@ -136,7 +136,7 @@ export function RazorpayConnectionCard({
                     : "Disconnected"}
           </p>
           <p><strong>Razorpay account:</strong> {connection.accountId}</p>
-          <p><strong>Environment:</strong> {connection.environment === "test" ? "Test" : "Production"}</p>
+          <p><strong>Environment:</strong> {connection.environment === "test" ? "Test" : "Live"}</p>
           {tokenExpiry ? <p><strong>Access token expires:</strong> {tokenExpiry}</p> : null}
           {lastRefresh ? <p><strong>Last token refresh:</strong> {lastRefresh}</p> : null}
         </div>

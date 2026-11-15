@@ -5,6 +5,9 @@ const mocks = vi.hoisted(() => ({
   checkFreeProductRateLimit: vi.fn(),
   getFreeProductDeliveryConfig: vi.fn(),
   getRazorpayCheckoutConnection: vi.fn(),
+  getRazorpayOAuthConfig: vi.fn(),
+  getRazorpayOAuthMode: vi.fn(),
+  isRazorpayLiveCheckoutBuyerAllowed: vi.fn(),
   hashCheckoutToken: vi.fn(),
   isRazorpayCheckoutEnabled: vi.fn(),
   isRazorpayPartnerWebhookFulfillmentEnabled: vi.fn(),
@@ -25,6 +28,7 @@ vi.mock("@/lib/free-products/server", () => ({
 vi.mock("@/lib/razorpay/checkout", () => ({
   getFreeProductDeliveryConfig: mocks.getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection: mocks.getRazorpayCheckoutConnection,
+  isRazorpayLiveCheckoutBuyerAllowed: mocks.isRazorpayLiveCheckoutBuyerAllowed,
   hashCheckoutToken: mocks.hashCheckoutToken,
   isRazorpayCheckoutEnabled: mocks.isRazorpayCheckoutEnabled,
   isRazorpayPartnerWebhookFulfillmentEnabled:
@@ -32,6 +36,11 @@ vi.mock("@/lib/razorpay/checkout", () => ({
   isValidCheckoutToken: mocks.isValidCheckoutToken,
   normalizeCustomerEmail: mocks.normalizeCustomerEmail,
   razorpayApiRequest: mocks.razorpayApiRequest,
+}));
+
+vi.mock("@/lib/razorpay/oauth", () => ({
+  getRazorpayOAuthConfig: mocks.getRazorpayOAuthConfig,
+  getRazorpayOAuthMode: mocks.getRazorpayOAuthMode,
 }));
 
 vi.mock("@/lib/razorpay/purchase-email", () => ({
@@ -95,6 +104,12 @@ beforeEach(() => {
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
   vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
   mocks.isRazorpayCheckoutEnabled.mockReturnValue(true);
+  mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
+  mocks.getRazorpayOAuthConfig.mockImplementation((environment: string) => ({
+    clientId: environment === "live" ? "live-client" : "development-client",
+    environment,
+  }));
+  mocks.isRazorpayLiveCheckoutBuyerAllowed.mockReturnValue(true);
   mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(true);
   mocks.isRazorpayPurchaseEmailDeliveryConfigured.mockReturnValue(true);
   mocks.checkFreeProductRateLimit.mockResolvedValue(true);
@@ -132,7 +147,7 @@ describe("POST /api/checkout/create-order", () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(mocks.getRazorpayCheckoutConnection).toHaveBeenCalledWith("creator-a");
+    expect(mocks.getRazorpayCheckoutConnection).toHaveBeenCalledWith("creator-a", "test");
     const providerBody = JSON.parse(
       mocks.razorpayApiRequest.mock.calls[0][2].body as string,
     );
@@ -200,13 +215,65 @@ describe("POST /api/checkout/create-order", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mocks.getRazorpayCheckoutConnection).toHaveBeenCalledWith("creator-a");
+    expect(mocks.getRazorpayCheckoutConnection).toHaveBeenCalledWith("creator-a", "test");
     expect(mocks.razorpayApiRequest).toHaveBeenCalledWith(
       "server-only-access-token",
       "/v1/orders",
       expect.objectContaining({ method: "POST" }),
     );
     expect((await response.json()).publicKey).toBe("rzp_test_public");
+  });
+
+  it("creates a Live Mode order only with its Live Mode connection and persists the environment", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_ENABLED", "true");
+    const liveConnection = {
+      ...creatorConnection,
+      publicToken: "rzp_live_public",
+      environment: "live",
+    };
+    mocks.getRazorpayCheckoutConnection.mockResolvedValue(liveConnection);
+
+    const response = await POST(
+      makeRequest({
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "buyer@example.com",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.getRazorpayCheckoutConnection).toHaveBeenCalledWith(
+      "creator-a",
+      "live",
+    );
+    expect(mocks.createSupabaseAdminClient.mock.results[0].value.rpc)
+      .toHaveBeenCalledWith(
+        "create_razorpay_checkout_order",
+        expect.objectContaining({ p_environment: "live" }),
+      );
+    expect((await response.json()).publicKey).toBe("rzp_live_public");
+  });
+
+  it("rejects a Live Mode buyer who is not in the controlled-test allowlist", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_ENABLED", "true");
+    mocks.isRazorpayLiveCheckoutBuyerAllowed.mockReturnValue(false);
+
+    const response = await POST(
+      makeRequest({
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "unapproved@example.com",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    expect(mocks.createSupabaseAdminClient.mock.results[0].value.rpc)
+      .not.toHaveBeenCalled();
+    expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
   });
 
   it("still requires the creator's Test Mode OAuth connection", async () => {
@@ -246,6 +313,7 @@ describe("POST /api/checkout/create-order", () => {
   it("never permits Test Mode checkout in Live Mode", async () => {
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
     vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "true");
+    mocks.isRazorpayCheckoutEnabled.mockReturnValue(false);
     mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(true);
 
     const response = await POST(

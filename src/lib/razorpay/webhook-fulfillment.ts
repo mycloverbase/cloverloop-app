@@ -5,6 +5,11 @@ import {
   RazorpayApiError,
   razorpayApiRequest,
 } from "@/lib/razorpay/checkout";
+import {
+  getRazorpayOAuthConfig,
+  getRazorpayOAuthMode,
+  type RazorpayOAuthEnvironment,
+} from "@/lib/razorpay/oauth";
 
 type AdminClient = NonNullable<ReturnType<typeof createSupabaseAdminClient>>;
 
@@ -12,6 +17,7 @@ type WebhookClaim = {
   event_id: string;
   creator_id: string;
   razorpay_account_id: string;
+  environment: RazorpayOAuthEnvironment;
   razorpay_order_id: string;
   razorpay_payment_id: string;
 };
@@ -30,6 +36,7 @@ type ProviderOrder = {
   amount: number;
   currency: string;
   receipt?: string;
+  account_id?: string;
 };
 
 type ProviderPayment = {
@@ -54,6 +61,7 @@ function parseClaim(value: unknown): WebhookClaim | null {
     typeof value.event_id !== "string" ||
     typeof value.creator_id !== "string" ||
     typeof value.razorpay_account_id !== "string" ||
+    (value.environment !== "test" && value.environment !== "live") ||
     typeof value.razorpay_order_id !== "string" ||
     typeof value.razorpay_payment_id !== "string"
   ) {
@@ -63,6 +71,7 @@ function parseClaim(value: unknown): WebhookClaim | null {
     event_id: value.event_id,
     creator_id: value.creator_id,
     razorpay_account_id: value.razorpay_account_id,
+    environment: value.environment,
     razorpay_order_id: value.razorpay_order_id,
     razorpay_payment_id: value.razorpay_payment_id,
   };
@@ -78,6 +87,7 @@ async function finishEvent(
     "finish_razorpay_partner_webhook_event",
     {
       p_event_id: claim.event_id,
+      p_environment: claim.environment,
       p_processing_status: result,
       p_error_code: errorCode ?? null,
     },
@@ -100,6 +110,7 @@ async function processClaim(
       .from("creator_razorpay_connections")
       .select("razorpay_account_id,client_id,environment,connection_status")
       .eq("creator_id", claim.creator_id)
+      .eq("environment", claim.environment)
       .maybeSingle();
 
     if (connectionError) {
@@ -109,21 +120,24 @@ async function processClaim(
       return "failed";
     }
 
-    const expectedClientId = process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim();
+    const config = getRazorpayOAuthConfig(claim.environment);
     if (
       !connectionRow ||
       connectionRow.connection_status !== "connected" ||
-      connectionRow.environment !== "test" ||
-      connectionRow.client_id !== expectedClientId ||
+      connectionRow.environment !== claim.environment ||
+      connectionRow.client_id !== config?.clientId ||
       connectionRow.razorpay_account_id !== claim.razorpay_account_id
     ) {
       return "ignored";
     }
 
-    const connection = await getRazorpayCheckoutConnection(claim.creator_id);
+    const connection = await getRazorpayCheckoutConnection(
+      claim.creator_id,
+      claim.environment,
+    );
     if (
       !connection ||
-      connection.environment !== "test" ||
+      connection.environment !== claim.environment ||
       connection.accountId !== claim.razorpay_account_id
     ) {
       return "failed";
@@ -136,7 +150,7 @@ async function processClaim(
       )
       .eq("creator_id", claim.creator_id)
       .eq("razorpay_order_id", claim.razorpay_order_id)
-      .eq("environment", "test")
+      .eq("environment", claim.environment)
       .maybeSingle();
 
     if (orderError) {
@@ -176,6 +190,8 @@ async function processClaim(
       providerOrder.amount !== order.amount_paise ||
       providerOrder.currency !== order.currency ||
       providerOrder.receipt !== order.id ||
+      (providerOrder.account_id &&
+        providerOrder.account_id !== claim.razorpay_account_id) ||
       payment.id !== claim.razorpay_payment_id ||
       payment.order_id !== claim.razorpay_order_id ||
       payment.amount !== order.amount_paise ||
@@ -199,6 +215,7 @@ async function processClaim(
       "record_razorpay_checkout_payment",
       {
         p_order_id: order.id,
+        p_environment: claim.environment,
         p_payment_id: payment.id,
         p_amount_paise: payment.amount,
         p_currency: payment.currency,
@@ -234,12 +251,18 @@ export async function processRazorpayPartnerWebhookQueue(
   admin: AdminClient,
   eventId: string | null,
   batchSize = 1,
+  environment: RazorpayOAuthEnvironment | null = getRazorpayOAuthMode(),
 ): Promise<{ claimed: number; processed: number; ignored: number; failed: number }> {
+  if (!environment || environment !== getRazorpayOAuthMode()) {
+    console.error("Razorpay partner webhook processing has no matching active environment.");
+    return { claimed: 0, processed: 0, ignored: 0, failed: 0 };
+  }
   const { data, error } = await admin.rpc(
     "claim_razorpay_partner_webhook_events",
     {
       p_event_id: eventId,
       p_batch_size: batchSize,
+      p_environment: environment,
     },
   );
   if (error) {
@@ -257,8 +280,12 @@ export async function processRazorpayPartnerWebhookQueue(
   if (claims.some((claim) => !claim)) {
     console.error("A Razorpay partner webhook claim was invalid.");
   }
+  if (claims.some((claim) => claim?.environment !== environment)) {
+    console.error("A Razorpay partner webhook claim crossed environments.");
+  }
   const validClaims = claims.filter(
-    (claim): claim is WebhookClaim => claim !== null,
+    (claim): claim is WebhookClaim =>
+      claim !== null && claim.environment === environment,
   );
   const outcomes = await Promise.all(
     validClaims.map(async (claim) => {

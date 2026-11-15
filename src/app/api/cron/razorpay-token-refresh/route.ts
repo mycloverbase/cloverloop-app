@@ -73,15 +73,17 @@ async function refreshClaim(
       claim.encrypted_refresh_token,
       claim.creator_id,
       "refresh",
+      config.environment,
     );
     const tokens = await refreshRazorpayTokenPair(currentRefreshToken, config);
     const now = Date.now();
     const { data: completed, error: completeError } = await admin.rpc("finish_razorpay_token_refresh", {
       requested_creator_id: claim.creator_id,
+        requested_environment: claim.environment,
       requested_lock_token: claim.lock_token,
       requested_public_token: tokens.publicToken,
-      requested_access_token_encrypted: encryptRazorpayToken(tokens.accessToken, claim.creator_id, "access"),
-      requested_refresh_token_encrypted: encryptRazorpayToken(tokens.refreshToken, claim.creator_id, "refresh"),
+        requested_access_token_encrypted: encryptRazorpayToken(tokens.accessToken, claim.creator_id, "access", config.environment),
+        requested_refresh_token_encrypted: encryptRazorpayToken(tokens.refreshToken, claim.creator_id, "refresh", config.environment),
       requested_token_expires_at: new Date(now + tokens.expiresInSeconds * 1000).toISOString(),
       requested_refresh_token_expires_at: new Date(now + 180 * 24 * 60 * 60 * 1000).toISOString(),
     });
@@ -106,6 +108,7 @@ async function refreshClaim(
     });
     const { data: failureRecorded, error: failureError } = await admin.rpc("fail_razorpay_token_refresh", {
       requested_creator_id: claim.creator_id,
+      requested_environment: claim.environment,
       requested_lock_token: claim.lock_token,
       requested_error_code: errorCode,
       requested_reconnect_required: requiresReconnect,
@@ -124,37 +127,49 @@ async function refreshClaim(
 export async function GET(request: Request) {
   if (!isAuthorized(request)) return jsonResponse({ error: "Unauthorized." }, 401);
 
-  const config = getRazorpayOAuthConfig();
-  if (!config) {
+  const configs = (["test", "live"] as const)
+    .map((environment) => getRazorpayOAuthConfig(environment))
+    .filter((config): config is RazorpayOAuthConfig => config !== null);
+  if (configs.length === 0) {
     return jsonResponse({ error: "Razorpay OAuth refresh is not configured for this environment." }, 503);
   }
   const admin = createSupabaseAdminClient();
   if (!admin) return jsonResponse({ error: "Razorpay token refresh services are unavailable." }, 503);
 
-  const { data, error } = await admin.rpc("claim_razorpay_token_refresh", {
-    requested_environment: config.environment,
-    requested_batch_size: 10,
-  });
-  if (error) {
-    console.error("Could not claim due Razorpay token refreshes.", { code: error.code });
-    return jsonResponse({ error: "Razorpay token refresh could not start." }, 503);
-  }
-  if (!Array.isArray(data)) {
-    console.error("The Razorpay token refresh claim response was invalid.");
+  const claimsByEnvironment = await Promise.all(configs.map(async (config) => {
+    const { data, error } = await admin.rpc("claim_razorpay_token_refresh", {
+      requested_environment: config.environment,
+      requested_batch_size: 10,
+    });
+    if (error) {
+      console.error("Could not claim due Razorpay token refreshes.", {
+        code: error.code,
+        environment: config.environment,
+      });
+      return null;
+    }
+    if (!Array.isArray(data) || data.length > 10) {
+      console.error("The Razorpay token refresh claim response was invalid.", {
+        environment: config.environment,
+      });
+      return null;
+    }
+    return { config, claims: data };
+  }));
+  if (claimsByEnvironment.some((result) => result === null)) {
     return jsonResponse({ error: "Razorpay token refresh could not start." }, 503);
   }
 
-  if (data.length > 10) {
-    console.error("The Razorpay refresh claim exceeded the configured batch size.");
-    return jsonResponse({ error: "Razorpay token refresh could not start." }, 503);
-  }
-  const outcomes = await Promise.all(data.map(async (candidate) => {
-    const claim = parseRefreshClaim(candidate);
-    if (!claim) {
-      console.error("A Razorpay token refresh claim was invalid.");
-      return "failed" as const;
-    }
-    return refreshClaim(admin, claim, config);
+  const outcomes = await Promise.all(claimsByEnvironment.flatMap((result) => {
+    if (!result) return [];
+    return result.claims.map(async (candidate) => {
+      const claim = parseRefreshClaim(candidate);
+      if (!claim) {
+        console.error("A Razorpay token refresh claim was invalid.");
+        return "failed" as const;
+      }
+      return refreshClaim(admin, claim, result.config);
+    });
   }));
   return jsonResponse({
     refreshed: outcomes.filter((outcome) => outcome === "refreshed").length,

@@ -5,8 +5,11 @@ const mocks = vi.hoisted(() => ({
   createSupabaseAdminClient: vi.fn(),
   getFreeProductDeliveryConfig: vi.fn(),
   getRazorpayCheckoutConnection: vi.fn(),
-  getRazorpayPartnerTestWebhookSecret: vi.fn(),
+  getRazorpayOAuthConfig: vi.fn(),
+  getRazorpayOAuthMode: vi.fn(),
+  getRazorpayPartnerWebhookSecret: vi.fn(),
   getRazorpayTestWebhookSecret: vi.fn(),
+  isRazorpayConnectionUsable: vi.fn(),
   isRazorpayPartnerWebhookFulfillmentEnabled: vi.fn(),
   processRazorpayPartnerWebhookQueue: vi.fn(),
   processRazorpayPurchaseEmailQueue: vi.fn(),
@@ -20,6 +23,8 @@ vi.mock("next/server", async (importOriginal) => {
   return { ...actual, after: mocks.after };
 });
 
+vi.mock("server-only", () => ({}));
+
 vi.mock("@/lib/supabase/admin", () => ({
   createSupabaseAdminClient: mocks.createSupabaseAdminClient,
 }));
@@ -27,12 +32,18 @@ vi.mock("@/lib/supabase/admin", () => ({
 vi.mock("@/lib/razorpay/checkout", () => ({
   getFreeProductDeliveryConfig: mocks.getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection: mocks.getRazorpayCheckoutConnection,
-  getRazorpayPartnerTestWebhookSecret: mocks.getRazorpayPartnerTestWebhookSecret,
+  getRazorpayPartnerWebhookSecret: mocks.getRazorpayPartnerWebhookSecret,
   getRazorpayTestWebhookSecret: mocks.getRazorpayTestWebhookSecret,
   isRazorpayPartnerWebhookFulfillmentEnabled:
     mocks.isRazorpayPartnerWebhookFulfillmentEnabled,
   razorpayApiRequest: mocks.razorpayApiRequest,
   verifyRazorpayWebhookSignature: mocks.verifyRazorpayWebhookSignature,
+}));
+
+vi.mock("@/lib/razorpay/oauth", () => ({
+  getRazorpayOAuthConfig: mocks.getRazorpayOAuthConfig,
+  getRazorpayOAuthMode: mocks.getRazorpayOAuthMode,
+  isRazorpayConnectionUsable: mocks.isRazorpayConnectionUsable,
 }));
 
 vi.mock("@/lib/razorpay/webhook-fulfillment", () => ({
@@ -84,9 +95,16 @@ function createPartnerAdmin(options: {
     eq: vi.fn(),
     maybeSingle: vi.fn().mockResolvedValue({
       data:
-        options.mapping === undefined
-          ? { creator_id: "creator-a", client_id: "development-client" }
-          : options.mapping,
+        options.mapping === null
+          ? null
+          : {
+              creator_id: "creator-a",
+              client_id: "development-client",
+              connection_status: "connected",
+              token_expires_at: "2099-01-01T00:00:00.000Z",
+              public_token: "rzp_test_public",
+              ...options.mapping,
+            },
       error: options.mappingError ?? null,
     }),
   };
@@ -191,8 +209,16 @@ beforeEach(() => {
   vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
   vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
   vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
-  mocks.getRazorpayPartnerTestWebhookSecret.mockReturnValue("partner-secret");
+  mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
+  mocks.getRazorpayOAuthConfig.mockImplementation((environment: string) => ({
+    clientId: environment === "live" ? "live-client" : "development-client",
+    environment,
+  }));
+  mocks.getRazorpayPartnerWebhookSecret.mockImplementation((environment: string) =>
+    environment === "live" ? "live-partner-secret" : "partner-secret",
+  );
   mocks.getRazorpayTestWebhookSecret.mockReturnValue("account-secret");
+  mocks.isRazorpayConnectionUsable.mockReturnValue(true);
   mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(false);
   mocks.processRazorpayPartnerWebhookQueue.mockResolvedValue({
     claimed: 1,
@@ -247,6 +273,47 @@ describe("POST /api/webhooks/razorpay application-level fulfillment", () => {
       admin,
       "event_TEST123",
       1,
+    );
+  });
+
+  it("verifies and queues a Live Mode event using only the Live application secret", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    const { admin, eventQuery, mappingQuery } = createPartnerAdmin({
+      mapping: {
+        creator_id: "creator-live",
+        client_id: "live-client",
+        public_token: "rzp_live_public",
+      },
+    });
+    mocks.createSupabaseAdminClient.mockReturnValue(admin);
+    mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(true);
+    mocks.verifyRazorpayWebhookSignature.mockImplementation(
+      (_body: string, signature: string | null, secret: string) =>
+        signature === "live-signature" && secret === "live-partner-secret",
+    );
+    const request = new Request("https://cloverloop.test/api/webhooks/razorpay", {
+      method: "POST",
+      headers: {
+        "x-razorpay-signature": "live-signature",
+        "x-razorpay-event-id": "event_LIVE123",
+      },
+      body: JSON.stringify(eventPayload),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(200);
+    expect(mocks.verifyRazorpayWebhookSignature).toHaveBeenCalledWith(
+      JSON.stringify(eventPayload),
+      "live-signature",
+      "live-partner-secret",
+    );
+    expect(mappingQuery.eq).toHaveBeenCalledWith("environment", "live");
+    expect(eventQuery.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        environment: "live",
+        creator_id: "creator-live",
+      }),
     );
   });
 
@@ -364,6 +431,7 @@ describe("POST /api/webhooks/razorpay application-level fulfillment", () => {
       existingEvent: {
         event_type: "payment.captured",
         razorpay_account_id: "acc_ABC123",
+        environment: "test",
         creator_id: "creator-a",
         razorpay_order_id: "order_TEST123",
         razorpay_payment_id: "pay_TEST123",

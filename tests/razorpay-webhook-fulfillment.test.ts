@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getFreeProductDeliveryConfig: vi.fn(),
   getRazorpayCheckoutConnection: vi.fn(),
+  getRazorpayOAuthConfig: vi.fn(),
+  getRazorpayOAuthMode: vi.fn(),
   razorpayApiRequest: vi.fn(),
 }));
 
@@ -15,6 +17,11 @@ vi.mock("@/lib/razorpay/checkout", () => ({
     }
   },
   razorpayApiRequest: mocks.razorpayApiRequest,
+}));
+
+vi.mock("@/lib/razorpay/oauth", () => ({
+  getRazorpayOAuthConfig: mocks.getRazorpayOAuthConfig,
+  getRazorpayOAuthMode: mocks.getRazorpayOAuthMode,
 }));
 
 import { processRazorpayPartnerWebhookQueue } from "@/lib/razorpay/webhook-fulfillment";
@@ -32,6 +39,7 @@ const claim = {
   event_id: "event_TEST123",
   creator_id: "creator-a",
   razorpay_account_id: "acc_A123",
+  environment: "test",
   razorpay_order_id: "order_TEST123",
   razorpay_payment_id: "pay_TEST123",
 };
@@ -122,6 +130,14 @@ function mockProvider(
 beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "test-client");
+  vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
+  mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
+  mocks.getRazorpayOAuthConfig.mockImplementation((environment: string) => ({
+    clientId: environment === "live"
+      ? process.env.RAZORPAY_LIVE_OAUTH_CLIENT_ID
+      : process.env.RAZORPAY_OAUTH_CLIENT_ID,
+    environment,
+  }));
   mocks.getFreeProductDeliveryConfig.mockReturnValue({
     maxDownloads: 3,
     expiryHours: 48,
@@ -200,11 +216,13 @@ describe("application-level Razorpay webhook fulfillment", () => {
       "record_razorpay_checkout_payment",
       expect.objectContaining({
         p_order_id: checkoutOrder.id,
+        p_environment: "test",
         p_payment_id: event.razorpay_payment_id,
         p_captured: true,
       }),
     );
-    expect(mocks.getRazorpayCheckoutConnection).toHaveBeenCalledWith(event.creator_id);
+    expect(mocks.getRazorpayCheckoutConnection)
+      .toHaveBeenCalledWith(event.creator_id, "test");
     expect(mocks.razorpayApiRequest).toHaveBeenCalledWith(
       `token-${event.creator_id}`,
       expect.any(String),
@@ -344,5 +362,89 @@ describe("application-level Razorpay webhook fulfillment", () => {
     const result = await processRazorpayPartnerWebhookQueue(admin as never, claim.event_id);
 
     expect(result).toEqual({ claimed: 1, processed: 0, ignored: 0, failed: 1 });
+  });
+
+  it("verifies and records a Live Mode payment only with its Live Mode connection", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_ID", "live-client");
+    const liveClaim = {
+      ...claim,
+      environment: "live" as const,
+      creator_id: "creator-live",
+      razorpay_account_id: "acc_LIVE123",
+      razorpay_order_id: "order_LIVE123",
+      razorpay_payment_id: "pay_LIVE123",
+    };
+    const liveOrder = {
+      ...order,
+      id: "internal-live-order",
+      creator_id: "creator-live",
+      razorpay_order_id: liveClaim.razorpay_order_id,
+    };
+    const admin = createAdmin({
+      claims: [liveClaim],
+      connection: {
+        razorpay_account_id: liveClaim.razorpay_account_id,
+        client_id: "live-client",
+        environment: "live",
+        connection_status: "connected",
+      },
+      order: liveOrder,
+    });
+    mocks.getRazorpayCheckoutConnection.mockResolvedValue({
+      creatorId: liveClaim.creator_id,
+      accountId: liveClaim.razorpay_account_id,
+      environment: "live",
+      publicToken: "rzp_live_public",
+      accessToken: "live-oauth-token",
+    });
+    mocks.razorpayApiRequest.mockImplementation(async (_token: string, path: string) =>
+      path.includes("/orders/")
+        ? {
+            id: liveClaim.razorpay_order_id,
+            amount: 29900,
+            currency: "INR",
+            receipt: liveOrder.id,
+          }
+        : {
+            id: liveClaim.razorpay_payment_id,
+            order_id: liveClaim.razorpay_order_id,
+            amount: 29900,
+            currency: "INR",
+            status: "captured",
+            captured: true,
+            account_id: liveClaim.razorpay_account_id,
+          },
+    );
+
+    const result = await processRazorpayPartnerWebhookQueue(
+      admin as never,
+      liveClaim.event_id,
+    );
+
+    expect(result).toEqual({ claimed: 1, processed: 1, ignored: 0, failed: 0 });
+    expect(admin.rpc).toHaveBeenCalledWith(
+      "record_razorpay_checkout_payment",
+      expect.objectContaining({ p_environment: "live" }),
+    );
+    expect(mocks.getRazorpayCheckoutConnection)
+      .toHaveBeenCalledWith("creator-live", "live");
+  });
+
+  it("does not process a claim whose environment differs from the active mode", async () => {
+    const admin = createAdmin({
+      claims: [{ ...claim, environment: "live" }],
+    });
+    const result = await processRazorpayPartnerWebhookQueue(
+      admin as never,
+      claim.event_id,
+    );
+
+    expect(result).toEqual({ claimed: 0, processed: 0, ignored: 0, failed: 0 });
+    expect(mocks.getRazorpayCheckoutConnection).not.toHaveBeenCalled();
+    expect(admin.rpc).not.toHaveBeenCalledWith(
+      "record_razorpay_checkout_payment",
+      expect.anything(),
+    );
   });
 });

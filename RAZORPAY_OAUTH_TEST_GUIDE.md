@@ -1,5 +1,7 @@
 # Razorpay OAuth End-to-End Testing Guide
 
+> Historical pre-Live Test Mode snapshot. The test counts and deployment guidance below describe the earlier implementation. For current Test/Live variables, migration, activation, controlled-transaction, and rollback steps, see [README.md](./README.md).
+
 ## Pre-Enablement Verification Summary
 
 ### ✅ ALL 8 VERIFICATION TASKS COMPLETED SUCCESSFULLY
@@ -327,12 +329,8 @@ disconnectRazorpayConnectionAction()
 - **Key Length:** 256 bits (32 bytes)
 - **IV:** 12 bytes, cryptographically random
 - **Auth Tag:** 16 bytes, prevents tampering
-- **AAD (Additional Authenticated Data):** `cloverloop-razorpay:{creatorId}:{purpose}:v1`
-  - Purpose: "access" vs "refresh" (separate encryption)
-  - Creator ID: binds token to creator (cross-creator decryption fails)
-  - Version: allows future algorithm changes
-
-**Result:** Tokens encrypted as `v1.{iv}.{tag}.{encrypted}`
+- **Current AAD:** Environment, creator ID, and token purpose are bound to ciphertext.
+- **Compatibility:** Existing Test Mode v1 ciphertext remains readable; new ciphertext uses v2 and cannot be decrypted across environments.
 
 ### CSRF Protection
 - **State:** 256-bit random value (base64url encoded)
@@ -537,21 +535,9 @@ curl -X GET "https://cloverloop.in/api/cron/razorpay-token-refresh" \
 
 ## Outstanding Issues & Recommendations
 
-### ⚠️ Issue #1: Test vs Live Connections
-**Severity:** MEDIUM
-**Current State:** Database schema allows only one connection per creator_id (primary key)
-**Impact:** Creator can't have both test AND live connections simultaneously
+### Live Mode updates after this snapshot
 
-**Options:**
-- ✅ **Option A (Recommended):** Accept current behavior - enforce one connection at a time
-- ✅ **Option B:** Migrate schema to support (creator_id, environment) composite key
-
-**No action required** for current testing - this is fine for dev/test purposes.
-
-### ⚠️ Issue #2: Cron Endpoint Missing Readiness Check
-**Severity:** LOW
-**Current State:** Token refresh continues even if `RAZORPAY_OAUTH_ENABLED=false`
-**Recommendation:** Add readiness check in cron handler (not critical for testing)
+The earlier one-connection-per-creator limitation is resolved by the Live Mode migration: creator connections are keyed by `(creator_id, environment)`, and order/payment/webhook database functions validate their environment. The token-refresh cron processes each configured OAuth environment with its own client credentials. See `supabase/migrations/20261115090000_razorpay_live_mode.sql` and the current README instructions before deployment. This historical report is not evidence that a Live integration has been exercised.
 
 ---
 

@@ -9,7 +9,10 @@ import {
 } from "@/components/dashboard/settings-forms";
 import { RazorpayConnectionCard } from "@/components/dashboard/razorpay-connection-card";
 import { requireCreatorContext } from "@/lib/account/server";
-import { getRazorpayOAuthReadiness } from "@/lib/razorpay/oauth";
+import {
+  getRazorpayOAuthMode,
+  getRazorpayOAuthReadiness,
+} from "@/lib/razorpay/oauth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
@@ -47,14 +50,16 @@ export default async function AccountSettingsPage({
     ? razorpayStatusValue[0]
     : razorpayStatusValue;
   const readiness = getRazorpayOAuthReadiness();
+  const razorpayEnvironment = getRazorpayOAuthMode();
   const admin = createSupabaseAdminClient();
   let razorpayConnection = null;
   let razorpayStatusServiceAvailable = Boolean(admin);
-  if (admin) {
+  if (admin && razorpayEnvironment) {
     const { data, error } = await admin
       .from("creator_razorpay_connections")
       .select("razorpay_account_id,environment,connection_status,token_expires_at,last_refreshed_at")
       .eq("creator_id", user.id)
+      .eq("environment", razorpayEnvironment)
       .maybeSingle();
     if (error) {
       console.error("Could not load the creator's Razorpay connection status.", { code: error.code });

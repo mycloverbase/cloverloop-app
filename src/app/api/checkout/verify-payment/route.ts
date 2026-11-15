@@ -7,6 +7,7 @@ import {
   isValidCheckoutToken,
   razorpayApiRequest,
 } from "@/lib/razorpay/checkout";
+import { getRazorpayOAuthMode } from "@/lib/razorpay/oauth";
 
 type ProviderOrder = {
   id: string;
@@ -22,11 +23,13 @@ type ProviderPayment = {
   currency: string;
   status: string;
   captured: boolean;
+  account_id?: string;
 };
 
 type CheckoutOrder = {
   id: string;
   creator_id: string;
+  environment: "test" | "live";
   amount_paise: number;
   currency: string;
   razorpay_order_id: string;
@@ -41,7 +44,8 @@ function jsonResponse(body: Record<string, unknown>, status = 200) {
 }
 
 export async function POST(request: Request) {
-  if (!isRazorpayCheckoutEnabled() || process.env.RAZORPAY_OAUTH_MODE !== "test") {
+  const environment = getRazorpayOAuthMode();
+  if (!isRazorpayCheckoutEnabled(environment) || !environment) {
     return jsonResponse({ error: "Checkout is not available." }, 503);
   }
 
@@ -74,11 +78,11 @@ export async function POST(request: Request) {
   const { data: order, error: orderError } = await admin
     .from("razorpay_checkout_orders")
     .select(
-      "id,creator_id,amount_paise,currency,razorpay_order_id,order_status",
+      "id,creator_id,environment,amount_paise,currency,razorpay_order_id,order_status",
     )
     .eq("id", orderId)
     .eq("checkout_token_hash", hashCheckoutToken(checkoutToken))
-    .eq("environment", "test")
+    .eq("environment", environment)
     .maybeSingle();
 
   if (orderError) {
@@ -91,12 +95,13 @@ export async function POST(request: Request) {
   const checkoutOrder = order as CheckoutOrder;
   if (
     checkoutOrder.razorpay_order_id !== razorpayOrderId ||
+    checkoutOrder.environment !== environment ||
     checkoutOrder.order_status === "failed"
   ) {
     return jsonResponse({ error: "Payment does not match this checkout." }, 409);
   }
 
-  const connection = await getRazorpayCheckoutConnection(checkoutOrder.creator_id);
+  const connection = await getRazorpayCheckoutConnection(checkoutOrder.creator_id, environment);
   if (!connection) {
     return jsonResponse({ error: "The creator's Razorpay connection is unavailable." }, 409);
   }
@@ -121,7 +126,8 @@ export async function POST(request: Request) {
       payment.id !== razorpayPaymentId ||
       payment.order_id !== razorpayOrderId ||
       payment.amount !== checkoutOrder.amount_paise ||
-      payment.currency !== checkoutOrder.currency
+      payment.currency !== checkoutOrder.currency ||
+      (payment.account_id && payment.account_id !== connection.accountId)
     ) {
       return jsonResponse({ error: "Payment details did not match the order." }, 409);
     }
@@ -140,6 +146,7 @@ export async function POST(request: Request) {
         .from("razorpay_payment_attempts")
         .insert({
           order_id: checkoutOrder.id,
+          environment,
           razorpay_payment_id: payment.id,
           payment_status: paymentStatus,
           amount_paise: payment.amount,
@@ -150,7 +157,7 @@ export async function POST(request: Request) {
       if (insertAttemptError) {
         const { data: existingAttempt, error: existingAttemptError } = await admin
           .from("razorpay_payment_attempts")
-          .select("order_id")
+          .select("order_id,environment")
           .eq("razorpay_payment_id", payment.id)
           .maybeSingle();
 
@@ -161,7 +168,10 @@ export async function POST(request: Request) {
             503,
           );
         }
-        if (existingAttempt?.order_id !== checkoutOrder.id) {
+        if (
+          existingAttempt?.order_id !== checkoutOrder.id ||
+          existingAttempt?.environment !== environment
+        ) {
           return jsonResponse({ error: "Payment does not match this checkout." }, 409);
         }
 
@@ -172,7 +182,8 @@ export async function POST(request: Request) {
             verified_at: new Date().toISOString(),
           })
           .eq("razorpay_payment_id", payment.id)
-          .eq("order_id", checkoutOrder.id);
+          .eq("order_id", checkoutOrder.id)
+          .eq("environment", environment);
         if (updateAttemptError) {
           console.error("Razorpay payment verification could not be recorded.");
           return jsonResponse(

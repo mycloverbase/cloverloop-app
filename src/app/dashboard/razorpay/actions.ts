@@ -8,6 +8,7 @@ import {
   createRazorpayOAuthState,
   decryptRazorpayToken,
   getRazorpayOAuthConfig,
+  getRazorpayOAuthMode,
   getRazorpayOAuthReadiness,
   revokeRazorpayToken,
 } from "@/lib/razorpay/oauth";
@@ -77,11 +78,14 @@ export async function disconnectRazorpayConnectionAction(): Promise<void> {
 
   const admin = createSupabaseAdminClient();
   if (!admin) redirect(`${settingsPath}?razorpay=service-unavailable`);
+  const environment = getRazorpayOAuthMode();
+  if (!environment) redirect(`${settingsPath}?razorpay=setup-required`);
 
   const { data: connection, error: loadError } = await admin
     .from("creator_razorpay_connections")
     .select("client_id,environment,access_token_encrypted,refresh_token_encrypted,token_expires_at,connection_status")
     .eq("creator_id", user.id)
+    .eq("environment", environment)
     .maybeSingle();
   if (loadError) {
     console.error("Could not load the creator's Razorpay connection.", { code: loadError.code });
@@ -107,7 +111,7 @@ export async function disconnectRazorpayConnectionAction(): Promise<void> {
         new Date(connection.token_expires_at).getTime() > Date.now()
       ) {
         await revokeRazorpayToken(
-          decryptRazorpayToken(connection.access_token_encrypted, user.id, "access"),
+          decryptRazorpayToken(connection.access_token_encrypted, user.id, "access", environment),
           "access_token",
           config,
         );
@@ -126,7 +130,7 @@ export async function disconnectRazorpayConnectionAction(): Promise<void> {
         remoteRevocationSucceeded = false;
       } else {
         await revokeRazorpayToken(
-          decryptRazorpayToken(connection.refresh_token_encrypted, user.id, "refresh"),
+          decryptRazorpayToken(connection.refresh_token_encrypted, user.id, "refresh", environment),
           "refresh_token",
           config,
         );
@@ -156,6 +160,7 @@ export async function disconnectRazorpayConnectionAction(): Promise<void> {
       refresh_lock_expires_at: null,
     })
     .eq("creator_id", user.id)
+    .eq("environment", environment)
     .in("connection_status", ["connected", "reconnect_required", "revoked"]);
   if (disconnectError) {
     console.error("Could not disconnect the creator's Razorpay account.", { code: disconnectError.code });

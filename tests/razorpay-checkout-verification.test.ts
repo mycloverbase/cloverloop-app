@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   createSupabaseAdminClient: vi.fn(),
   getRazorpayCheckoutConnection: vi.fn(),
+  getRazorpayOAuthMode: vi.fn(),
   hashCheckoutToken: vi.fn(),
   isRazorpayCheckoutEnabled: vi.fn(),
   isValidCheckoutToken: vi.fn(),
@@ -21,11 +22,16 @@ vi.mock("@/lib/razorpay/checkout", () => ({
   razorpayApiRequest: mocks.razorpayApiRequest,
 }));
 
+vi.mock("@/lib/razorpay/oauth", () => ({
+  getRazorpayOAuthMode: mocks.getRazorpayOAuthMode,
+}));
+
 import { POST } from "@/app/api/checkout/verify-payment/route";
 
 const checkoutOrder = {
   id: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
   creator_id: "creator-a",
+  environment: "test" as const,
   amount_paise: 29900,
   currency: "INR",
   razorpay_order_id: "order_test123",
@@ -66,6 +72,8 @@ function makeRequest() {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
+  vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_ENABLED", "true");
+  mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
   mocks.isRazorpayCheckoutEnabled.mockReturnValue(true);
   mocks.isValidCheckoutToken.mockReturnValue(true);
   mocks.hashCheckoutToken.mockReturnValue("a".repeat(64));
@@ -138,5 +146,25 @@ describe("POST /api/checkout/verify-payment", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ status: "not_captured" });
     expect(admin.rpc).not.toHaveBeenCalled();
+  });
+
+  it("uses only the selected environment when verifying a Live Mode order", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    const admin = makeAdmin();
+    mocks.getRazorpayCheckoutConnection.mockResolvedValue({
+      creatorId: "creator-a",
+      accountId: "account-a",
+      environment: "live",
+      publicToken: "rzp_live_public",
+      accessToken: "server-only-live-token",
+    });
+    mocks.createSupabaseAdminClient.mockReturnValue(admin);
+
+    const response = await POST(makeRequest());
+    const query = admin.from.mock.results[0]?.value;
+
+    expect(response.status).toBe(409);
+    expect(query.eq).toHaveBeenCalledWith("environment", "live");
+    expect(mocks.getRazorpayCheckoutConnection).not.toHaveBeenCalled();
   });
 });

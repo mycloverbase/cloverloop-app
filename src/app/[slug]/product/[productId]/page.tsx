@@ -191,10 +191,13 @@ export default async function PublishedProductPage({
               <p>{product.description}</p>
             </section>
             {formattedSize || fileFormat ? (
-              <dl className="product-detail-file-info">
-                {fileFormat ? <div><dt>File format</dt><dd>{fileFormat}</dd></div> : null}
-                {formattedSize ? <div><dt>File size</dt><dd>{formattedSize}</dd></div> : null}
-              </dl>
+              <section className="product-detail-specifications" aria-labelledby="product-specifications-title">
+                <h2 id="product-specifications-title">File details</h2>
+                <dl className="product-detail-file-info">
+                  {fileFormat ? <div><dt>File format</dt><dd>{fileFormat}</dd></div> : null}
+                  {formattedSize ? <div><dt>File size</dt><dd>{formattedSize}</dd></div> : null}
+                </dl>
+              </section>
             ) : null}
             <Link className="product-detail-creator" href={storeUrl}>
               {storefront.profileImageUrl ? (

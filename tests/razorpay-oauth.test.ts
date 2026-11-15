@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { createCipheriv, randomBytes } from "node:crypto";
 
 const mocks = vi.hoisted(() => ({
   createSupabaseAdminClient: vi.fn(),
@@ -48,6 +49,10 @@ function createSupabaseFakes(options: {
   existingStatus?: string | null;
   refreshClaims?: unknown[];
 } = {}) {
+  const environment = process.env.RAZORPAY_OAUTH_MODE === "live" ? "live" : "test";
+  const clientId = environment === "live"
+    ? "razorpay-live-client"
+    : "razorpay-test-client";
   const rpcCalls: { name: string; args: Record<string, unknown> }[] = [];
   const auditRows: Record<string, unknown>[] = [];
   const admin = {
@@ -57,15 +62,24 @@ function createSupabaseFakes(options: {
         return {
           data: options.stateValid === false ? [] : [{
             creator_id: creatorId,
-            client_id: "razorpay-test-client",
-            environment: "test",
+            client_id: clientId,
+            environment,
           }],
           error: null,
         };
       }
       if (name === "save_razorpay_connection") return { data: true, error: null };
       if (name === "claim_razorpay_token_refresh") {
-        return { data: options.refreshClaims ?? [], error: null };
+        return {
+          data: (options.refreshClaims ?? []).filter(
+            (claim) =>
+              typeof claim === "object" &&
+              claim !== null &&
+              "environment" in claim &&
+              claim.environment === args.requested_environment,
+          ),
+          error: null,
+        };
       }
       if (name === "finish_razorpay_token_refresh") return { data: true, error: null };
       if (name === "fail_razorpay_token_refresh") return { data: true, error: null };
@@ -108,6 +122,8 @@ function configureRazorpayOAuth() {
   vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
   vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "razorpay-test-client");
   vi.stubEnv("RAZORPAY_OAUTH_CLIENT_SECRET", "test-client-secret");
+  vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_ID", "razorpay-live-client");
+  vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_SECRET", "live-client-secret");
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
   vi.stubEnv("RAZORPAY_TOKEN_ENCRYPTION_KEY", Buffer.alloc(32, 9).toString("base64"));
   vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://cloverloop.test");
@@ -135,9 +151,15 @@ describe("Razorpay OAuth configuration and token protection", () => {
     expect(getRazorpayOAuthReadiness().available).toBe(false);
     vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
     expect(getRazorpayOAuthConfig()?.environment).toBe("test");
+    expect(getRazorpayOAuthConfig("test")?.clientId).toBe("razorpay-test-client");
+    expect(getRazorpayOAuthConfig("live")?.clientId).toBe("razorpay-live-client");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "http://cloverloop.test");
     expect(getRazorpayOAuthReadiness().available).toBe(false);
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://cloverloop.test");
+    expect(getRazorpayOAuthConfig()?.clientId).toBe("razorpay-live-client");
+    vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_SECRET", "");
+    expect(getRazorpayOAuthConfig()).toBeNull();
   });
 
   it("encrypts tokens with creator and purpose binding and rejects tampering", () => {
@@ -147,6 +169,33 @@ describe("Razorpay OAuth configuration and token protection", () => {
     expect(() => decryptRazorpayToken(encrypted, "another-creator", "access")).toThrow();
     expect(() => decryptRazorpayToken(encrypted, creatorId, "refresh")).toThrow();
     expect(() => decryptRazorpayToken(`${encrypted}x`, creatorId, "access")).toThrow();
+  });
+
+  it("binds new ciphertext to its environment while retaining legacy Test Mode tokens", () => {
+    const liveCiphertext = encryptRazorpayToken("live-token", creatorId, "access", "live");
+    expect(decryptRazorpayToken(liveCiphertext, creatorId, "access", "live")).toBe("live-token");
+    expect(() => decryptRazorpayToken(liveCiphertext, creatorId, "access", "test")).toThrow();
+
+    const iv = randomBytes(12);
+    const cipher = createCipheriv(
+      "aes-256-gcm",
+      Buffer.alloc(32, 9),
+      iv,
+    );
+    cipher.setAAD(Buffer.from(`cloverloop-razorpay:${creatorId}:access:v1`));
+    const encrypted = Buffer.concat([
+      cipher.update("existing-test-token", "utf8"),
+      cipher.final(),
+    ]);
+    const legacyCiphertext = [
+      "v1",
+      iv.toString("base64url"),
+      cipher.getAuthTag().toString("base64url"),
+      encrypted.toString("base64url"),
+    ].join(".");
+    expect(decryptRazorpayToken(legacyCiphertext, creatorId, "access", "test"))
+      .toBe("existing-test-token");
+    expect(() => decryptRazorpayToken(legacyCiphertext, creatorId, "access", "live")).toThrow();
   });
 
   it("creates random state whose stored representation is only its SHA-256 digest", () => {
@@ -242,6 +291,29 @@ describe("Razorpay OAuth callback and scheduled refresh", () => {
     expect(saveCall?.args.requested_access_token_encrypted).not.toBe("private-access-token");
     expect(saveCall?.args.requested_refresh_token_encrypted).not.toBe("private-refresh-token");
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("connects Live Mode with the Live OAuth client without replacing Test Mode", async () => {
+    vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    const admin = createSupabaseFakes();
+    vi.stubGlobal("fetch", vi.fn(async () =>
+      Response.json(tokenResponse({
+        public_token: "rzp_live_oauth_public",
+        razorpay_account_id: "acc_liveMerchant123",
+      }))));
+
+    const response = await razorpayCallback(callbackRequest("E".repeat(43)));
+    const saveCall = admin.rpcCalls.find((call) => call.name === "save_razorpay_connection");
+
+    expect(new URL(response.headers.get("location") ?? "https://invalid.example")
+      .searchParams.get("razorpay")).toBe("connected");
+    expect(saveCall?.args).toMatchObject({
+      requested_client_id: "razorpay-live-client",
+      requested_environment: "live",
+      requested_razorpay_account_id: "acc_liveMerchant123",
+    });
+    expect(saveCall?.args.requested_access_token_encrypted)
+      .not.toBe("private-access-token");
   });
 
   it("rejects an invalid or replayed OAuth state before exchanging a code", async () => {

@@ -1,5 +1,7 @@
 # Razorpay OAuth Pre-Enablement Verification Results
 
+> Historical Test Mode snapshot from 2026-11-13; it predates the Live Mode migration and current activation guidance in [README.md](./README.md).
+
 **Date:** 2026-11-13 14:10 UTC
 **Status:** ✅ ALL VERIFICATION TASKS COMPLETED - READY FOR TESTING
 

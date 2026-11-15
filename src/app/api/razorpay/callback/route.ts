@@ -80,6 +80,7 @@ export async function GET(request: NextRequest) {
     .from("creator_razorpay_connections")
     .select("connection_status,token_expires_at")
     .eq("creator_id", user.id)
+    .eq("environment", config.environment)
     .maybeSingle();
   if (existingError) {
     console.error("Could not check the creator's current Razorpay connection.", { code: existingError.code });
@@ -104,8 +105,8 @@ export async function GET(request: NextRequest) {
       requested_client_id: config.clientId,
       requested_environment: config.environment,
       requested_public_token: tokens.publicToken,
-      requested_access_token_encrypted: encryptRazorpayToken(tokens.accessToken, user.id, "access"),
-      requested_refresh_token_encrypted: encryptRazorpayToken(tokens.refreshToken, user.id, "refresh"),
+      requested_access_token_encrypted: encryptRazorpayToken(tokens.accessToken, user.id, "access", config.environment),
+      requested_refresh_token_encrypted: encryptRazorpayToken(tokens.refreshToken, user.id, "refresh", config.environment),
       requested_token_expires_at: new Date(now + tokens.expiresInSeconds * 1000).toISOString(),
       requested_refresh_token_expires_at: new Date(now + 180 * 24 * 60 * 60 * 1000).toISOString(),
     });

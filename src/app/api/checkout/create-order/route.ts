@@ -5,6 +5,7 @@ import { isRazorpayPurchaseEmailDeliveryConfigured } from "@/lib/razorpay/purcha
 import {
   getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection,
+  isRazorpayLiveCheckoutBuyerAllowed,
   hashCheckoutToken,
   isRazorpayPartnerWebhookFulfillmentEnabled,
   isRazorpayCheckoutEnabled,
@@ -13,6 +14,10 @@ import {
   RazorpayApiError,
   razorpayApiRequest,
 } from "@/lib/razorpay/checkout";
+import {
+  getRazorpayOAuthConfig,
+  getRazorpayOAuthMode,
+} from "@/lib/razorpay/oauth";
 
 type CreatedOrder = {
   id: string;
@@ -68,17 +73,17 @@ async function releaseProviderCreationClaim(
 }
 
 export async function POST(request: Request) {
-  if (!isRazorpayCheckoutEnabled()) {
+  const environment = getRazorpayOAuthMode();
+  if (!isRazorpayCheckoutEnabled(environment)) {
     return jsonResponse({ error: "Checkout is not available." }, 503);
   }
 
-  if (process.env.RAZORPAY_OAUTH_MODE !== "test") {
-    return jsonResponse({ error: "Test Mode checkout is not configured." }, 503);
+  if (!environment || !getRazorpayOAuthConfig(environment)) {
+    return jsonResponse({ error: "Razorpay checkout is not configured." }, 503);
   }
-
-  if (!isRazorpayPartnerWebhookFulfillmentEnabled()) {
+  if (!isRazorpayPartnerWebhookFulfillmentEnabled(environment)) {
     return jsonResponse(
-      { error: "Test Mode payment notifications are not configured." },
+      { error: "Razorpay payment notifications are not configured." },
       503,
     );
   }
@@ -125,6 +130,12 @@ export async function POST(request: Request) {
   ) {
     return jsonResponse({ error: "Invalid checkout details." }, 400);
   }
+  if (!isRazorpayLiveCheckoutBuyerAllowed(email)) {
+    return jsonResponse(
+      { error: "Live Mode checkout is currently restricted to approved test buyers." },
+      403,
+    );
+  }
 
   const forwardedFor = request.headers.get("x-forwarded-for");
   const clientIp = forwardedFor?.split(",")[0]?.trim() || "unknown";
@@ -153,6 +164,7 @@ export async function POST(request: Request) {
       p_customer_name: customerName,
       p_customer_phone: null,
       p_checkout_token_hash: hashCheckoutToken(checkoutToken),
+      p_environment: environment,
     },
   );
 
@@ -180,11 +192,11 @@ export async function POST(request: Request) {
   }
   const order = rowValue;
 
-  const connection = await getRazorpayCheckoutConnection(order.creator_id);
+  const connection = await getRazorpayCheckoutConnection(order.creator_id, environment);
   if (!connection) {
     await releaseProviderCreationClaim(admin, order.order_id);
     return jsonResponse(
-      { error: "The creator's Razorpay Test Mode connection is unavailable." },
+      { error: "The creator's Razorpay connection for this environment is unavailable." },
       409,
     );
   }

@@ -4,12 +4,18 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection,
-  getRazorpayPartnerTestWebhookSecret,
+  getRazorpayPartnerWebhookSecret,
   getRazorpayTestWebhookSecret,
   isRazorpayPartnerWebhookFulfillmentEnabled,
   razorpayApiRequest,
   verifyRazorpayWebhookSignature,
 } from "@/lib/razorpay/checkout";
+import {
+  getRazorpayOAuthConfig,
+  getRazorpayOAuthMode,
+  isRazorpayConnectionUsable,
+  type RazorpayOAuthEnvironment,
+} from "@/lib/razorpay/oauth";
 import { processRazorpayPartnerWebhookQueue } from "@/lib/razorpay/webhook-fulfillment";
 import { processRazorpayPurchaseEmailQueue } from "@/lib/razorpay/purchase-email";
 
@@ -53,7 +59,7 @@ async function deliverPurchaseEmailForEvent(
 ) {
   const { data: event, error: eventError } = await admin
     .from("razorpay_checkout_events")
-    .select("razorpay_order_id")
+    .select("razorpay_order_id,environment")
     .eq("event_id", eventId)
     .maybeSingle();
   if (eventError) {
@@ -62,13 +68,17 @@ async function deliverPurchaseEmailForEvent(
     });
     return;
   }
-  if (!event || typeof event.razorpay_order_id !== "string") return;
+  if (
+    !event ||
+    typeof event.razorpay_order_id !== "string" ||
+    (event.environment !== "test" && event.environment !== "live")
+  ) return;
 
   const { data: order, error: orderError } = await admin
     .from("razorpay_checkout_orders")
     .select("id")
     .eq("razorpay_order_id", event.razorpay_order_id)
-    .eq("environment", "test")
+    .eq("environment", event.environment)
     .maybeSingle();
   if (orderError) {
     console.error("Razorpay order could not be loaded for purchase email delivery.", {
@@ -129,15 +139,16 @@ async function enqueuePartnerPaymentEvent(
   accountId: string,
   paymentId: string,
   orderId: string,
+  environment: RazorpayOAuthEnvironment,
 ): Promise<number> {
-  const clientId = process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim();
-  if (!clientId) return 503;
+  const config = getRazorpayOAuthConfig(environment);
+  if (!config) return 503;
 
   const { data: connection, error: connectionError } = await admin
     .from("creator_razorpay_connections")
-    .select("creator_id,client_id")
+    .select("creator_id,client_id,connection_status,token_expires_at,public_token")
     .eq("razorpay_account_id", accountId)
-    .eq("environment", "test")
+    .eq("environment", environment)
     .eq("connection_status", "connected")
     .maybeSingle();
 
@@ -150,17 +161,31 @@ async function enqueuePartnerPaymentEvent(
   if (
     !connection ||
     typeof connection.creator_id !== "string" ||
-    connection.client_id !== clientId
+    connection.client_id !== config.clientId
   ) {
-    console.warn("Razorpay partner webhook account is not a connected Test Mode creator.");
+    console.warn("Razorpay partner webhook account is not a connected creator in the active environment.");
     return 400;
+  }
+  if (
+    !isRazorpayConnectionUsable(
+      connection.connection_status,
+      typeof connection.token_expires_at === "string"
+        ? connection.token_expires_at
+        : null,
+    ) ||
+    typeof connection.public_token !== "string" ||
+    !connection.public_token.startsWith(
+      environment === "test" ? "rzp_test_" : "rzp_live_",
+    )
+  ) {
+    return 503;
   }
 
   const eventRow = {
     event_id: eventId,
     event_type: eventType,
     razorpay_account_id: accountId,
-    environment: "test",
+    environment,
     creator_id: connection.creator_id,
     razorpay_order_id: orderId,
     razorpay_payment_id: paymentId,
@@ -196,7 +221,7 @@ async function enqueuePartnerPaymentEvent(
     const legacyEvent =
       existingEvent.event_type === eventType &&
       existingEvent.razorpay_account_id === accountId &&
-      existingEvent.environment === "test" &&
+      existingEvent.environment === environment &&
       existingEvent.creator_id === null &&
       existingEvent.razorpay_order_id === null &&
       existingEvent.razorpay_payment_id === null &&
@@ -219,7 +244,7 @@ async function enqueuePartnerPaymentEvent(
         .eq("event_id", eventId)
         .eq("event_type", eventType)
         .eq("razorpay_account_id", accountId)
-        .eq("environment", "test")
+        .eq("environment", environment)
         .is("creator_id", null)
         .is("razorpay_order_id", null)
         .is("razorpay_payment_id", null)
@@ -250,6 +275,7 @@ async function enqueuePartnerPaymentEvent(
     const sameEvent =
       existingEvent.event_type === eventType &&
       existingEvent.razorpay_account_id === accountId &&
+      existingEvent.environment === environment &&
       existingEvent.creator_id === connection.creator_id &&
       existingEvent.razorpay_order_id === orderId &&
       existingEvent.razorpay_payment_id === paymentId;
@@ -267,6 +293,7 @@ async function enqueuePartnerPaymentEvent(
   }
 
   console.info("Razorpay partner payment event queued.", {
+    environment,
     eventType,
     accountId,
     paymentId,
@@ -306,24 +333,22 @@ async function setEventStatus(
 }
 
 export async function POST(request: Request) {
-  if (process.env.RAZORPAY_OAUTH_MODE !== "test") return response(503);
+  const environment = getRazorpayOAuthMode();
+  if (!environment) return response(503);
   const admin = createSupabaseAdminClient();
-  const accountWebhookSecret = getRazorpayTestWebhookSecret();
-  const partnerWebhookSecret = getRazorpayPartnerTestWebhookSecret();
+  const accountWebhookSecret =
+    environment === "test" ? getRazorpayTestWebhookSecret() : null;
+  const partnerWebhookSecret = getRazorpayPartnerWebhookSecret(environment);
   const partnerFulfillmentEnabled =
-    isRazorpayPartnerWebhookFulfillmentEnabled();
+    isRazorpayPartnerWebhookFulfillmentEnabled(environment);
   if (!admin || (!accountWebhookSecret && !partnerFulfillmentEnabled)) {
     return response(503);
   }
 
   const rawBody = await request.text();
   const signature = request.headers.get("x-razorpay-signature");
-  if (
-    accountWebhookSecret &&
-    partnerWebhookSecret &&
-    accountWebhookSecret === partnerWebhookSecret
-  ) {
-    console.error("Razorpay account and partner Test Mode webhook secrets must be distinct.");
+  if (accountWebhookSecret && accountWebhookSecret === partnerWebhookSecret) {
+    console.error("Razorpay account and partner webhook secrets must be distinct.");
     return response(503);
   }
 
@@ -335,7 +360,11 @@ export async function POST(request: Request) {
     ? verifyRazorpayWebhookSignature(rawBody, signature, partnerWebhookSecret)
     : false;
 
-  if (!accountSignatureValid && partnerSignatureValid) {
+  if (accountSignatureValid && partnerSignatureValid) {
+    console.error("Razorpay webhook signature matched multiple integrations.");
+    return response(400);
+  }
+  if (partnerSignatureValid) {
     let event: Record<string, unknown>;
     try {
       const parsed: unknown = JSON.parse(rawBody);
@@ -378,6 +407,7 @@ export async function POST(request: Request) {
       accountId,
       paymentId,
       orderId,
+      environment,
     );
     return response(status);
   }
@@ -575,6 +605,7 @@ export async function POST(request: Request) {
       "record_razorpay_checkout_payment",
       {
         p_order_id: order.id,
+        p_environment: "test",
         p_payment_id: payment.id,
         p_amount_paise: payment.amount,
         p_currency: payment.currency,
