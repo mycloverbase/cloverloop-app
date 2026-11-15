@@ -59,27 +59,18 @@ The Supabase URL and public anon/publishable key are required to use email or Go
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Before launch | Confirmed CloverLoop support address. The Contact page shows a setup notice until provided. |
 | `RESEND_API_KEY` | For launch checklist, creator feedback, free and paid product delivery, and programme reminders | Server-only Resend API key used for transactional email delivery. |
 | `RESEND_FROM_EMAIL` | For launch checklist, creator feedback, free and paid product delivery, and programme reminders | Verified sender address for transactional email. |
-| `RESEND_WEBHOOK_SECRET` | For paid purchase email delivery status | Server-only Resend webhook signing secret for `/api/webhooks/resend`; configure delivery, bounce, failure, and complaint events. |
+| `RESEND_WEBHOOK_SECRET` | Optional delivery-status tracking | Server-only Resend webhook signing secret for `/api/webhooks/resend`; configure delivery, bounce, failure, and complaint events. Not required to enable checkout or send purchase email. |
 | `PURCHASE_DOWNLOAD_LINK_SECRET` | For paid purchase download links | Server-only random secret of at least 32 bytes. Keep it stable; changing it invalidates previously emailed download links. |
 | `CRON_SECRET` | For Vercel production schedule | Long, random bearer secret used to authorize scheduled Founding Creator expiry/reminders, Razorpay token refresh, webhook queue recovery, and purchase email retries. Configure it as a Vercel production environment variable. |
 | `FREE_PRODUCT_LINK_EXPIRY_HOURS` | No | Free product download link expiry in hours (1–168; default 48). |
 | `FREE_PRODUCT_MAX_DOWNLOADS` | No | Maximum successful download redirects per claim (1–20; default 3). |
-| `RAZORPAY_OAUTH_ENABLED` | No | Must be explicitly set to `true` to enable creator account connections; defaults to `false`. |
-| `RAZORPAY_OAUTH_CLIENT_ID` | Test Mode OAuth | Server-side Razorpay Development OAuth client ID. Used only when `RAZORPAY_OAUTH_MODE=test`. |
-| `RAZORPAY_OAUTH_CLIENT_SECRET` | Test Mode OAuth | Server-only Development OAuth client secret. Never expose it to browser code. |
-| `RAZORPAY_LIVE_OAUTH_CLIENT_ID` | Live Mode OAuth | Server-side Razorpay Production OAuth client ID. Used only when `RAZORPAY_OAUTH_MODE=live`. |
-| `RAZORPAY_LIVE_OAUTH_CLIENT_SECRET` | Live Mode OAuth | Server-only Production OAuth client secret. Never expose it to browser code. |
+| `RAZORPAY_OAUTH_CLIENT_ID` | For Razorpay OAuth | OAuth client ID for the selected mode. Set its value to the Development client in Test deployments or Production client in Live deployments. |
+| `RAZORPAY_OAUTH_CLIENT_SECRET` | For Razorpay OAuth | Server-only secret matching the selected mode's client ID. Never expose it to browser code. |
 | `RAZORPAY_OAUTH_MODE` | For Razorpay OAuth/checkout | Explicit `test` or `live` selector. It has no default; choose separately per Vercel environment. |
 | `RAZORPAY_TOKEN_ENCRYPTION_KEY` | For Razorpay OAuth | Server-only base64-encoded 32-byte AES-256-GCM key, separate from the Razorpay client secret. |
-| `RAZORPAY_CHECKOUT_ENABLED` | No | General paid-checkout gate; defaults to off. Live checkout also requires its Live-specific gates below. |
-| `RAZORPAY_LIVE_CHECKOUT_ENABLED` | No | Live payment gate; defaults to off. Must be deliberately enabled even when OAuth is in Live Mode. |
-| `RAZORPAY_LIVE_CHECKOUT_TEST_EMAILS` | Controlled Live transaction | Comma-separated approved buyer addresses for a restricted low-value production test. |
-| `RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED` | No | Defaults to off. Only set `true` after a controlled Live transaction and production readiness review to allow all buyers. |
-| `RAZORPAY_TEST_WEBHOOK_SECRET` | For existing account-scoped webhook compatibility | Server-only signing secret for legacy creator-account webhooks. Keep it separate from the Technology Partner application webhook secret. |
-| `RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED` | For webhook fulfillment | Must be explicitly `true` to enable the active environment's application-level webhook fulfillment. |
-| `RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS` | No | Keep unset or `false`. If `true`, fulfillment and checkout fail closed. |
-| `RAZORPAY_PARTNER_TEST_WEBHOOK_SECRET` | For Test Mode checkout | Server-only secret configured on the Technology Partner application's Test Webhook. Must differ from `RAZORPAY_TEST_WEBHOOK_SECRET`. |
-| `RAZORPAY_PARTNER_LIVE_WEBHOOK_SECRET` | For Live Mode checkout | Server-only secret configured on the Technology Partner application's Live Webhook. Must differ from the Test Mode application secret. |
+| `RAZORPAY_CHECKOUT_ENABLED` | No | The single paid-checkout switch. Defaults to `false`; `true` enables checkout for all buyers in the selected mode. |
+| `RAZORPAY_PARTNER_WEBHOOK_SECRET` | For paid checkout | Server-only signing secret for the Technology Partner application's webhook in the selected mode. Use the same variable name with a mode-matching value in each Vercel environment. |
+| `RAZORPAY_TEST_WEBHOOK_SECRET` | Optional legacy Test Mode webhook | Server-only secret only for existing account-scoped Test Mode webhooks; not needed for the application webhook used by checkout. |
 
 The launch-checklist email uses the branded HTML in `src/lib/launch-checklist-email.ts`. Its PDF attachment is `public/downloads/cloverloop-link-in-bio-launch-checklist.pdf`, also served as the fallback download link.
 
@@ -89,24 +80,24 @@ Set the same environment variables in the Vercel project. Keep `.env.local` priv
 
 ### Razorpay Technology Partner OAuth and mode separation
 
-The authenticated **Dashboard → Settings → Razorpay account** connects the creator account for the selected `RAZORPAY_OAUTH_MODE`. Test credentials remain `RAZORPAY_OAUTH_CLIENT_ID` and `RAZORPAY_OAUTH_CLIENT_SECRET`; Live uses the separate `RAZORPAY_LIVE_OAUTH_CLIENT_ID` and `RAZORPAY_LIVE_OAUTH_CLIENT_SECRET`. Live Mode never falls back to the Test credentials. The selected mode controls the OAuth client, API token, creator connection, checkout order, and webhook secret. Connections for each mode are stored independently; changing the deployment mode does not overwrite the other connection.
+The authenticated **Dashboard → Settings → Razorpay account** connects the creator account for the selected `RAZORPAY_OAUTH_MODE`. Use the same `RAZORPAY_OAUTH_CLIENT_ID`, `RAZORPAY_OAUTH_CLIENT_SECRET`, and `RAZORPAY_PARTNER_WEBHOOK_SECRET` variable names in every deployment; set their values to the Development credentials/secrets in Test deployments and Production credentials/secrets in Live deployments. Vercel environment scoping keeps those values separate. The selected mode controls the OAuth client, API token, creator connection, checkout order, and webhook secret. Connections for each mode are stored independently.
 
-Both OAuth clients must allow the unchanged callback URI `https://cloverloop.in/api/razorpay/callback`. The authorization code exchange runs server-side at `https://auth.razorpay.com/token`, sends the selected mode, and stores encrypted tokens. New ciphertext is environment-bound; existing v1 Test Mode token ciphertext remains readable and is re-encrypted on refresh. Keep the existing `RAZORPAY_TOKEN_ENCRYPTION_KEY` stable. Never place secrets in `NEXT_PUBLIC_*` variables or source control.
+Configure each OAuth client to allow the callback URI `https://cloverloop.in/api/razorpay/callback`. The authorization code exchange runs server-side at `https://auth.razorpay.com/token`, sends the selected mode, and stores encrypted tokens. New ciphertext is environment-bound; existing v1 Test Mode token ciphertext remains readable and is re-encrypted on refresh. Keep the existing `RAZORPAY_TOKEN_ENCRYPTION_KEY` stable. Never place secrets in `NEXT_PUBLIC_*` variables or source control.
 
 **Vercel environment policy**
 
 | Vercel environment | OAuth mode and credentials | Webhook secrets | Checkout |
 | --- | --- | --- | --- |
-| Development | `RAZORPAY_OAUTH_MODE=test`; Development client variables only | Test account/app webhook secrets only, when needed | `RAZORPAY_CHECKOUT_ENABLED=false` by default |
-| Preview | `RAZORPAY_OAUTH_MODE=test`; Development client variables only | Test secrets only, when needed | `RAZORPAY_CHECKOUT_ENABLED=false`; never configure Live secrets |
-| Production before Live activation | Keep the currently approved mode and matching client pair; for the existing Test setup use `test` and Development credentials | Keep Test secrets unchanged; do not set the Live app secret yet | Keep `RAZORPAY_CHECKOUT_ENABLED=false` unless explicitly approved for Test |
-| Production Live cutover | Explicitly set `RAZORPAY_OAUTH_MODE=live`; add Production client ID/secret | Configure only the separate Live application webhook secret for Live processing; preserve Test variables for rollback | Keep all Live checkout flags off until the controlled transaction steps below |
+| Development | `RAZORPAY_OAUTH_MODE=test`; generic OAuth/webhook variables contain Test values | Test application webhook secret | `RAZORPAY_CHECKOUT_ENABLED=false` by default |
+| Preview | `RAZORPAY_OAUTH_MODE=test`; generic OAuth/webhook variables contain Test values | Test application webhook secret | `RAZORPAY_CHECKOUT_ENABLED=false` by default |
+| Production before Live activation | Keep the currently approved mode and matching generic credential values | Keep the matching application webhook secret | Keep `RAZORPAY_CHECKOUT_ENABLED=false` |
+| Production Live | `RAZORPAY_OAUTH_MODE=live`; generic OAuth/webhook variables contain Production values | Live application webhook secret | Keep `RAZORPAY_CHECKOUT_ENABLED=false` until ready |
 
-Set `RAZORPAY_OAUTH_ENABLED=true` only after Technology Partner OAuth has been approved and configured. In Vercel, variables are scoped per environment; redeploy after changing them. Do not configure production OAuth secrets in Preview or Development.
+OAuth is available when the selected mode, matching client pair, site URL, and encryption key are configured; there is no separate OAuth enable flag. In Vercel, variables are scoped per environment; redeploy after changing them. Do not configure production OAuth values in Preview or Development.
 
 ### Test Mode checkout and fulfillment
 
-The Test application webhook is `https://cloverloop.in/api/webhooks/razorpay`. It verifies the exact raw-body HMAC using `RAZORPAY_PARTNER_TEST_WEBHOOK_SECRET`, maps the top-level `account_id` to an active Test creator connection, and durably records the event before acknowledging it. Background processing retrieves the order and payment using that creator's OAuth token and verifies account, order, receipt, payment ID, amount, currency, and captured status before transactional entitlement creation. The browser response never grants access; the signed download email is queued only after verified capture and entitlement creation. No download link is displayed on the checkout success page.
+The Test application webhook is `https://cloverloop.in/api/webhooks/razorpay`. It verifies the exact raw-body HMAC using `RAZORPAY_PARTNER_WEBHOOK_SECRET`, maps the top-level `account_id` to an active Test creator connection, and durably records the event before acknowledging it. Background processing retrieves the order and payment using that creator's OAuth token and verifies account, order, receipt, payment ID, amount, currency, and captured status before transactional entitlement creation. The browser response never grants access; the signed download email is queued only after verified capture and entitlement creation. No download link is displayed on the checkout success page.
 
 Apply through the established Supabase migration workflow, in order (this code change does not apply migrations to a database):
 
@@ -116,24 +107,23 @@ Apply through the established Supabase migration workflow, in order (this code c
 4. `supabase/migrations/20261114194000_razorpay_purchase_email_delivery.sql`
 5. `supabase/migrations/20261115090000_razorpay_live_mode.sql`
 
-Keep the existing account-scoped `RAZORPAY_TEST_WEBHOOK_SECRET` unchanged and distinct from the Test application secret. Set `RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED=true` and keep `RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS` unset or `false`. The legacy account-scoped webhook path and registration lock remain Test-only; new checkout fulfillment uses the application webhook.
+Set `RAZORPAY_PARTNER_WEBHOOK_SECRET` to the Test application's signing secret. If retaining an existing account-scoped Test webhook, keep its optional `RAZORPAY_TEST_WEBHOOK_SECRET` separate. New checkout fulfillment uses the application webhook.
 
 ### Live Mode activation and controlled transaction
 
-Do not enable Live checkout merely by deploying this code. The Razorpay Live application webhook is expected at `https://cloverloop.in/api/webhooks/razorpay` for `payment.captured`; set its distinct Live signing secret in `RAZORPAY_PARTNER_LIVE_WEBHOOK_SECRET`. Keep the Test application secret and Test webhook setup unchanged. Live checkout requires all of `RAZORPAY_CHECKOUT_ENABLED=true`, `RAZORPAY_LIVE_CHECKOUT_ENABLED=true`, and either an allowlisted controlled-test email or the separate public-checkout gate. OAuth connection by itself does not enable payment creation.
+Do not enable Live checkout merely by deploying this code. In Vercel Production, set `RAZORPAY_OAUTH_MODE=live`, use the Production values for the generic OAuth client pair and `RAZORPAY_PARTNER_WEBHOOK_SECRET`, and configure the Live application webhook at `https://cloverloop.in/api/webhooks/razorpay` for `payment.captured`. `RAZORPAY_CHECKOUT_ENABLED=true` enables Live checkout for all buyers, so leave it `false` until production readiness is reviewed. OAuth connection by itself does not enable payment creation.
 
 After review and migration:
 
-1. In Vercel **Production only**, set mode `live`, enable OAuth, configure the Production OAuth client pair, the Live webhook secret, the unchanged encryption key, and `RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED=true`. Keep `RAZORPAY_CHECKOUT_ENABLED`, `RAZORPAY_LIVE_CHECKOUT_ENABLED`, and `RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED` false. Keep the existing Test credentials/secrets so Test can be restored.
+1. In Vercel **Production only**, set mode `live`, configure the generic OAuth client pair and webhook secret with their Production values, and keep `RAZORPAY_CHECKOUT_ENABLED=false`. Keep the existing Test values in the Preview/Development scopes.
 2. Confirm Razorpay's Production OAuth client allows the exact callback URI above and the Live application webhook has `payment.captured` enabled. Do not change the webhook URL.
 3. Reconnect each creator from **Dashboard → Settings → Connect Razorpay** while Production is in Live mode. This creates a separate Live connection; a Test-only connection is never accepted for a Live order. The daily token-refresh cron refreshes both configured environments independently.
-4. After the Live account, product, amount, currency, fulfillment, email, and webhook configuration have been reviewed, set `RAZORPAY_CHECKOUT_ENABLED=true`, `RAZORPAY_LIVE_CHECKOUT_ENABLED=true`, and `RAZORPAY_LIVE_CHECKOUT_TEST_EMAILS` to the controlled buyer address(es). Leave `RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED=false`. The allowlist is checked server-side and is not logged.
-5. Use a published low-value product and a pre-arranged buyer on the allowlist. Complete one real transaction; check the Razorpay dashboard for capture, then verify the matching environment/account/order/payment in sanitized application and database status, one entitlement, and a delivered Resend email. Verify private signed download URL, expiry, and download limit. The current Test Mode two-creator diagnostic is not part of this procedure.
-6. Only after the controlled transaction and review succeed, explicitly set `RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED=true` to admit all buyers. Remove the test allowlist after the controlled phase. If confirmation or email delivery fails, turn checkout off and investigate; do not treat a browser redirect as a successful payment.
+4. Before activation, complete the end-to-end payment and delivery checks in Test Mode. After reviewing the Live account, product, amount, currency, fulfillment, email, and webhook configuration, set `RAZORPAY_CHECKOUT_ENABLED=true`. This immediately enables real payment checkout for all buyers.
+5. If you choose to make a controlled low-value Live transaction, note that checkout is public while the single switch is on. If confirmation or email delivery fails, set `RAZORPAY_CHECKOUT_ENABLED=false` and investigate; do not treat a browser redirect as a successful payment.
 
 The checkout amount/currency remain the product's stored INR price. CloverLoop does not add or deduct the proposed 4% commission; Razorpay's commission activation and settlement configuration must be confirmed directly with Razorpay.
 
-**Rollback:** First set `RAZORPAY_CHECKOUT_ENABLED=false` and `RAZORPAY_LIVE_CHECKOUT_ENABLED=false` to stop new Live orders. Keep `RAZORPAY_OAUTH_MODE=live` and the Live webhook secret active until in-flight Live orders/events are verified or drained, so their webhooks can still be processed. Then switch `RAZORPAY_OAUTH_MODE=test`, restore/use the existing Development client pair and Test webhook secret, and redeploy. Live connections and payment records remain stored separately; do not delete them or rotate the encryption key. If a Live event arrives after switching back, restore Live mode to process it before returning to Test.
+**Rollback:** Set `RAZORPAY_CHECKOUT_ENABLED=false` to stop new orders. Keep Live mode and its generic Production credentials/webhook secret active until in-flight Live orders and events are verified or drained. Then switch the Production-scoped generic OAuth credentials and webhook secret to Test values, set `RAZORPAY_OAUTH_MODE=test`, and redeploy. Live connections and payment records remain stored separately; do not delete them or rotate the encryption key. If a Live event arrives after switching back, restore Live mode and its values to process it.
 
 Automated tests cover environment separation and mocked provider behavior. They are not a Live Razorpay integration test, do not prove dashboard credentials/secrets, and do not replace the controlled production transaction. Actual merchant OAuth, capture, webhook delivery, settlement, email, and download verification remain deployment/operator checks.
 

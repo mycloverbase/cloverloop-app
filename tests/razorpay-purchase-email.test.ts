@@ -71,6 +71,7 @@ describe("purchase download email tickets", () => {
   });
 
   it("sends a purchase email with a signed fragment link and provider idempotency key", async () => {
+    vi.stubEnv("RESEND_WEBHOOK_SECRET", "");
     const rpc = vi.fn(async (name: string) => {
       if (name === "claim_razorpay_purchase_email_deliveries") {
         return { data: [job], error: null };

@@ -110,9 +110,6 @@
 ### Current Environment Configuration
 
 ```env
-# OAuth Enabled Status
-RAZORPAY_OAUTH_ENABLED=false  ← WILL BE ENABLED AFTER TESTING
-
 # OAuth Credentials (Development)
 RAZORPAY_OAUTH_CLIENT_ID=[REDACTED]
 RAZORPAY_OAUTH_CLIENT_SECRET=[REDACTED]
@@ -368,9 +365,8 @@ disconnectRazorpayConnectionAction()
 
 ### Prerequisites
 ✅ All environment variables configured in Vercel:
-- `RAZORPAY_OAUTH_ENABLED` (currently `false` - will enable)
-- `RAZORPAY_OAUTH_CLIENT_ID` (Development)
-- `RAZORPAY_OAUTH_CLIENT_SECRET` (Development)
+- `RAZORPAY_OAUTH_CLIENT_ID` (Development value in Test deployments)
+- `RAZORPAY_OAUTH_CLIENT_SECRET` (matching Development value)
 - `RAZORPAY_OAUTH_MODE=test`
 - `RAZORPAY_TOKEN_ENCRYPTION_KEY`
 - `CRON_SECRET`
@@ -394,11 +390,8 @@ disconnectRazorpayConnectionAction()
 
 ### First OAuth Connection Flow (Step-by-Step)
 
-#### Step 1: Enable OAuth in Vercel
-```bash
-# In Vercel Dashboard → Environment Variables
-RAZORPAY_OAUTH_ENABLED=true  ← Change from false to true
-```
+#### Step 1: Configure OAuth in Vercel
+- Set `RAZORPAY_OAUTH_MODE=test` and configure the Development values for `RAZORPAY_OAUTH_CLIENT_ID` and `RAZORPAY_OAUTH_CLIENT_SECRET`.
 - **Wait:** 2-3 minutes for Vercel deployment to complete
 - **Verify:** Visit https://cloverloop.in/dashboard/settings and check for OAuth card
 
@@ -558,14 +551,9 @@ Your OAuth implementation is **PRODUCTION-READY** when:
 
 ## Next Steps
 
-### To Enable OAuth (When Ready)
+### To Connect OAuth (When Ready)
 
-1. **In Vercel Dashboard:**
-   ```
-   Environment Variables → Update
-   RAZORPAY_OAUTH_ENABLED: false → true
-   ```
-
+1. **In Vercel Dashboard:** Confirm `RAZORPAY_OAUTH_MODE=test` and configure the Development values for `RAZORPAY_OAUTH_CLIENT_ID` and `RAZORPAY_OAUTH_CLIENT_SECRET`.
 2. **Wait for deployment:** 2-3 minutes
 
 3. **Follow this guide:** Perform first OAuth connection test

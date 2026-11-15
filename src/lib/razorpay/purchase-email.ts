@@ -42,7 +42,6 @@ export function isRazorpayPurchaseEmailDeliveryConfigured(): boolean {
   return Boolean(
     process.env.RESEND_API_KEY?.trim() &&
     process.env.RESEND_FROM_EMAIL?.trim() &&
-    process.env.RESEND_WEBHOOK_SECRET?.trim() &&
     downloadSecret(),
   );
 }

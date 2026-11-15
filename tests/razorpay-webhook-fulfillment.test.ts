@@ -133,9 +133,7 @@ beforeEach(() => {
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
   mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
   mocks.getRazorpayOAuthConfig.mockImplementation((environment: string) => ({
-    clientId: environment === "live"
-      ? process.env.RAZORPAY_LIVE_OAUTH_CLIENT_ID
-      : process.env.RAZORPAY_OAUTH_CLIENT_ID,
+    clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID,
     environment,
   }));
   mocks.getFreeProductDeliveryConfig.mockReturnValue({
@@ -366,7 +364,7 @@ describe("application-level Razorpay webhook fulfillment", () => {
 
   it("verifies and records a Live Mode payment only with its Live Mode connection", async () => {
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
-    vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_ID", "live-client");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "live-client");
     const liveClaim = {
       ...claim,
       environment: "live" as const,

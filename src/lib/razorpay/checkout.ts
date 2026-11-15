@@ -36,47 +36,18 @@ type StoredConnection = {
 export function isRazorpayCheckoutEnabled(
   environment = getRazorpayOAuthMode(),
 ): boolean {
-  return (
-    process.env.RAZORPAY_CHECKOUT_ENABLED === "true" &&
-    environment !== null &&
-    (environment !== "live" ||
-      (process.env.RAZORPAY_LIVE_CHECKOUT_ENABLED === "true" &&
-        (process.env.RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED === "true" ||
-          Boolean(getRazorpayLiveCheckoutTestEmails().length))))
-  );
-}
-
-function getRazorpayLiveCheckoutTestEmails(): string[] {
-  return (process.env.RAZORPAY_LIVE_CHECKOUT_TEST_EMAILS ?? "")
-    .split(",")
-    .map((email) => normalizeCustomerEmail(email))
-    .filter((email): email is string => email !== null);
-}
-
-export function isRazorpayLiveCheckoutBuyerAllowed(email: string): boolean {
-  if (
-    getRazorpayOAuthMode() !== "live" ||
-    process.env.RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED === "true"
-  ) {
-    return true;
-  }
-  return getRazorpayLiveCheckoutTestEmails().includes(email);
+  return process.env.RAZORPAY_CHECKOUT_ENABLED === "true" && environment !== null;
 }
 
 export function getRazorpayTestWebhookSecret(): string | null {
   return process.env.RAZORPAY_TEST_WEBHOOK_SECRET?.trim() || null;
 }
 
-export function getRazorpayPartnerTestWebhookSecret(): string | null {
-  return process.env.RAZORPAY_PARTNER_TEST_WEBHOOK_SECRET?.trim() || null;
-}
-
 export function getRazorpayPartnerWebhookSecret(
   environment: RazorpayOAuthEnvironment,
 ): string | null {
-  return environment === "live"
-    ? process.env.RAZORPAY_PARTNER_LIVE_WEBHOOK_SECRET?.trim() || null
-    : getRazorpayPartnerTestWebhookSecret();
+  if (environment !== getRazorpayOAuthMode()) return null;
+  return process.env.RAZORPAY_PARTNER_WEBHOOK_SECRET?.trim() || null;
 }
 
 export function isRazorpayPartnerWebhookFulfillmentEnabled(
@@ -85,17 +56,10 @@ export function isRazorpayPartnerWebhookFulfillmentEnabled(
   if (!environment || environment !== getRazorpayOAuthMode()) return false;
   const config = getRazorpayOAuthConfig(environment);
   const partnerSecret = getRazorpayPartnerWebhookSecret(environment);
-  const otherPartnerSecret = getRazorpayPartnerWebhookSecret(
-    environment === "test" ? "live" : "test",
-  );
   return (
-    process.env.RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED === "true" &&
-    process.env.RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS !== "true" &&
     Boolean(config?.clientId) &&
     Boolean(partnerSecret) &&
-    partnerSecret !== otherPartnerSecret &&
-    (environment === "live" ||
-      partnerSecret !== getRazorpayTestWebhookSecret())
+    partnerSecret !== getRazorpayTestWebhookSecret()
   );
 }
 

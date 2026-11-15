@@ -13,17 +13,8 @@ vi.mock("@/lib/supabase/admin", () => ({
 vi.mock("@/lib/razorpay/oauth", () => ({
   decryptRazorpayToken: mocks.decryptRazorpayToken,
   getRazorpayOAuthConfig: (environment: "test" | "live" | null) =>
-    process.env.RAZORPAY_OAUTH_ENABLED === "true" &&
-    environment &&
-    (environment === "test"
-      ? process.env.RAZORPAY_OAUTH_CLIENT_ID
-      : process.env.RAZORPAY_LIVE_OAUTH_CLIENT_ID)
-      ? {
-          clientId: environment === "test"
-            ? process.env.RAZORPAY_OAUTH_CLIENT_ID
-            : process.env.RAZORPAY_LIVE_OAUTH_CLIENT_ID,
-          environment,
-        }
+    process.env.RAZORPAY_OAUTH_CLIENT_ID && environment
+      ? { clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID, environment }
       : null,
   getRazorpayOAuthMode: () => {
     const mode = process.env.RAZORPAY_OAUTH_MODE;
@@ -35,7 +26,6 @@ import {
   getFreeProductDeliveryConfig,
   isRazorpayPartnerWebhookFulfillmentEnabled,
   getRazorpayCheckoutConnection,
-  isRazorpayLiveCheckoutBuyerAllowed,
   hashCheckoutToken,
   isRazorpayCheckoutEnabled,
   isValidCheckoutToken,
@@ -61,43 +51,32 @@ describe("Razorpay checkout helpers", () => {
 
     vi.stubEnv("RAZORPAY_CHECKOUT_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
-    expect(isRazorpayCheckoutEnabled()).toBe(false);
-    vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_ENABLED", "true");
-    expect(isRazorpayCheckoutEnabled()).toBe(false);
-    vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED", "true");
     expect(isRazorpayCheckoutEnabled()).toBe(true);
   });
 
-  it("enables partner webhook fulfillment only with explicit Test Mode OAuth and a distinct secret", () => {
-    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
+  it("enables webhook fulfillment from the active mode's credentials and signing secret", () => {
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
     vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
-    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED", "true");
-    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
-    vi.stubEnv("RAZORPAY_PARTNER_TEST_WEBHOOK_SECRET", "partner-secret");
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_SECRET", "partner-secret");
     vi.stubEnv("RAZORPAY_TEST_WEBHOOK_SECRET", "account-secret");
     expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(true);
 
-    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "true");
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_SECRET", "");
     expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(false);
 
-    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
-    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED", "false");
-    expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(false);
-
-    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_FULFILLMENT_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
-    expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(false);
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_SECRET", "live-partner-secret");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "production-client");
+    expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(true);
 
-    vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
-    vi.stubEnv("RAZORPAY_TEST_WEBHOOK_SECRET", "partner-secret");
+    vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_SECRET", "account-secret");
+    vi.stubEnv("RAZORPAY_TEST_WEBHOOK_SECRET", "account-secret");
     expect(isRazorpayPartnerWebhookFulfillmentEnabled()).toBe(false);
   });
 
   it("uses the distinct Live Mode creator connection and rejects Test Mode credentials", async () => {
-    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
-    vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_ID", "production-client");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "production-client");
     const query = {
       select: vi.fn(),
       eq: vi.fn(),
@@ -166,18 +145,6 @@ describe("Razorpay checkout helpers", () => {
     expect(getFreeProductDeliveryConfig()).toBeNull();
   });
 
-  it("keeps Live Mode checkout limited to approved buyers until public checkout is explicitly enabled", () => {
-    vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
-    vi.stubEnv("RAZORPAY_CHECKOUT_ENABLED", "true");
-    vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_ENABLED", "true");
-    vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_TEST_EMAILS", "approved@example.com");
-    expect(isRazorpayCheckoutEnabled()).toBe(true);
-    expect(isRazorpayLiveCheckoutBuyerAllowed("approved@example.com")).toBe(true);
-    expect(isRazorpayLiveCheckoutBuyerAllowed("other@example.com")).toBe(false);
-    vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_PUBLIC_ENABLED", "true");
-    expect(isRazorpayLiveCheckoutBuyerAllowed("other@example.com")).toBe(true);
-  });
-
   it("checks webhook signatures with constant-time HMAC comparison", () => {
     const body = '{"event":"payment.captured"}';
     const secret = "test-webhook-secret";
@@ -191,7 +158,6 @@ describe("Razorpay checkout helpers", () => {
   });
 
   it("does not decrypt a connection belonging to a different creator", async () => {
-    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
     vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
 
@@ -224,7 +190,6 @@ describe("Razorpay checkout helpers", () => {
   });
 
   it("decrypts only the connected creator's Test Mode access token for the configured OAuth client", async () => {
-    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
     vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
 
@@ -271,7 +236,6 @@ describe("Razorpay checkout helpers", () => {
   });
 
   it("rejects a Live connection even when the query mock returns it", async () => {
-    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
     vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
 

@@ -119,11 +119,8 @@ function createSupabaseFakes(options: {
 }
 
 function configureRazorpayOAuth() {
-  vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
   vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "razorpay-test-client");
   vi.stubEnv("RAZORPAY_OAUTH_CLIENT_SECRET", "test-client-secret");
-  vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_ID", "razorpay-live-client");
-  vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_SECRET", "live-client-secret");
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
   vi.stubEnv("RAZORPAY_TOKEN_ENCRYPTION_KEY", Buffer.alloc(32, 9).toString("base64"));
   vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://cloverloop.test");
@@ -146,19 +143,20 @@ describe("Razorpay OAuth configuration and token protection", () => {
     vi.clearAllMocks();
   });
 
-  it("keeps OAuth unavailable unless it is explicitly enabled and fully configured", () => {
-    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "false");
+  it("requires a selected mode and a complete OAuth client pair", () => {
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "");
     expect(getRazorpayOAuthReadiness().available).toBe(false);
-    vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
+    configureRazorpayOAuth();
     expect(getRazorpayOAuthConfig()?.environment).toBe("test");
     expect(getRazorpayOAuthConfig("test")?.clientId).toBe("razorpay-test-client");
-    expect(getRazorpayOAuthConfig("live")?.clientId).toBe("razorpay-live-client");
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "razorpay-live-client");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_SECRET", "live-client-secret");
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "http://cloverloop.test");
     expect(getRazorpayOAuthReadiness().available).toBe(false);
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://cloverloop.test");
     expect(getRazorpayOAuthConfig()?.clientId).toBe("razorpay-live-client");
-    vi.stubEnv("RAZORPAY_LIVE_OAUTH_CLIENT_SECRET", "");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_SECRET", "");
     expect(getRazorpayOAuthConfig()).toBeNull();
   });
 
@@ -295,6 +293,8 @@ describe("Razorpay OAuth callback and scheduled refresh", () => {
 
   it("connects Live Mode with the Live OAuth client without replacing Test Mode", async () => {
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "razorpay-live-client");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_SECRET", "live-client-secret");
     const admin = createSupabaseFakes();
     vi.stubGlobal("fetch", vi.fn(async () =>
       Response.json(tokenResponse({

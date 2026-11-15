@@ -206,17 +206,13 @@ beforeEach(() => {
     mocks.scheduled.push(callback);
   });
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
-  vi.stubEnv("RAZORPAY_OAUTH_ENABLED", "true");
   vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "development-client");
-  vi.stubEnv("RAZORPAY_PARTNER_WEBHOOK_DIAGNOSTICS", "false");
   mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
   mocks.getRazorpayOAuthConfig.mockImplementation((environment: string) => ({
-    clientId: environment === "live" ? "live-client" : "development-client",
+    clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID,
     environment,
   }));
-  mocks.getRazorpayPartnerWebhookSecret.mockImplementation((environment: string) =>
-    environment === "live" ? "live-partner-secret" : "partner-secret",
-  );
+  mocks.getRazorpayPartnerWebhookSecret.mockReturnValue("partner-secret");
   mocks.getRazorpayTestWebhookSecret.mockReturnValue("account-secret");
   mocks.isRazorpayConnectionUsable.mockReturnValue(true);
   mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(false);
@@ -276,8 +272,9 @@ describe("POST /api/webhooks/razorpay application-level fulfillment", () => {
     );
   });
 
-  it("verifies and queues a Live Mode event using only the Live application secret", async () => {
+  it("verifies and queues a Live Mode event using the selected application's secret", async () => {
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "live-client");
     const { admin, eventQuery, mappingQuery } = createPartnerAdmin({
       mapping: {
         creator_id: "creator-live",
@@ -289,7 +286,7 @@ describe("POST /api/webhooks/razorpay application-level fulfillment", () => {
     mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(true);
     mocks.verifyRazorpayWebhookSignature.mockImplementation(
       (_body: string, signature: string | null, secret: string) =>
-        signature === "live-signature" && secret === "live-partner-secret",
+        signature === "live-signature" && secret === "partner-secret",
     );
     const request = new Request("https://cloverloop.test/api/webhooks/razorpay", {
       method: "POST",
@@ -306,7 +303,7 @@ describe("POST /api/webhooks/razorpay application-level fulfillment", () => {
     expect(mocks.verifyRazorpayWebhookSignature).toHaveBeenCalledWith(
       JSON.stringify(eventPayload),
       "live-signature",
-      "live-partner-secret",
+      "partner-secret",
     );
     expect(mappingQuery.eq).toHaveBeenCalledWith("environment", "live");
     expect(eventQuery.insert).toHaveBeenCalledWith(

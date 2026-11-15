@@ -72,7 +72,6 @@ function makeRequest() {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
-  vi.stubEnv("RAZORPAY_LIVE_CHECKOUT_ENABLED", "true");
   mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
   mocks.isRazorpayCheckoutEnabled.mockReturnValue(true);
   mocks.isValidCheckoutToken.mockReturnValue(true);

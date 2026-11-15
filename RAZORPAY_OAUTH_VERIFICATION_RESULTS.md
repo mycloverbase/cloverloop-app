@@ -34,14 +34,13 @@ All 8 required verification tasks have been completed successfully. Your Razorpa
 ### Current Environment (`.env.local`)
 
 ```
-✅ RAZORPAY_OAUTH_ENABLED=false        (Ready to enable after testing)
-✅ RAZORPAY_OAUTH_CLIENT_ID=[REDACTED]
-✅ RAZORPAY_OAUTH_CLIENT_SECRET=[REDACTED]
-✅ RAZORPAY_OAUTH_MODE=test            (Test mode - no live payments)
+✅ RAZORPAY_OAUTH_CLIENT_ID=[REDACTED]     (Development client in Test deployments)
+✅ RAZORPAY_OAUTH_CLIENT_SECRET=[REDACTED] (matching client secret)
+✅ RAZORPAY_OAUTH_MODE=test                (Test mode - no live payments)
 ✅ RAZORPAY_TOKEN_ENCRYPTION_KEY=[REDACTED]
 ✅ CRON_SECRET=[REDACTED]
 ✅ NEXT_PUBLIC_SITE_URL=http://cloverloop.in    (Will need https:// in production)
-✅ RAZORPAY_CHECKOUT_ENABLED=false     (Not yet implemented, will be enforced when needed)
+✅ RAZORPAY_CHECKOUT_ENABLED=false     (Checkout remains disabled by default)
 ```
 
 ---
@@ -256,18 +255,9 @@ All 8 required verification tasks have been completed successfully. Your Razorpa
 
 ---
 
-### ⚠️ Issue #2: Cron Endpoint Missing RAZORPAY_OAUTH_ENABLED Check
+### OAuth Configuration
 
-**Severity:** LOW (Not blocking for testing)
-**Status:** ACKNOWLEDGED - Token refresh continues if OAuth disabled
-
-**Current Behavior:**
-- Cron endpoint doesn't check `RAZORPAY_OAUTH_ENABLED` flag
-- If flag is false, token refresh still processes
-
-**Recommendation:**
-- ✅ Not critical for testing
-- ⏱️ Add readiness check before processing (when moving to production)
+OAuth readiness is determined by the selected mode and its configured client pair; no separate enable flag is needed.
 
 ---
 
@@ -287,11 +277,13 @@ All 8 required verification tasks have been completed successfully. Your Razorpa
 
 ## Quick Reference: First OAuth Connection Steps
 
-### Step 1: Enable OAuth in Vercel
+### Step 1: Configure OAuth in Vercel
 
 ```
 Vercel Dashboard → Environment Variables
-RAZORPAY_OAUTH_ENABLED: false → true
+RAZORPAY_OAUTH_MODE=test
+RAZORPAY_OAUTH_CLIENT_ID=<Development client ID>
+RAZORPAY_OAUTH_CLIENT_SECRET=<Development client secret>
 Wait: 2-3 minutes for deployment
 ```
 

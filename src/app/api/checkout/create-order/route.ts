@@ -5,7 +5,6 @@ import { isRazorpayPurchaseEmailDeliveryConfigured } from "@/lib/razorpay/purcha
 import {
   getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection,
-  isRazorpayLiveCheckoutBuyerAllowed,
   hashCheckoutToken,
   isRazorpayPartnerWebhookFulfillmentEnabled,
   isRazorpayCheckoutEnabled,
@@ -130,13 +129,6 @@ export async function POST(request: Request) {
   ) {
     return jsonResponse({ error: "Invalid checkout details." }, 400);
   }
-  if (!isRazorpayLiveCheckoutBuyerAllowed(email)) {
-    return jsonResponse(
-      { error: "Live Mode checkout is currently restricted to approved test buyers." },
-      403,
-    );
-  }
-
   const forwardedFor = request.headers.get("x-forwarded-for");
   const clientIp = forwardedFor?.split(",")[0]?.trim() || "unknown";
   let withinRateLimit: boolean;

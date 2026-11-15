@@ -59,14 +59,13 @@ export function getRazorpayOAuthMode(): RazorpayOAuthEnvironment | null {
   return mode === "test" || mode === "live" ? mode : null;
 }
 
-function credentialsForEnvironment(environment: RazorpayOAuthEnvironment): {
+function credentials(): {
   clientId: string | null;
   clientSecret: string | null;
 } {
-  const prefix = environment === "live" ? "RAZORPAY_LIVE_OAUTH" : "RAZORPAY_OAUTH";
   return {
-    clientId: process.env[`${prefix}_CLIENT_ID`]?.trim() || null,
-    clientSecret: process.env[`${prefix}_CLIENT_SECRET`]?.trim() || null,
+    clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim() || null,
+    clientSecret: process.env.RAZORPAY_OAUTH_CLIENT_SECRET?.trim() || null,
   };
 }
 
@@ -92,19 +91,13 @@ function siteOrigin(): string | null {
 export function getRazorpayOAuthReadiness(
   requestedEnvironment = getRazorpayOAuthMode(),
 ): RazorpayOAuthReadiness {
-  if (process.env.RAZORPAY_OAUTH_ENABLED !== "true") {
-    return {
-      available: false,
-      message: "Razorpay account connections are disabled until Technology Partner setup is approved.",
-    };
-  }
   const environment = requestedEnvironment;
-  const credentials = environment ? credentialsForEnvironment(environment) : null;
+  const configuredCredentials = environment ? credentials() : null;
   const origin = siteOrigin();
   if (
     !environment ||
-    !credentials?.clientId ||
-    !credentials.clientSecret ||
+    !configuredCredentials?.clientId ||
+    !configuredCredentials.clientSecret ||
     !origin
   ) {
     return {
@@ -135,8 +128,7 @@ export function getRazorpayOAuthConfig(
   const readiness = getRazorpayOAuthReadiness(environment);
   if (!readiness.available) return null;
   const origin = siteOrigin();
-  const credentials = credentialsForEnvironment(readiness.environment);
-  const { clientId, clientSecret } = credentials;
+  const { clientId, clientSecret } = credentials();
   if (!origin || !clientId || !clientSecret) return null;
   return {
     clientId,
