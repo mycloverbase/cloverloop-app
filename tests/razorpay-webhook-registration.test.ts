@@ -21,6 +21,8 @@ import {
 const connection: RazorpayCheckoutConnection = {
   creatorId: "creator-a",
   accountId: "acc_ABC123",
+  applicationKey: "ZERO_FEE",
+  applicationId: "test-client",
   environment: "test",
   publicToken: "rzp_test_public",
   accessToken: "oauth-access-token-never-log",

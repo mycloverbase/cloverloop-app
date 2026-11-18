@@ -4,14 +4,14 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   getFreeProductDeliveryConfig,
   getRazorpayCheckoutConnection,
-  getRazorpayPartnerWebhookSecret,
+  getRazorpayApplicationWebhookSecrets,
   getRazorpayTestWebhookSecret,
   isRazorpayPartnerWebhookFulfillmentEnabled,
   razorpayApiRequest,
   verifyRazorpayWebhookSignature,
 } from "@/lib/razorpay/checkout";
 import {
-  getRazorpayOAuthConfig,
+  getRazorpayApplicationConfig,
   getRazorpayOAuthMode,
   isRazorpayConnectionUsable,
   type RazorpayOAuthEnvironment,
@@ -44,6 +44,8 @@ type InternalOrder = {
   amount_paise: number;
   currency: string;
   razorpay_order_id: string;
+  application_key: string;
+  razorpay_account_id: string;
 };
 
 function response(status: number) {
@@ -140,13 +142,14 @@ async function enqueuePartnerPaymentEvent(
   paymentId: string,
   orderId: string,
   environment: RazorpayOAuthEnvironment,
+  applicationKey: "ZERO_FEE" | "FOUR_PERCENT",
 ): Promise<number> {
-  const config = getRazorpayOAuthConfig(environment);
+  const config = getRazorpayApplicationConfig(applicationKey, environment);
   if (!config) return 503;
 
   const { data: connection, error: connectionError } = await admin
     .from("creator_razorpay_connections")
-    .select("creator_id,client_id,connection_status,token_expires_at,public_token")
+    .select("creator_id,application_key,client_id,connection_status,token_expires_at,public_token")
     .eq("razorpay_account_id", accountId)
     .eq("environment", environment)
     .eq("connection_status", "connected")
@@ -158,24 +161,53 @@ async function enqueuePartnerPaymentEvent(
     });
     return 503;
   }
-  if (
-    !connection ||
-    typeof connection.creator_id !== "string" ||
-    connection.client_id !== config.clientId
-  ) {
-    console.warn("Razorpay partner webhook account is not a connected creator in the active environment.");
+  let creatorId = connection?.application_key === applicationKey &&
+      connection.client_id === config.clientId &&
+      typeof connection.creator_id === "string"
+    ? connection.creator_id
+    : null;
+  const activeConnection = Boolean(creatorId);
+  if (!creatorId) {
+    const { data: historicalConnection, error: historyError } = await admin
+      .from("razorpay_connection_history")
+      .select("creator_id,application_id")
+      .eq("razorpay_account_id", accountId)
+      .eq("environment", environment)
+      .eq("application_key", applicationKey)
+      .eq("connection_status", "connected")
+      .order("archived_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (historyError) {
+      console.error("Razorpay historical webhook account mapping could not be checked.", {
+        code: historyError.code,
+      });
+      return 503;
+    }
+    if (historicalConnection?.application_id === config.clientId) {
+      creatorId = typeof historicalConnection.creator_id === "string"
+        ? historicalConnection.creator_id
+        : null;
+    }
+  }
+  if (!creatorId) {
+    console.warn("Razorpay partner webhook account has no creator/application mapping.");
     return 400;
   }
   if (
-    !isRazorpayConnectionUsable(
-      connection.connection_status,
-      typeof connection.token_expires_at === "string"
-        ? connection.token_expires_at
-        : null,
-    ) ||
-    typeof connection.public_token !== "string" ||
-    !connection.public_token.startsWith(
-      environment === "test" ? "rzp_test_" : "rzp_live_",
+    connection &&
+    activeConnection &&
+    (
+      !isRazorpayConnectionUsable(
+        connection.connection_status,
+        typeof connection.token_expires_at === "string"
+          ? connection.token_expires_at
+          : null,
+      ) ||
+      typeof connection.public_token !== "string" ||
+      !connection.public_token.startsWith(
+        environment === "test" ? "rzp_test_" : "rzp_live_",
+      )
     )
   ) {
     return 503;
@@ -186,7 +218,8 @@ async function enqueuePartnerPaymentEvent(
     event_type: eventType,
     razorpay_account_id: accountId,
     environment,
-    creator_id: connection.creator_id,
+    application_key: applicationKey,
+    creator_id: creatorId,
     razorpay_order_id: orderId,
     razorpay_payment_id: paymentId,
     processing_status: "received",
@@ -207,7 +240,7 @@ async function enqueuePartnerPaymentEvent(
     const { data: existingEvent, error: existingError } = await admin
       .from("razorpay_checkout_events")
       .select(
-        "event_type,razorpay_account_id,environment,creator_id,razorpay_order_id,razorpay_payment_id,processing_status",
+        "event_type,razorpay_account_id,environment,application_key,creator_id,razorpay_order_id,razorpay_payment_id,processing_status",
       )
       .eq("event_id", eventId)
       .maybeSingle();
@@ -222,6 +255,7 @@ async function enqueuePartnerPaymentEvent(
       existingEvent.event_type === eventType &&
       existingEvent.razorpay_account_id === accountId &&
       existingEvent.environment === environment &&
+      existingEvent.application_key === null &&
       existingEvent.creator_id === null &&
       existingEvent.razorpay_order_id === null &&
       existingEvent.razorpay_payment_id === null &&
@@ -232,9 +266,10 @@ async function enqueuePartnerPaymentEvent(
       const { error: upgradeError } = await admin
         .from("razorpay_checkout_events")
         .update({
-          creator_id: connection.creator_id,
+          creator_id: creatorId,
           razorpay_order_id: orderId,
           razorpay_payment_id: paymentId,
+          application_key: applicationKey,
           processing_status: "received",
           processed_at: null,
           next_attempt_at: new Date().toISOString(),
@@ -245,6 +280,7 @@ async function enqueuePartnerPaymentEvent(
         .eq("event_type", eventType)
         .eq("razorpay_account_id", accountId)
         .eq("environment", environment)
+        .is("application_key", null)
         .is("creator_id", null)
         .is("razorpay_order_id", null)
         .is("razorpay_payment_id", null)
@@ -259,7 +295,7 @@ async function enqueuePartnerPaymentEvent(
       const { data: upgradedEvent, error: upgradedEventError } = await admin
         .from("razorpay_checkout_events")
         .select(
-          "event_type,razorpay_account_id,environment,creator_id,razorpay_order_id,razorpay_payment_id,processing_status",
+          "event_type,razorpay_account_id,environment,application_key,creator_id,razorpay_order_id,razorpay_payment_id,processing_status",
         )
         .eq("event_id", eventId)
         .maybeSingle();
@@ -276,7 +312,8 @@ async function enqueuePartnerPaymentEvent(
       existingEvent.event_type === eventType &&
       existingEvent.razorpay_account_id === accountId &&
       existingEvent.environment === environment &&
-      existingEvent.creator_id === connection.creator_id &&
+      existingEvent.application_key === applicationKey &&
+      existingEvent.creator_id === creatorId &&
       existingEvent.razorpay_order_id === orderId &&
       existingEvent.razorpay_payment_id === paymentId;
     if (!sameEvent) {
@@ -316,6 +353,278 @@ async function enqueuePartnerPaymentEvent(
   return 200;
 }
 
+async function processPartnerApplicationEvent(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  eventId: string,
+  eventType: string,
+  accountId: string,
+  applicationKey: "ZERO_FEE" | "FOUR_PERCENT",
+  environment: RazorpayOAuthEnvironment,
+  event: Record<string, unknown>,
+): Promise<number> {
+  const config = getRazorpayApplicationConfig(applicationKey, environment);
+  if (!config) return 503;
+
+  const { data: connection, error: connectionError } = await admin
+    .from("creator_razorpay_connections")
+    .select("creator_id,client_id,application_key,connection_status")
+    .eq("razorpay_account_id", accountId)
+    .eq("environment", environment)
+    .eq("application_key", applicationKey)
+    .maybeSingle();
+  if (connectionError) {
+    console.error("Razorpay application event account mapping could not be checked.", {
+      code: connectionError.code,
+    });
+    return 503;
+  }
+  let creatorId = connection?.client_id === config.clientId &&
+      connection.application_key === applicationKey &&
+      typeof connection.creator_id === "string"
+    ? connection.creator_id
+    : null;
+  if (!creatorId) {
+    const { data: historicalConnection, error: historyError } = await admin
+      .from("razorpay_connection_history")
+      .select("creator_id,application_id")
+      .eq("razorpay_account_id", accountId)
+      .eq("environment", environment)
+      .eq("application_key", applicationKey)
+      .eq("connection_status", "connected")
+      .order("archived_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (historyError) {
+      console.error("Razorpay historical application event mapping could not be checked.", {
+        code: historyError.code,
+      });
+      return 503;
+    }
+    if (historicalConnection?.application_id === config.clientId) {
+      creatorId = typeof historicalConnection.creator_id === "string"
+        ? historicalConnection.creator_id
+        : null;
+    }
+  }
+  if (!creatorId) return 400;
+
+  const payload = isRecord(event.payload) ? event.payload : {};
+  const paymentEntity = isRecord(payload.payment) && isRecord(payload.payment.entity)
+    ? payload.payment.entity
+    : null;
+  const refundEntity = isRecord(payload.refund) && isRecord(payload.refund.entity)
+    ? payload.refund.entity
+    : null;
+  const paymentId = diagnosticIdentifier(paymentEntity?.id ?? refundEntity?.payment_id, "pay");
+  const orderId = diagnosticIdentifier(paymentEntity?.order_id, "order");
+
+  const { error: insertError } = await admin.from("razorpay_checkout_events").insert({
+    event_id: eventId,
+    event_type: eventType,
+    razorpay_account_id: accountId,
+    environment,
+    application_key: applicationKey,
+    creator_id: creatorId,
+    razorpay_order_id: orderId,
+    razorpay_payment_id: paymentId,
+    processing_status: "received",
+  });
+  if (insertError) {
+    if (insertError.code !== "23505") {
+      console.error("Razorpay application event could not be recorded.", {
+        code: insertError.code,
+      });
+      return 503;
+    }
+    const { data: existingEvent, error: duplicateError } = await admin
+      .from("razorpay_checkout_events")
+      .select("event_type,razorpay_account_id,environment,application_key,processing_status")
+      .eq("event_id", eventId)
+      .maybeSingle();
+    if (duplicateError || !existingEvent) return 503;
+    if (
+      existingEvent.event_type !== eventType ||
+      existingEvent.razorpay_account_id !== accountId ||
+      existingEvent.environment !== environment ||
+      existingEvent.application_key !== applicationKey
+    ) return 409;
+    if (["processed", "ignored"].includes(existingEvent.processing_status)) return 200;
+  }
+
+  if (eventType === "account.app.authorization_revoked") {
+    const { error: revokeError } = await admin
+      .from("creator_razorpay_connections")
+      .update({
+        connection_status: "revoked",
+        public_token: null,
+        access_token_encrypted: null,
+        refresh_token_encrypted: null,
+        token_expires_at: null,
+        refresh_token_expires_at: null,
+        disconnected_at: new Date().toISOString(),
+        last_error_code: "authorization_revoked",
+        refresh_lock_token: null,
+        refresh_lock_expires_at: null,
+      })
+      .eq("creator_id", creatorId)
+      .eq("environment", environment)
+      .eq("application_key", applicationKey)
+      .in("connection_status", ["connected", "reconnect_required"]);
+    if (revokeError) {
+      console.error("Razorpay revoked authorisation could not be recorded.", {
+        code: revokeError.code,
+      });
+      await setEventStatus(admin, eventId, "failed");
+      return 503;
+    }
+    const { error: historyRevokeError } = await admin
+      .from("razorpay_connection_history")
+      .update({
+        connection_status: "revoked",
+        public_token: null,
+        access_token_encrypted: null,
+        refresh_token_encrypted: null,
+        token_expires_at: null,
+        refresh_token_expires_at: null,
+      })
+      .eq("creator_id", creatorId)
+      .eq("razorpay_account_id", accountId)
+      .eq("environment", environment)
+      .eq("application_key", applicationKey)
+      .eq("connection_status", "connected");
+    if (historyRevokeError) {
+      console.error("Razorpay historical revocation status could not be saved.", {
+        code: historyRevokeError.code,
+      });
+    }
+    const { error: auditError } = await admin.from("razorpay_connection_audit").insert({
+      creator_id: creatorId,
+      action: "authorization_revoked",
+      environment,
+      application_key: applicationKey,
+    });
+    if (auditError) console.error("Razorpay revocation audit could not be saved.", { code: auditError.code });
+    return (await setEventStatus(admin, eventId, "processed")) ? 200 : 503;
+  }
+
+  if (eventType === "refund.processed" || eventType === "refund.failed") {
+    if (!paymentId || !refundEntity || typeof refundEntity.amount !== "number") {
+      await setEventStatus(admin, eventId, "failed");
+      return 400;
+    }
+    const { data: updated, error: refundError } = await admin
+      .from("razorpay_payment_attempts")
+      .update({
+        refund_status: eventType === "refund.processed" ? "processed" : "failed",
+        refund_amount_paise: refundEntity.amount,
+      })
+      .eq("razorpay_payment_id", paymentId)
+      .eq("environment", environment)
+      .eq("application_key", applicationKey)
+      .eq("razorpay_account_id", accountId)
+      .select("razorpay_payment_id")
+      .maybeSingle();
+    if (refundError || !updated) {
+      if (refundError) {
+        console.error("Razorpay refund event could not be recorded.", {
+          code: refundError.code,
+        });
+      }
+      await setEventStatus(admin, eventId, "failed");
+      return 503;
+    }
+    return (await setEventStatus(admin, eventId, "processed")) ? 200 : 503;
+  }
+
+  if (
+    (eventType !== "payment.authorized" && eventType !== "payment.failed") ||
+    !paymentId ||
+    !orderId
+  ) {
+    return (await setEventStatus(admin, eventId, "ignored")) ? 200 : 503;
+  }
+
+  const { data: orderData, error: orderError } = await admin
+    .from("razorpay_checkout_orders")
+    .select("id,creator_id,amount_paise,currency,razorpay_order_id,application_key,razorpay_account_id")
+    .eq("razorpay_order_id", orderId)
+    .eq("environment", environment)
+    .eq("application_key", applicationKey)
+    .eq("razorpay_account_id", accountId)
+    .maybeSingle();
+  if (orderError || !orderData) {
+    if (orderError) console.error("Razorpay application event order could not be loaded.", { code: orderError.code });
+    await setEventStatus(admin, eventId, "failed");
+    return orderError ? 503 : 200;
+  }
+  const order = orderData as InternalOrder;
+  const checkoutConnection = await getRazorpayCheckoutConnection(
+    order.creator_id,
+    environment,
+    applicationKey,
+  );
+  if (
+    !checkoutConnection ||
+    checkoutConnection.applicationKey !== applicationKey ||
+    checkoutConnection.accountId !== accountId
+  ) {
+    await setEventStatus(admin, eventId, "failed");
+    return 503;
+  }
+
+  try {
+    const payment = await razorpayApiRequest<ProviderPayment>(
+      checkoutConnection.accessToken,
+      `/v1/payments/${encodeURIComponent(paymentId)}`,
+    );
+    if (
+      payment.id !== paymentId ||
+      payment.order_id !== orderId ||
+      payment.amount !== order.amount_paise ||
+      payment.currency !== order.currency ||
+      (payment.account_id && payment.account_id !== accountId)
+    ) {
+      return (await setEventStatus(admin, eventId, "ignored")) ? 200 : 503;
+    }
+    const status = payment.status === "captured" && payment.captured
+      ? "captured"
+      : payment.status === "failed"
+        ? "failed"
+        : payment.status === "authorized"
+          ? "authorized"
+          : null;
+    if (!status) return (await setEventStatus(admin, eventId, "ignored")) ? 200 : 503;
+    const deliveryConfig = getFreeProductDeliveryConfig();
+    if (!deliveryConfig) {
+      await setEventStatus(admin, eventId, "failed");
+      return 503;
+    }
+    const { error: recordError } = await admin.rpc("record_razorpay_checkout_payment", {
+      p_order_id: order.id,
+      p_environment: environment,
+      p_payment_id: payment.id,
+      p_amount_paise: payment.amount,
+      p_currency: payment.currency,
+      p_payment_status: status,
+      p_captured: status === "captured",
+      p_max_downloads: deliveryConfig.maxDownloads,
+      p_expiry_hours: deliveryConfig.expiryHours,
+    });
+    if (recordError) {
+      console.error("Razorpay application payment status could not be persisted.", {
+        code: recordError.code,
+      });
+      await setEventStatus(admin, eventId, "failed");
+      return 503;
+    }
+    if (status === "captured") await processRazorpayPurchaseEmailQueue(admin, order.id, 1);
+    return (await setEventStatus(admin, eventId, "processed")) ? 200 : 503;
+  } catch {
+    await setEventStatus(admin, eventId, "failed");
+    return 503;
+  }
+}
+
 async function setEventStatus(
   admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
   eventId: string,
@@ -338,7 +647,7 @@ export async function POST(request: Request) {
   const admin = createSupabaseAdminClient();
   const accountWebhookSecret =
     environment === "test" ? getRazorpayTestWebhookSecret() : null;
-  const partnerWebhookSecret = getRazorpayPartnerWebhookSecret(environment);
+  const partnerWebhookSecrets = getRazorpayApplicationWebhookSecrets(environment);
   const partnerFulfillmentEnabled =
     isRazorpayPartnerWebhookFulfillmentEnabled(environment);
   if (!admin || (!accountWebhookSecret && !partnerFulfillmentEnabled)) {
@@ -347,24 +656,21 @@ export async function POST(request: Request) {
 
   const rawBody = await request.text();
   const signature = request.headers.get("x-razorpay-signature");
-  if (accountWebhookSecret && accountWebhookSecret === partnerWebhookSecret) {
-    console.error("Razorpay account and partner webhook secrets must be distinct.");
-    return response(503);
-  }
-
   const accountSignatureValid = accountWebhookSecret
     ? verifyRazorpayWebhookSignature(rawBody, signature, accountWebhookSecret)
     : false;
-  const partnerSignatureValid =
-    partnerFulfillmentEnabled && partnerWebhookSecret
-    ? verifyRazorpayWebhookSignature(rawBody, signature, partnerWebhookSecret)
-    : false;
+  const matchingPartnerSecrets = partnerFulfillmentEnabled
+    ? partnerWebhookSecrets.filter(({ secret }) =>
+        verifyRazorpayWebhookSignature(rawBody, signature, secret),
+      )
+    : [];
 
-  if (accountSignatureValid && partnerSignatureValid) {
+  if (matchingPartnerSecrets.length > 1 || (accountSignatureValid && matchingPartnerSecrets.length > 0)) {
     console.error("Razorpay webhook signature matched multiple integrations.");
     return response(400);
   }
-  if (partnerSignatureValid) {
+  if (matchingPartnerSecrets.length === 1) {
+    const applicationKey = matchingPartnerSecrets[0].applicationKey;
     let event: Record<string, unknown>;
     try {
       const parsed: unknown = JSON.parse(rawBody);
@@ -376,22 +682,25 @@ export async function POST(request: Request) {
 
     const eventType = event.event;
     if (typeof eventType !== "string") return response(400);
-    if (eventType !== "payment.captured") return response(200);
-
     const payload = isRecord(event.payload) ? event.payload : {};
     const paymentEntity =
       isRecord(payload.payment) && isRecord(payload.payment.entity)
         ? payload.payment.entity
         : null;
     const accountId = diagnosticIdentifier(event.account_id, "acc");
-    const paymentId = diagnosticIdentifier(paymentEntity?.id, "pay");
+    const refundEntity =
+      isRecord(payload.refund) && isRecord(payload.refund.entity)
+        ? payload.refund.entity
+        : null;
+    const paymentId = diagnosticIdentifier(
+      paymentEntity?.id ?? refundEntity?.payment_id,
+      "pay",
+    );
     const orderId = diagnosticIdentifier(paymentEntity?.order_id, "order");
     const embeddedAccountId = paymentEntity?.account_id;
     const eventId = request.headers.get("x-razorpay-event-id");
     if (
       !accountId ||
-      !paymentId ||
-      !orderId ||
       (typeof embeddedAccountId === "string" && embeddedAccountId !== accountId) ||
       (embeddedAccountId !== undefined && typeof embeddedAccountId !== "string") ||
       !eventId ||
@@ -399,6 +708,19 @@ export async function POST(request: Request) {
     ) {
       return response(400);
     }
+
+    if (eventType !== "payment.captured") {
+      return processPartnerApplicationEvent(
+        admin,
+        eventId,
+        eventType,
+        accountId,
+        applicationKey,
+        environment,
+        event,
+      ).then(response);
+    }
+    if (!paymentId || !orderId) return response(400);
 
     const status = await enqueuePartnerPaymentEvent(
       admin,
@@ -408,6 +730,7 @@ export async function POST(request: Request) {
       paymentId,
       orderId,
       environment,
+      applicationKey,
     );
     return response(status);
   }

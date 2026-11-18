@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   isRazorpayPartnerWebhookFulfillmentEnabled: vi.fn(),
   processRazorpayPartnerWebhookQueue: vi.fn(),
   processRazorpayPurchaseEmailQueue: vi.fn(),
+  processRazorpayCommissionAuthorisationEmailQueue: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/admin", () => ({
@@ -24,6 +25,11 @@ vi.mock("@/lib/razorpay/purchase-email", () => ({
   processRazorpayPurchaseEmailQueue: mocks.processRazorpayPurchaseEmailQueue,
 }));
 
+vi.mock("@/lib/razorpay/commission-authorisation-email", () => ({
+  processRazorpayCommissionAuthorisationEmailQueue:
+    mocks.processRazorpayCommissionAuthorisationEmailQueue,
+}));
+
 import { GET } from "@/app/api/cron/razorpay-webhook-process/route";
 
 beforeEach(() => {
@@ -40,6 +46,12 @@ beforeEach(() => {
   mocks.processRazorpayPurchaseEmailQueue.mockResolvedValue({
     claimed: 1,
     accepted: 1,
+    failed: 0,
+  });
+  mocks.processRazorpayCommissionAuthorisationEmailQueue.mockResolvedValue({
+    claimed: 1,
+    sent: 1,
+    retried: 0,
     failed: 0,
   });
 });
@@ -79,6 +91,12 @@ describe("GET /api/cron/razorpay-webhook-process", () => {
         accepted: 1,
         failed: 0,
       },
+      commissionAuthorisationEmails: {
+        claimed: 1,
+        sent: 1,
+        retried: 0,
+        failed: 0,
+      },
     });
     expect(mocks.processRazorpayPartnerWebhookQueue).toHaveBeenCalledWith(
       admin,
@@ -90,6 +108,8 @@ describe("GET /api/cron/razorpay-webhook-process", () => {
       null,
       5,
     );
+    expect(mocks.processRazorpayCommissionAuthorisationEmailQueue)
+      .toHaveBeenCalledWith(admin, 5);
   });
 
   it("fails closed when the Test Mode application webhook is not configured", async () => {

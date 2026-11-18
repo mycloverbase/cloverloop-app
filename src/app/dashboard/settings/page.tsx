@@ -10,8 +10,10 @@ import {
 import { RazorpayConnectionCard } from "@/components/dashboard/razorpay-connection-card";
 import { requireCreatorContext } from "@/lib/account/server";
 import {
+  getRazorpayApplicationReadiness,
   getRazorpayOAuthMode,
-  getRazorpayOAuthReadiness,
+  selectRazorpayApplication,
+  type RazorpayApplicationKey,
 } from "@/lib/razorpay/oauth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -49,15 +51,38 @@ export default async function AccountSettingsPage({
   const razorpayStatus = Array.isArray(razorpayStatusValue)
     ? razorpayStatusValue[0]
     : razorpayStatusValue;
-  const readiness = getRazorpayOAuthReadiness();
   const razorpayEnvironment = getRazorpayOAuthMode();
   const admin = createSupabaseAdminClient();
+  let razorpayPlan: string | null = null;
+  let razorpayApplication: RazorpayApplicationKey | null = null;
+  let razorpayEntitlementServiceAvailable = Boolean(admin);
   let razorpayConnection = null;
   let razorpayStatusServiceAvailable = Boolean(admin);
+  if (admin) {
+    const { data: entitlement, error: entitlementError } = await admin
+      .from("plan_entitlements")
+      .select("plan_key,platform_fee_percentage,founder_status")
+      .eq("creator_id", user.id)
+      .maybeSingle();
+    if (entitlementError || !entitlement) {
+      console.error("Could not load the creator's Razorpay plan entitlement.", {
+        code: entitlementError?.code ?? "not_found",
+      });
+      razorpayEntitlementServiceAvailable = false;
+    } else {
+      razorpayPlan = typeof entitlement.plan_key === "string" ? entitlement.plan_key : null;
+      razorpayApplication = selectRazorpayApplication(
+        entitlement.plan_key,
+        entitlement.platform_fee_percentage,
+        entitlement.founder_status,
+      );
+      if (!razorpayApplication) razorpayEntitlementServiceAvailable = false;
+    }
+  }
   if (admin && razorpayEnvironment) {
     const { data, error } = await admin
       .from("creator_razorpay_connections")
-      .select("razorpay_account_id,environment,connection_status,token_expires_at,last_refreshed_at")
+      .select("razorpay_account_id,application_key,creator_plan_key,commission_rate,environment,connection_status,token_expires_at,last_refreshed_at")
       .eq("creator_id", user.id)
       .eq("environment", razorpayEnvironment)
       .maybeSingle();
@@ -67,11 +92,15 @@ export default async function AccountSettingsPage({
     } else if (data) {
       if (
         typeof data.razorpay_account_id === "string" &&
+        (data.application_key === "ZERO_FEE" || data.application_key === "FOUR_PERCENT") &&
         (data.environment === "test" || data.environment === "live") &&
         ["connected", "reconnect_required", "revoked", "disconnected"].includes(data.connection_status)
       ) {
         razorpayConnection = {
           accountId: data.razorpay_account_id,
+          applicationKey: data.application_key as RazorpayApplicationKey,
+          creatorPlan: typeof data.creator_plan_key === "string" ? data.creator_plan_key : null,
+          commissionRate: typeof data.commission_rate === "number" ? data.commission_rate : null,
           environment: data.environment,
           status: data.connection_status as "connected" | "reconnect_required" | "revoked" | "disconnected",
           tokenExpiresAt: typeof data.token_expires_at === "string" ? data.token_expires_at : null,
@@ -83,6 +112,12 @@ export default async function AccountSettingsPage({
       }
     }
   }
+  const readiness = razorpayApplication && razorpayEntitlementServiceAvailable
+    ? getRazorpayApplicationReadiness(razorpayApplication)
+    : {
+        available: false as const,
+        message: "Your current plan entitlement could not be verified. Razorpay connection is unavailable.",
+      };
   const createdAt = new Intl.DateTimeFormat("en-IN", {
     dateStyle: "long",
     timeZone: "Asia/Kolkata",
@@ -102,6 +137,9 @@ export default async function AccountSettingsPage({
         <RazorpayConnectionCard
           readiness={readiness}
           connection={razorpayConnection}
+          plan={razorpayPlan}
+          applicationKey={razorpayApplication}
+          creatorEmail={user.email ?? ""}
           statusMessage={razorpayStatus}
           statusServiceAvailable={razorpayStatusServiceAvailable}
         />

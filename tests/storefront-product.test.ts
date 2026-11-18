@@ -96,12 +96,15 @@ describe("published storefront product lookup", () => {
     ).toBeNull();
   });
 
-  it("does not return published products with a missing or blank category", async () => {
+  it("uses the default category when published data has a missing or blank category", async () => {
     for (const category of [null, "  "]) {
       const { client } = makeSupabase({ product: { ...productRow, category } });
-      await expect(
-        getPublishedStorefrontProduct(client as never, "test-creator", productId),
-      ).rejects.toThrow("The published product data returned by Supabase is invalid.");
+      const result = await getPublishedStorefrontProduct(
+        client as never,
+        "test-creator",
+        productId,
+      );
+      expect(result?.product.category).toBe("Other");
     }
   });
 

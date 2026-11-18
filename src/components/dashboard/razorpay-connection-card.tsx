@@ -4,6 +4,7 @@ import {
 } from "@/app/dashboard/razorpay/actions";
 import {
   isRazorpayConnectionUsable,
+  type RazorpayApplicationKey,
   type RazorpayOAuthEnvironment,
   type RazorpayOAuthReadiness,
 } from "@/lib/razorpay/oauth";
@@ -11,6 +12,9 @@ import { RazorpayActionButton } from "@/components/dashboard/razorpay-action-but
 
 type RazorpayConnectionSummary = {
   accountId: string;
+  applicationKey: RazorpayApplicationKey;
+  creatorPlan: string | null;
+  commissionRate: number | null;
   environment: RazorpayOAuthEnvironment;
   status: "connected" | "reconnect_required" | "revoked" | "disconnected";
   tokenExpiresAt: string | null;
@@ -68,6 +72,26 @@ const queryMessages: Record<string, { message: string; tone: "success" | "warnin
     message: "The connection was disabled, but CloverLoop could not record the audit entry. Contact support.",
     tone: "error",
   },
+  "plan-unavailable": {
+    message: "Your current plan could not be verified. Razorpay connection is unavailable.",
+    tone: "error",
+  },
+  "plan-unsupported": {
+    message: "Your current plan does not have a supported Razorpay commission configuration.",
+    tone: "error",
+  },
+  "commission-consent-required": {
+    message: "Accept the Creator Plan commission disclosure and provide the requested details before connecting.",
+    tone: "warning",
+  },
+  "migration-error": {
+    message: "The Razorpay application migration could not be recorded. Please retry or contact support.",
+    tone: "error",
+  },
+  "plan-changed": {
+    message: "Your plan changed while Razorpay authorisation was in progress. Start a new connection using the current plan.",
+    tone: "warning",
+  },
 };
 
 function formattedDate(value: string | null): string | null {
@@ -84,20 +108,34 @@ function formattedDate(value: string | null): string | null {
 export function RazorpayConnectionCard({
   readiness,
   connection,
+  plan,
+  applicationKey,
+  creatorEmail,
   statusMessage,
   statusServiceAvailable,
 }: {
   readiness: RazorpayOAuthReadiness;
   connection: RazorpayConnectionSummary | null;
+  plan: string | null;
+  applicationKey: RazorpayApplicationKey | null;
+  creatorEmail: string;
   statusMessage: string | undefined;
   statusServiceAvailable: boolean;
 }) {
   const currentMessage = statusMessage ? queryMessages[statusMessage] : undefined;
   const tokenExpiry = formattedDate(connection?.tokenExpiresAt ?? null);
   const lastRefresh = formattedDate(connection?.lastRefreshedAt ?? null);
-  const tokenIsCurrent = connection
+  const applicationMatchesPlan = Boolean(
+    connection &&
+    applicationKey &&
+    connection.applicationKey === applicationKey &&
+    connection.commissionRate === (applicationKey === "FOUR_PERCENT" ? 4 : 0),
+  );
+  const tokenIsCurrent = connection && applicationMatchesPlan
     ? isRazorpayConnectionUsable(connection.status, connection.tokenExpiresAt)
     : false;
+  const applicationMismatch = Boolean(connection && !applicationMatchesPlan);
+  const requiresCommissionConsent = applicationKey === "FOUR_PERCENT";
   const canDisconnect = Boolean(
     connection && connection.status !== "disconnected",
   );
@@ -136,7 +174,13 @@ export function RazorpayConnectionCard({
                     : "Disconnected"}
           </p>
           <p><strong>Razorpay account:</strong> {connection.accountId}</p>
+          <p><strong>Connected application:</strong> {connection.applicationKey === "ZERO_FEE" ? "0% commission" : "4% commission"}</p>
           <p><strong>Environment:</strong> {connection.environment === "test" ? "Test" : "Live"}</p>
+          {applicationMismatch ? (
+            <p className="dashboard-message dashboard-message-warning" role="status">
+              This connection does not match your current plan commission. Reconnect Razorpay to begin a tracked application migration.
+            </p>
+          ) : null}
           {tokenExpiry ? <p><strong>Access token expires:</strong> {tokenExpiry}</p> : null}
           {lastRefresh ? <p><strong>Last token refresh:</strong> {lastRefresh}</p> : null}
         </div>
@@ -147,17 +191,48 @@ export function RazorpayConnectionCard({
       {!readiness.available ? (
         <p className="product-manager-note">{readiness.message}</p>
       ) : null}
+      {plan ? <p><strong>Current plan:</strong> {plan.replaceAll("_", " ")}</p> : null}
 
       <div className="dashboard-form-actions">
         {!tokenIsCurrent ? (
           <form action={startRazorpayConnectionAction}>
+            {requiresCommissionConsent ? (
+              <div className="dashboard-stack">
+                <p>
+                  I authorise CloverLoop to charge an additional platform commission of 4% on eligible successful transactions, plus applicable GST. I understand that this commission will be automatically deducted through Razorpay settlements, in addition to standard Razorpay payment gateway charges. I agree to the applicable platform commission and refund terms.
+                </p>
+                <label>
+                  Legal or business name
+                  <input name="businessName" type="text" required minLength={2} maxLength={120} autoComplete="organization" />
+                </label>
+                <label>
+                  Registered Razorpay email
+                  <input
+                    name="razorpayEmail"
+                    type="email"
+                    required
+                    maxLength={254}
+                    autoComplete="email"
+                    defaultValue={creatorEmail}
+                  />
+                </label>
+                <label>
+                  <input name="commissionConsent" type="checkbox" value="yes" required />
+                  {" "}I explicitly accept the additional 4% platform commission, applicable GST, and the applicable platform commission and refund terms.
+                </label>
+              </div>
+            ) : null}
             <RazorpayActionButton
               className="button"
-              disabled={!readiness.available || !statusServiceAvailable}
-              label={connection?.status === "reconnect_required" || connection?.status === "revoked"
+              disabled={!readiness.available || !statusServiceAvailable || !applicationKey}
+              label={applicationMismatch
+                ? "Reconnect to apply plan"
+                : connection?.status === "reconnect_required" || connection?.status === "revoked"
                 ? "Reconnect Razorpay"
                 : "Connect Razorpay"}
-              pendingLabel={connection?.status === "reconnect_required" || connection?.status === "revoked"
+              pendingLabel={applicationMismatch
+                ? "Migrating Razorpay application..."
+                : connection?.status === "reconnect_required" || connection?.status === "revoked"
                 ? "Reconnecting..."
                 : "Connecting..."}
             />

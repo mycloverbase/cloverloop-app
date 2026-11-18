@@ -7,9 +7,12 @@ import {
 } from "node:crypto";
 
 export type RazorpayOAuthEnvironment = "test" | "live";
+export type RazorpayApplicationKey = "ZERO_FEE" | "FOUR_PERCENT";
 export type RazorpayTokenHint = "access_token" | "refresh_token";
 
 export type RazorpayOAuthConfig = {
+  applicationKey: RazorpayApplicationKey;
+  applicationId: string;
   clientId: string;
   clientSecret: string;
   environment: RazorpayOAuthEnvironment;
@@ -63,10 +66,25 @@ function credentials(): {
   clientId: string | null;
   clientSecret: string | null;
 } {
-  return {
-    clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID?.trim() || null,
-    clientSecret: process.env.RAZORPAY_OAUTH_CLIENT_SECRET?.trim() || null,
-  };
+  return applicationCredentials("ZERO_FEE", getRazorpayOAuthMode());
+}
+
+function applicationCredentials(
+  applicationKey: RazorpayApplicationKey,
+  environment: RazorpayOAuthEnvironment | null,
+): { clientId: string | null; clientSecret: string | null } {
+  if (!environment) return { clientId: null, clientSecret: null };
+  const prefix = `RAZORPAY_${applicationKey}`;
+  const mode = environment.toUpperCase();
+  const read = (suffix: "CLIENT_ID" | "CLIENT_SECRET") =>
+    process.env[`${prefix}_${mode}_${suffix}`]?.trim() ||
+    process.env[`${prefix}_${suffix}`]?.trim() ||
+    (applicationKey === "ZERO_FEE"
+      ? process.env[`RAZORPAY_OAUTH_${mode}_${suffix}`]?.trim() ||
+        process.env[`RAZORPAY_OAUTH_${suffix}`]?.trim()
+      : "") ||
+    null;
+  return { clientId: read("CLIENT_ID"), clientSecret: read("CLIENT_SECRET") };
 }
 
 function siteOrigin(): string | null {
@@ -91,12 +109,19 @@ function siteOrigin(): string | null {
 export function getRazorpayOAuthReadiness(
   requestedEnvironment = getRazorpayOAuthMode(),
 ): RazorpayOAuthReadiness {
+  return getRazorpayApplicationReadiness("ZERO_FEE", requestedEnvironment);
+}
+
+export function getRazorpayApplicationReadiness(
+  applicationKey: RazorpayApplicationKey,
+  requestedEnvironment = getRazorpayOAuthMode(),
+): RazorpayOAuthReadiness {
   const environment = requestedEnvironment;
-  const configuredCredentials = environment ? credentials() : null;
+  const configuredCredentials = applicationCredentials(applicationKey, environment);
   const origin = siteOrigin();
   if (
     !environment ||
-    !configuredCredentials?.clientId ||
+    !configuredCredentials.clientId ||
     !configuredCredentials.clientSecret ||
     !origin
   ) {
@@ -125,17 +150,48 @@ export function getRazorpayOAuthReadiness(
 export function getRazorpayOAuthConfig(
   environment = getRazorpayOAuthMode(),
 ): RazorpayOAuthConfig | null {
-  const readiness = getRazorpayOAuthReadiness(environment);
+  return getRazorpayApplicationConfig("ZERO_FEE", environment);
+}
+
+export function getRazorpayApplicationConfig(
+  applicationKey: RazorpayApplicationKey,
+  environment = getRazorpayOAuthMode(),
+): RazorpayOAuthConfig | null {
+  const readiness = getRazorpayApplicationReadiness(applicationKey, environment);
   if (!readiness.available) return null;
   const origin = siteOrigin();
-  const { clientId, clientSecret } = credentials();
+  const { clientId, clientSecret } = applicationCredentials(applicationKey, environment);
   if (!origin || !clientId || !clientSecret) return null;
   return {
+    applicationKey,
+    applicationId: clientId,
     clientId,
     clientSecret,
     environment: readiness.environment,
     redirectUri: `${origin}/api/razorpay/callback`,
   };
+}
+
+export function selectRazorpayApplication(
+  plan: unknown,
+  commissionPercentage: unknown,
+  foundingProgrammeStatus: unknown,
+): RazorpayApplicationKey | null {
+  if (typeof commissionPercentage !== "number") return null;
+  if (plan === "free" || plan === "pro_creator") {
+    return commissionPercentage === 0 ? "ZERO_FEE" : null;
+  }
+  if (plan === "founding_creator") {
+    return commissionPercentage === 0 ? "ZERO_FEE" : null;
+  }
+  if (plan !== "creator") return null;
+  if (commissionPercentage === 4 && foundingProgrammeStatus !== "active") {
+    return "FOUR_PERCENT";
+  }
+  if (commissionPercentage === 0 && foundingProgrammeStatus === "active") {
+    return "ZERO_FEE";
+  }
+  return null;
 }
 
 export function createRazorpayOAuthState(): { state: string; stateHash: string } {

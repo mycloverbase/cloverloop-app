@@ -7,8 +7,10 @@ import {
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   decryptRazorpayToken,
+  getRazorpayApplicationConfig,
   getRazorpayOAuthConfig,
   getRazorpayOAuthMode,
+  type RazorpayApplicationKey,
   type RazorpayOAuthEnvironment,
 } from "@/lib/razorpay/oauth";
 
@@ -17,6 +19,8 @@ const RAZORPAY_API_BASE = "https://api.razorpay.com";
 export type RazorpayCheckoutConnection = {
   creatorId: string;
   accountId: string;
+  applicationKey: RazorpayApplicationKey;
+  applicationId: string;
   environment: "test" | "live";
   publicToken: string;
   accessToken: string;
@@ -30,6 +34,7 @@ export type RazorpayCheckoutConnectionStatus =
 type StoredConnection = {
   creator_id: string;
   razorpay_account_id: string;
+  application_key?: string;
   client_id: string;
   environment: string;
   public_token: string | null;
@@ -51,20 +56,51 @@ export function getRazorpayTestWebhookSecret(): string | null {
 export function getRazorpayPartnerWebhookSecret(
   environment: RazorpayOAuthEnvironment,
 ): string | null {
+  return getRazorpayApplicationWebhookSecret("ZERO_FEE", environment);
+}
+
+export function getRazorpayApplicationWebhookSecret(
+  applicationKey: RazorpayApplicationKey,
+  environment: RazorpayOAuthEnvironment,
+): string | null {
   if (environment !== getRazorpayOAuthMode()) return null;
-  return process.env.RAZORPAY_PARTNER_WEBHOOK_SECRET?.trim() || null;
+  const prefix = `RAZORPAY_${applicationKey}`;
+  const mode = environment.toUpperCase();
+  return (
+    process.env[`${prefix}_${mode}_WEBHOOK_SECRET`]?.trim() ||
+    process.env[`${prefix}_WEBHOOK_SECRET`]?.trim() ||
+    (applicationKey === "ZERO_FEE"
+      ? process.env[`RAZORPAY_PARTNER_${mode}_WEBHOOK_SECRET`]?.trim() ||
+        process.env.RAZORPAY_PARTNER_WEBHOOK_SECRET?.trim()
+      : "") ||
+    null
+  );
+}
+
+export function getRazorpayApplicationWebhookSecrets(
+  environment: RazorpayOAuthEnvironment,
+): Array<{ applicationKey: RazorpayApplicationKey; secret: string }> {
+  return (["ZERO_FEE", "FOUR_PERCENT"] as const).flatMap((applicationKey) => {
+    const secret = getRazorpayApplicationWebhookSecret(applicationKey, environment);
+    return secret ? [{ applicationKey, secret }] : [];
+  });
 }
 
 export function isRazorpayPartnerWebhookFulfillmentEnabled(
   environment = getRazorpayOAuthMode(),
 ): boolean {
   if (!environment || environment !== getRazorpayOAuthMode()) return false;
-  const config = getRazorpayOAuthConfig(environment);
-  const partnerSecret = getRazorpayPartnerWebhookSecret(environment);
+  const configurations = (["ZERO_FEE", "FOUR_PERCENT"] as const)
+    .map((applicationKey) => ({
+      config: getRazorpayApplicationConfig(applicationKey, environment),
+      secret: getRazorpayApplicationWebhookSecret(applicationKey, environment),
+    }))
+    .filter((entry) => entry.config && entry.secret);
+  const secrets = configurations.map((entry) => entry.secret);
   return (
-    Boolean(config?.clientId) &&
-    Boolean(partnerSecret) &&
-    partnerSecret !== getRazorpayTestWebhookSecret()
+    configurations.length > 0 &&
+    new Set(secrets).size === secrets.length &&
+    secrets.every((secret) => secret !== getRazorpayTestWebhookSecret())
   );
 }
 
@@ -88,10 +124,16 @@ export function normalizeCustomerEmail(email: unknown): string | null {
 export async function getRazorpayCheckoutConnection(
   creatorId: string,
   environment = getRazorpayOAuthMode(),
+  applicationKey?: RazorpayApplicationKey,
 ): Promise<RazorpayCheckoutConnection | null> {
   const admin = createSupabaseAdminClient();
   if (!admin) return null;
-  const result = await loadRazorpayCheckoutConnection(admin, creatorId, environment);
+  const result = await loadRazorpayCheckoutConnection(
+    admin,
+    creatorId,
+    environment,
+    applicationKey,
+  );
   return result.status === "connected" ? result.connection : null;
 }
 
@@ -110,7 +152,8 @@ export async function getPublishedStorefrontRazorpayConnectionStatus(
 ): Promise<RazorpayCheckoutConnectionStatus> {
   const admin = createSupabaseAdminClient();
   if (!admin || !environment || environment !== getRazorpayOAuthMode() ||
-      !getRazorpayOAuthConfig(environment)) {
+      (!getRazorpayOAuthConfig(environment) &&
+        !getRazorpayApplicationConfig("FOUR_PERCENT", environment))) {
     return "unavailable";
   }
   const { data: storefront, error } = await admin
@@ -136,6 +179,7 @@ async function loadRazorpayCheckoutConnection(
   admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
   creatorId: string,
   environment: RazorpayOAuthEnvironment | null,
+  requestedApplicationKey?: RazorpayApplicationKey,
 ): Promise<
   | { status: "connected"; connection: RazorpayCheckoutConnection }
   | { status: "not_connected" | "unavailable" }
@@ -143,16 +187,17 @@ async function loadRazorpayCheckoutConnection(
   if (!environment || environment !== getRazorpayOAuthMode()) {
     return { status: "unavailable" };
   }
-  const config = getRazorpayOAuthConfig(environment);
-  if (!config) return { status: "unavailable" };
-  const clientId = config.clientId;
-  const { data, error } = await admin
+  let connectionQuery = admin
     .from("creator_razorpay_connections")
     .select(
-      "creator_id,razorpay_account_id,client_id,environment,public_token,access_token_encrypted,token_expires_at,connection_status",
+      "creator_id,razorpay_account_id,application_key,client_id,environment,public_token,access_token_encrypted,token_expires_at,connection_status",
     )
     .eq("creator_id", creatorId)
-    .eq("environment", environment)
+    .eq("environment", environment);
+  if (requestedApplicationKey) {
+    connectionQuery = connectionQuery.eq("application_key", requestedApplicationKey);
+  }
+  const { data, error } = await connectionQuery
     .eq("connection_status", "connected")
     .maybeSingle();
 
@@ -160,14 +205,50 @@ async function loadRazorpayCheckoutConnection(
     console.error("Razorpay checkout connection could not be loaded.");
     return { status: "unavailable" };
   }
-  if (!data) return { status: "not_connected" };
+  let storedConnection: StoredConnection | null = data as StoredConnection | null;
+  if (!storedConnection && requestedApplicationKey) {
+    const { data: history, error: historyError } = await admin
+      .from("razorpay_connection_history")
+      .select("creator_id,razorpay_account_id,application_key,application_id,environment,public_token,access_token_encrypted,token_expires_at,connection_status")
+      .eq("creator_id", creatorId)
+      .eq("environment", environment)
+      .eq("application_key", requestedApplicationKey)
+      .eq("connection_status", "connected")
+      .order("archived_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (historyError) {
+      console.error("Razorpay historical connection could not be loaded.", {
+        code: historyError.code,
+      });
+      return { status: "unavailable" };
+    }
+    if (history) {
+      storedConnection = {
+        ...history,
+        client_id: history.application_id,
+      } as StoredConnection;
+    }
+  }
+  if (!storedConnection) return { status: "not_connected" };
 
-  const connection = data as StoredConnection;
+  const connection = storedConnection;
+  const applicationKey: RazorpayApplicationKey =
+    connection.application_key === "FOUR_PERCENT"
+      ? "FOUR_PERCENT"
+      : connection.application_key === "ZERO_FEE"
+        ? "ZERO_FEE"
+        : requestedApplicationKey ?? "ZERO_FEE";
+  const config = getRazorpayApplicationConfig(applicationKey, environment);
+  if (!config) return { status: "unavailable" };
+  const clientId = config.clientId;
   const tokenExpiry = connection.token_expires_at
     ? new Date(connection.token_expires_at).getTime()
     : Number.NaN;
   if (
     connection.creator_id !== creatorId ||
+    (connection.application_key !== undefined && connection.application_key !== applicationKey) ||
+    (requestedApplicationKey !== undefined && requestedApplicationKey !== applicationKey) ||
     connection.client_id !== clientId ||
     connection.environment !== environment ||
     connection.connection_status !== "connected" ||
@@ -187,6 +268,8 @@ async function loadRazorpayCheckoutConnection(
       connection: {
         creatorId,
         accountId: connection.razorpay_account_id,
+        applicationKey,
+        applicationId: config.applicationId,
         environment,
         publicToken: connection.public_token,
         accessToken: decryptRazorpayToken(

@@ -85,8 +85,6 @@ function parseCreatorProduct(value: unknown): CreatorStorefrontProduct | null {
     typeof value.storefront_id !== "string" ||
     typeof value.name !== "string" ||
     typeof value.description !== "string" ||
-    typeof value.category !== "string" ||
-    value.category.trim().length === 0 ||
     typeof value.is_free !== "boolean" ||
     typeof value.is_active !== "boolean" ||
     value.product_type !== "digital"
@@ -99,7 +97,7 @@ function parseCreatorProduct(value: unknown): CreatorStorefrontProduct | null {
     storefrontId: value.storefront_id,
     name: value.name,
     description: value.description,
-    category: value.category,
+    category: typeof value.category === "string" && value.category.trim() ? value.category : "Other",
     productType: "digital",
     isFree: value.is_free,
     pricePaise,
@@ -122,8 +120,6 @@ function parsePublicProduct(value: unknown): StorefrontProductDisplay | null {
     typeof value.id !== "string" ||
     typeof value.name !== "string" ||
     typeof value.description !== "string" ||
-    typeof value.category !== "string" ||
-    value.category.trim().length === 0 ||
     typeof value.is_free !== "boolean" ||
     value.product_type !== "digital"
   ) return null;
@@ -133,7 +129,7 @@ function parsePublicProduct(value: unknown): StorefrontProductDisplay | null {
     id: value.id,
     name: value.name,
     description: value.description,
-    category: value.category,
+    category: typeof value.category === "string" && value.category.trim() ? value.category : "Other",
     productType: "digital",
     isFree: value.is_free,
     pricePaise,

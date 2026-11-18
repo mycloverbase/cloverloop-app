@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getFreeProductDeliveryConfig: vi.fn(),
   getRazorpayCheckoutConnection: vi.fn(),
-  getRazorpayOAuthConfig: vi.fn(),
+  getRazorpayApplicationConfig: vi.fn(),
   getRazorpayOAuthMode: vi.fn(),
   razorpayApiRequest: vi.fn(),
 }));
@@ -20,7 +20,7 @@ vi.mock("@/lib/razorpay/checkout", () => ({
 }));
 
 vi.mock("@/lib/razorpay/oauth", () => ({
-  getRazorpayOAuthConfig: mocks.getRazorpayOAuthConfig,
+  getRazorpayApplicationConfig: mocks.getRazorpayApplicationConfig,
   getRazorpayOAuthMode: mocks.getRazorpayOAuthMode,
 }));
 
@@ -40,6 +40,7 @@ const claim = {
   creator_id: "creator-a",
   razorpay_account_id: "acc_A123",
   environment: "test",
+  application_key: "ZERO_FEE",
   razorpay_order_id: "order_TEST123",
   razorpay_payment_id: "pay_TEST123",
 };
@@ -69,10 +70,14 @@ function createAdmin(options?: {
     const result = {
       select: vi.fn(),
       eq: vi.fn(),
+      order: vi.fn(),
+      limit: vi.fn(),
       maybeSingle: vi.fn(),
     };
     result.select.mockReturnValue(result);
     result.eq.mockReturnValue(result);
+    result.order.mockReturnValue(result);
+    result.limit.mockReturnValue(result);
     result.maybeSingle.mockImplementation(async () => {
       if (table === "creator_razorpay_connections") {
         return {
@@ -81,6 +86,7 @@ function createAdmin(options?: {
               ? options.connection
               : {
                   razorpay_account_id: claim.razorpay_account_id,
+                  application_key: "ZERO_FEE",
                   client_id: "test-client",
                   environment: "test",
                   connection_status: "connected",
@@ -132,7 +138,9 @@ beforeEach(() => {
   vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "test-client");
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
   mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
-  mocks.getRazorpayOAuthConfig.mockImplementation((environment: string) => ({
+  mocks.getRazorpayApplicationConfig.mockImplementation((applicationKey: string, environment: string) => ({
+    applicationKey,
+    applicationId: process.env.RAZORPAY_OAUTH_CLIENT_ID,
     clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID,
     environment,
   }));
@@ -143,6 +151,8 @@ beforeEach(() => {
   mocks.getRazorpayCheckoutConnection.mockResolvedValue({
     creatorId: claim.creator_id,
     accountId: claim.razorpay_account_id,
+    applicationKey: "ZERO_FEE",
+    applicationId: "test-client",
     environment: "test",
     publicToken: "rzp_test_public",
     accessToken: "creator-oauth-token",
@@ -174,6 +184,7 @@ describe("application-level Razorpay webhook fulfillment", () => {
       claims: [event],
       connection: {
         razorpay_account_id: event.razorpay_account_id,
+        application_key: "ZERO_FEE",
         client_id: "test-client",
         environment: "test",
         connection_status: "connected",
@@ -183,6 +194,8 @@ describe("application-level Razorpay webhook fulfillment", () => {
     mocks.getRazorpayCheckoutConnection.mockResolvedValue({
       creatorId: event.creator_id,
       accountId: event.razorpay_account_id,
+      applicationKey: "ZERO_FEE",
+      applicationId: "test-client",
       environment: "test",
       publicToken: "rzp_test_public",
       accessToken: `token-${event.creator_id}`,
@@ -220,7 +233,7 @@ describe("application-level Razorpay webhook fulfillment", () => {
       }),
     );
     expect(mocks.getRazorpayCheckoutConnection)
-      .toHaveBeenCalledWith(event.creator_id, "test");
+      .toHaveBeenCalledWith(event.creator_id, "test", "ZERO_FEE");
     expect(mocks.razorpayApiRequest).toHaveBeenCalledWith(
       `token-${event.creator_id}`,
       expect.any(String),
@@ -383,6 +396,7 @@ describe("application-level Razorpay webhook fulfillment", () => {
       claims: [liveClaim],
       connection: {
         razorpay_account_id: liveClaim.razorpay_account_id,
+        application_key: "ZERO_FEE",
         client_id: "live-client",
         environment: "live",
         connection_status: "connected",
@@ -392,6 +406,8 @@ describe("application-level Razorpay webhook fulfillment", () => {
     mocks.getRazorpayCheckoutConnection.mockResolvedValue({
       creatorId: liveClaim.creator_id,
       accountId: liveClaim.razorpay_account_id,
+      applicationKey: "ZERO_FEE",
+      applicationId: "live-client",
       environment: "live",
       publicToken: "rzp_live_public",
       accessToken: "live-oauth-token",
@@ -426,7 +442,7 @@ describe("application-level Razorpay webhook fulfillment", () => {
       expect.objectContaining({ p_environment: "live" }),
     );
     expect(mocks.getRazorpayCheckoutConnection)
-      .toHaveBeenCalledWith("creator-live", "live");
+      .toHaveBeenCalledWith("creator-live", "live", "ZERO_FEE");
   });
 
   it("does not process a claim whose environment differs from the active mode", async () => {

@@ -22,10 +22,12 @@ import {
   decryptRazorpayToken,
   encryptRazorpayToken,
   exchangeRazorpayAuthorizationCode,
+  getRazorpayApplicationConfig,
   getRazorpayOAuthConfig,
   getRazorpayOAuthReadiness,
   isRazorpayConnectionUsable,
   refreshRazorpayTokenPair,
+  selectRazorpayApplication,
 } from "@/lib/razorpay/oauth";
 
 const creatorId = "f0991ad4-a6a1-4bc8-9dd7-2c2bf8e1db49";
@@ -64,9 +66,20 @@ function createSupabaseFakes(options: {
             creator_id: creatorId,
             client_id: clientId,
             environment,
+            application_key: "ZERO_FEE",
+            plan_key: "free",
+            commission_percentage: 0,
+            consent_accepted_at: null,
+            consent_terms_version: null,
+            business_name: null,
+            registered_email: null,
+            migration_id: null,
           }],
           error: null,
         };
+      }
+      if (name === "get_razorpay_oauth_state_result") {
+        return { data: [{ completed: false }], error: null };
       }
       if (name === "save_razorpay_connection") return { data: true, error: null };
       if (name === "claim_razorpay_token_refresh") {
@@ -90,9 +103,18 @@ function createSupabaseFakes(options: {
         select: vi.fn(() => builder),
         eq: vi.fn(() => builder),
         maybeSingle: vi.fn(async () => ({
-          data: table === "creator_razorpay_connections" && options.existingStatus
-            ? { connection_status: options.existingStatus }
-            : null,
+          data: table === "plan_entitlements"
+            ? {
+                plan_key: "free",
+                platform_fee_percentage: 0,
+                founder_status: null,
+              }
+            : table === "creator_razorpay_connections" && options.existingStatus
+              ? {
+                  application_key: "ZERO_FEE",
+                  connection_status: options.existingStatus,
+                }
+              : null,
           error: null,
         })),
         insert: vi.fn(async (values: Record<string, unknown>) => {
@@ -158,6 +180,26 @@ describe("Razorpay OAuth configuration and token protection", () => {
     expect(getRazorpayOAuthConfig()?.clientId).toBe("razorpay-live-client");
     vi.stubEnv("RAZORPAY_OAUTH_CLIENT_SECRET", "");
     expect(getRazorpayOAuthConfig()).toBeNull();
+  });
+
+  it("selects an app only for supported database-backed plan entitlements", () => {
+    expect(selectRazorpayApplication("free", 0, null)).toBe("ZERO_FEE");
+    expect(selectRazorpayApplication("creator", 0, "active")).toBe("ZERO_FEE");
+    expect(selectRazorpayApplication("creator", 4, "expired")).toBe("FOUR_PERCENT");
+    expect(selectRazorpayApplication("pro_creator", 0, null)).toBe("ZERO_FEE");
+    expect(selectRazorpayApplication("creator", 4, "active")).toBeNull();
+    expect(selectRazorpayApplication("unknown", 4, null)).toBeNull();
+  });
+
+  it("keeps the Creator OAuth app isolated from the legacy zero-fee credentials", () => {
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_ID", "legacy-zero-client");
+    vi.stubEnv("RAZORPAY_OAUTH_CLIENT_SECRET", "legacy-zero-secret");
+    expect(getRazorpayApplicationConfig("ZERO_FEE")?.clientId).toBe("legacy-zero-client");
+    expect(getRazorpayApplicationConfig("FOUR_PERCENT")).toBeNull();
+
+    vi.stubEnv("RAZORPAY_FOUR_PERCENT_TEST_CLIENT_ID", "creator-test-client");
+    vi.stubEnv("RAZORPAY_FOUR_PERCENT_TEST_CLIENT_SECRET", "creator-test-secret");
+    expect(getRazorpayApplicationConfig("FOUR_PERCENT")?.clientId).toBe("creator-test-client");
   });
 
   it("encrypts tokens with creator and purpose binding and rejects tampering", () => {
@@ -366,6 +408,7 @@ describe("Razorpay OAuth callback and scheduled refresh", () => {
       refreshClaims: [{
         creator_id: creatorId,
         environment: "test",
+        application_key: "ZERO_FEE",
         encrypted_refresh_token: encryptedRefreshToken,
         lock_token: "b50534d0-0182-4c73-bdac-24dd574d8ff6",
       }],

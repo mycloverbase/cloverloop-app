@@ -4,6 +4,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isRazorpayPartnerWebhookFulfillmentEnabled } from "@/lib/razorpay/checkout";
 import { processRazorpayPartnerWebhookQueue } from "@/lib/razorpay/webhook-fulfillment";
 import { processRazorpayPurchaseEmailQueue } from "@/lib/razorpay/purchase-email";
+import { processRazorpayCommissionAuthorisationEmailQueue } from "@/lib/razorpay/commission-authorisation-email";
 
 export const runtime = "nodejs";
 
@@ -44,5 +45,7 @@ export async function GET(request: Request) {
 
   const results = await processRazorpayPartnerWebhookQueue(admin, null, 5);
   const purchaseEmails = await processRazorpayPurchaseEmailQueue(admin, null, 5);
-  return jsonResponse({ webhooks: results, purchaseEmails });
+  const commissionAuthorisationEmails =
+    await processRazorpayCommissionAuthorisationEmailQueue(admin, 5);
+  return jsonResponse({ webhooks: results, purchaseEmails, commissionAuthorisationEmails });
 }

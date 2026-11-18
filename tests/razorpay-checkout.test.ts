@@ -12,9 +12,27 @@ vi.mock("@/lib/supabase/admin", () => ({
 
 vi.mock("@/lib/razorpay/oauth", () => ({
   decryptRazorpayToken: mocks.decryptRazorpayToken,
+  getRazorpayApplicationConfig: (applicationKey: "ZERO_FEE" | "FOUR_PERCENT", environment: "test" | "live" | null) =>
+    process.env.RAZORPAY_OAUTH_CLIENT_ID && environment && applicationKey === "ZERO_FEE"
+      ? {
+          applicationKey,
+          applicationId: process.env.RAZORPAY_OAUTH_CLIENT_ID,
+          clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID,
+          clientSecret: "client-secret",
+          environment,
+          redirectUri: "https://cloverloop.test/api/razorpay/callback",
+        }
+      : null,
   getRazorpayOAuthConfig: (environment: "test" | "live" | null) =>
     process.env.RAZORPAY_OAUTH_CLIENT_ID && environment
-      ? { clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID, environment }
+      ? {
+          applicationKey: "ZERO_FEE",
+          applicationId: process.env.RAZORPAY_OAUTH_CLIENT_ID,
+          clientId: process.env.RAZORPAY_OAUTH_CLIENT_ID,
+          clientSecret: "client-secret",
+          environment,
+          redirectUri: "https://cloverloop.test/api/razorpay/callback",
+        }
       : null,
   getRazorpayOAuthMode: () => {
     const mode = process.env.RAZORPAY_OAUTH_MODE;
@@ -106,6 +124,8 @@ describe("Razorpay checkout helpers", () => {
     await expect(getRazorpayCheckoutConnection("creator-a")).resolves.toEqual({
       creatorId: "creator-a",
       accountId: "acc_LIVE123",
+      applicationKey: "ZERO_FEE",
+      applicationId: "production-client",
       environment: "live",
       publicToken: "rzp_live_public",
       accessToken: "live-access",
@@ -276,6 +296,8 @@ describe("Razorpay checkout helpers", () => {
     await expect(getRazorpayCheckoutConnection("creator-a")).resolves.toEqual({
       creatorId: "creator-a",
       accountId: "acc_ABC123",
+      applicationKey: "ZERO_FEE",
+      applicationId: "development-client",
       environment: "test",
       publicToken: "rzp_test_public",
       accessToken: "decrypted-test-access",

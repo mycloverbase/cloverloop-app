@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   decryptRazorpayToken,
-  getRazorpayOAuthConfig,
+  getRazorpayApplicationConfig,
   RazorpayOAuthError,
   refreshRazorpayTokenPair,
   encryptRazorpayToken,
@@ -15,6 +15,7 @@ export const runtime = "nodejs";
 type RefreshClaim = {
   creator_id: string;
   environment: string;
+  application_key: string;
   encrypted_refresh_token: string;
   lock_token: string;
 };
@@ -47,12 +48,14 @@ function parseRefreshClaim(value: unknown): RefreshClaim | null {
     !isRecord(value) ||
     typeof value.creator_id !== "string" ||
     typeof value.environment !== "string" ||
+    (value.application_key !== "ZERO_FEE" && value.application_key !== "FOUR_PERCENT") ||
     typeof value.encrypted_refresh_token !== "string" ||
     typeof value.lock_token !== "string"
   ) return null;
   return {
     creator_id: value.creator_id,
     environment: value.environment,
+    application_key: value.application_key,
     encrypted_refresh_token: value.encrypted_refresh_token,
     lock_token: value.lock_token,
   };
@@ -63,8 +66,11 @@ async function refreshClaim(
   claim: RefreshClaim,
   config: RazorpayOAuthConfig,
 ): Promise<"refreshed" | "failed" | "reconnect_required"> {
-  if (claim.environment !== config.environment) {
-    console.error("A Razorpay token refresh claim had a mismatched environment.");
+  if (
+    claim.environment !== config.environment ||
+    claim.application_key !== config.applicationKey
+  ) {
+    console.error("A Razorpay token refresh claim had a mismatched application or environment.");
     return "failed";
   }
 
@@ -127,8 +133,11 @@ async function refreshClaim(
 export async function GET(request: Request) {
   if (!isAuthorized(request)) return jsonResponse({ error: "Unauthorized." }, 401);
 
-  const configs = (["test", "live"] as const)
-    .map((environment) => getRazorpayOAuthConfig(environment))
+  const configs = (["test", "live"] as const).flatMap((environment) =>
+    (["ZERO_FEE", "FOUR_PERCENT"] as const).map((applicationKey) =>
+      getRazorpayApplicationConfig(applicationKey, environment),
+    ),
+  )
     .filter((config): config is RazorpayOAuthConfig => config !== null);
   if (configs.length === 0) {
     return jsonResponse({ error: "Razorpay OAuth refresh is not configured for this environment." }, 503);
@@ -136,31 +145,34 @@ export async function GET(request: Request) {
   const admin = createSupabaseAdminClient();
   if (!admin) return jsonResponse({ error: "Razorpay token refresh services are unavailable." }, 503);
 
-  const claimsByEnvironment = await Promise.all(configs.map(async (config) => {
+  const claimsByApplication = await Promise.all(configs.map(async (config) => {
     const { data, error } = await admin.rpc("claim_razorpay_token_refresh", {
       requested_environment: config.environment,
+      requested_application_key: config.applicationKey,
       requested_batch_size: 10,
     });
     if (error) {
       console.error("Could not claim due Razorpay token refreshes.", {
         code: error.code,
         environment: config.environment,
+        applicationKey: config.applicationKey,
       });
       return null;
     }
     if (!Array.isArray(data) || data.length > 10) {
       console.error("The Razorpay token refresh claim response was invalid.", {
         environment: config.environment,
+        applicationKey: config.applicationKey,
       });
       return null;
     }
     return { config, claims: data };
   }));
-  if (claimsByEnvironment.some((result) => result === null)) {
+  if (claimsByApplication.some((result) => result === null)) {
     return jsonResponse({ error: "Razorpay token refresh could not start." }, 503);
   }
 
-  const outcomes = await Promise.all(claimsByEnvironment.flatMap((result) => {
+  const outcomes = await Promise.all(claimsByApplication.flatMap((result) => {
     if (!result) return [];
     return result.claims.map(async (candidate) => {
       const claim = parseRefreshClaim(candidate);

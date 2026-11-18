@@ -6,8 +6,9 @@ import {
   razorpayApiRequest,
 } from "@/lib/razorpay/checkout";
 import {
-  getRazorpayOAuthConfig,
+  getRazorpayApplicationConfig,
   getRazorpayOAuthMode,
+  type RazorpayApplicationKey,
   type RazorpayOAuthEnvironment,
 } from "@/lib/razorpay/oauth";
 
@@ -18,6 +19,7 @@ type WebhookClaim = {
   creator_id: string;
   razorpay_account_id: string;
   environment: RazorpayOAuthEnvironment;
+  application_key: RazorpayApplicationKey;
   razorpay_order_id: string;
   razorpay_payment_id: string;
 };
@@ -62,6 +64,7 @@ function parseClaim(value: unknown): WebhookClaim | null {
     typeof value.creator_id !== "string" ||
     typeof value.razorpay_account_id !== "string" ||
     (value.environment !== "test" && value.environment !== "live") ||
+    (value.application_key !== "ZERO_FEE" && value.application_key !== "FOUR_PERCENT") ||
     typeof value.razorpay_order_id !== "string" ||
     typeof value.razorpay_payment_id !== "string"
   ) {
@@ -72,6 +75,7 @@ function parseClaim(value: unknown): WebhookClaim | null {
     creator_id: value.creator_id,
     razorpay_account_id: value.razorpay_account_id,
     environment: value.environment,
+    application_key: value.application_key,
     razorpay_order_id: value.razorpay_order_id,
     razorpay_payment_id: value.razorpay_payment_id,
   };
@@ -106,9 +110,9 @@ async function processClaim(
   claim: WebhookClaim,
 ): Promise<ProcessingResult> {
   try {
-    const { data: connectionRow, error: connectionError } = await admin
+    const { data: currentConnection, error: connectionError } = await admin
       .from("creator_razorpay_connections")
-      .select("razorpay_account_id,client_id,environment,connection_status")
+      .select("razorpay_account_id,application_key,client_id,environment,connection_status")
       .eq("creator_id", claim.creator_id)
       .eq("environment", claim.environment)
       .maybeSingle();
@@ -120,25 +124,52 @@ async function processClaim(
       return "failed";
     }
 
-    const config = getRazorpayOAuthConfig(claim.environment);
-    if (
-      !connectionRow ||
-      connectionRow.connection_status !== "connected" ||
-      connectionRow.environment !== claim.environment ||
-      connectionRow.client_id !== config?.clientId ||
-      connectionRow.razorpay_account_id !== claim.razorpay_account_id
-    ) {
+    const config = getRazorpayApplicationConfig(claim.application_key, claim.environment);
+    let connectionMatches = Boolean(
+      currentConnection &&
+      currentConnection.connection_status === "connected" &&
+      currentConnection.environment === claim.environment &&
+      currentConnection.application_key === claim.application_key &&
+      currentConnection.client_id === config?.clientId &&
+      currentConnection.razorpay_account_id === claim.razorpay_account_id,
+    );
+    if (!connectionMatches && !connectionError) {
+      const { data: historicalConnection, error: historyError } = await admin
+        .from("razorpay_connection_history")
+        .select("razorpay_account_id,application_key,application_id,environment,connection_status")
+        .eq("creator_id", claim.creator_id)
+        .eq("razorpay_account_id", claim.razorpay_account_id)
+        .eq("application_key", claim.application_key)
+        .eq("environment", claim.environment)
+        .eq("connection_status", "connected")
+        .order("archived_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (historyError) {
+        console.error("Razorpay historical webhook connection could not be checked.", {
+          code: historyError.code,
+        });
+        return "failed";
+      }
+      connectionMatches = Boolean(
+        historicalConnection &&
+        historicalConnection.application_id === config?.clientId,
+      );
+    }
+    if (!connectionMatches || !config) {
       return "ignored";
     }
 
     const connection = await getRazorpayCheckoutConnection(
       claim.creator_id,
       claim.environment,
+      claim.application_key,
     );
     if (
       !connection ||
       connection.environment !== claim.environment ||
       connection.accountId !== claim.razorpay_account_id
+      || connection.applicationKey !== claim.application_key
     ) {
       return "failed";
     }
