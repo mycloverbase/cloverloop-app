@@ -1032,21 +1032,28 @@ function StorefrontPreviewFrame({
     const root = frameDocument?.getElementById("storefront-preview-root");
     if (!frameDocument || !root) return;
 
-    document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]').forEach((source) => {
-      const stylesheet = frameDocument.createElement("link");
-      stylesheet.rel = "stylesheet";
-      stylesheet.href = source.href;
-      stylesheet.media = source.media;
-      frameDocument.head.append(stylesheet);
-    });
-    document.querySelectorAll("style").forEach((source) => {
-      const style = frameDocument.createElement("style");
-      style.media = source.media;
-      style.textContent = source.textContent;
-      frameDocument.head.append(style);
-    });
+    if (frameDocument.documentElement.dataset.previewStylesCopied !== "true") {
+      document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]').forEach((source) => {
+        const stylesheet = frameDocument.createElement("link");
+        stylesheet.rel = "stylesheet";
+        stylesheet.href = source.href;
+        stylesheet.media = source.media;
+        frameDocument.head.append(stylesheet);
+      });
+      document.querySelectorAll("style").forEach((source) => {
+        const style = frameDocument.createElement("style");
+        style.media = source.media;
+        style.textContent = source.textContent;
+        frameDocument.head.append(style);
+      });
+      frameDocument.documentElement.dataset.previewStylesCopied = "true";
+    }
     setPreviewRoot(root);
   }, []);
+
+  useEffect(() => {
+    onFrameLoad();
+  }, [onFrameLoad]);
 
   return (
     <div className={`storefront-preview-frame storefront-preview-${device}`}>
