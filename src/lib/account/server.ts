@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -109,17 +110,20 @@ export async function ensureCreatorProfile(
       : {}),
   };
 
-  const { error: insertError } = await client.from("creator_profiles").insert(seed);
+  const { error: insertError } = await client.from("creator_profiles").upsert(seed, {
+    onConflict: "user_id",
+    ignoreDuplicates: true,
+  });
   if (insertError && insertError.code === "23505" && username) {
-    const { error: retryError } = await client.from("creator_profiles").insert({
-      ...seed,
-      username: null,
-    });
-    if (retryError && retryError.code !== "23505") {
+    const { error: retryError } = await client.from("creator_profiles").upsert(
+      { ...seed, username: null },
+      { onConflict: "user_id", ignoreDuplicates: true },
+    );
+    if (retryError) {
       console.error("Could not create creator profile.", retryError);
       throw new Error("Your creator profile could not be created. Please try again.");
     }
-  } else if (insertError && insertError.code !== "23505") {
+  } else if (insertError) {
     console.error("Could not create creator profile.", insertError);
     throw new Error("Your creator profile could not be created. Please try again.");
   }
@@ -129,7 +133,7 @@ export async function ensureCreatorProfile(
   return created;
 }
 
-export async function requireCreatorContext() {
+export const requireCreatorContext = cache(async function requireCreatorContext() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) redirect("/login?error=configuration");
 
@@ -145,7 +149,7 @@ export async function requireCreatorContext() {
 
   const profile = await ensureCreatorProfile(supabase, user);
   return { supabase, user, profile };
-}
+});
 
 export async function getAvatarSignedUrl(
   client: AccountSupabaseClient,

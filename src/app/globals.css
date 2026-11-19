@@ -1563,6 +1563,25 @@ a {
   padding-top: 34px;
 }
 
+.article-chart {
+  margin: 1.75rem 0 2rem;
+}
+
+.article-chart img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+.article-chart figcaption {
+  margin-top: 0.6rem;
+  color: #76827b;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
 .article-copy ol,
 .article-copy ul {
   margin: 0 0 1.5rem;

@@ -12,7 +12,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 
 function InlineText({ text }: { text: string }) {
-  const tokenPattern = /(\[([^\]]+)\]\(((?:https?:\/\/|\/)[^)\s]+)\)|\*\*([^*]+)\*\*)/g;
+  const tokenPattern = /(\[([^\]]+)\]\(((?:https?:\/\/|\/)[^)\s]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*)/g;
   const content: React.ReactNode[] = [];
   let cursor = 0;
   let match: RegExpExecArray | null;
@@ -25,6 +25,8 @@ function InlineText({ text }: { text: string }) {
         : <a href={match[3]} key={match.index}>{match[2]}</a>);
     } else if (match[4]) {
       content.push(<strong key={match.index}>{match[4]}</strong>);
+    } else if (match[5]) {
+      content.push(<em key={match.index}>{match[5]}</em>);
     }
     cursor = tokenPattern.lastIndex;
   }
@@ -52,6 +54,14 @@ function ArticleBlocks({ blocks, slug }: { blocks: ResourceBlock[]; slug: string
         }
         if (block.type === "subheading") {
           return <h3 id={`section-${index}`} key={index}>{block.text}</h3>;
+        }
+        if (block.type === "image") {
+          return (
+            <figure className="article-chart" key={index}>
+              <Image src={block.src} alt={block.alt} width={1200} height={780} sizes="(max-width: 760px) 100vw, 740px" />
+              {block.caption && <figcaption><InlineText text={block.caption} /></figcaption>}
+            </figure>
+          );
         }
         if (block.type === "table") {
           return (
@@ -115,11 +125,12 @@ export function ArticlePage({ slug, contentType = "resource" }: { slug: string; 
       return blog ? { slug: blog.slug, title: blog.title, href: `/blog/${blog.slug}` } : null;
     })
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
-  const headings = article.blocks
-    .map((block, index) => ({ ...block, index }))
-    .filter((block) => block.type === "heading");
+  const headings = article.blocks.flatMap((block, index) =>
+    block.type === "heading" ? [{ index, text: block.text }] : [],
+  );
   const introIndex = article.blocks.findIndex((block) => block.type === "paragraph");
-  const intro = introIndex >= 0 ? article.blocks[introIndex].text : undefined;
+  const introBlock = article.blocks.find((block) => block.type === "paragraph");
+  const intro = introBlock?.type === "paragraph" ? introBlock.text : undefined;
   const organization = {
     "@context": "https://schema.org",
     "@type": "Article",

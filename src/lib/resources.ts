@@ -20,6 +20,13 @@ type TableBlock = {
   rows: string[][];
 };
 
+type ImageBlock = {
+  type: "image";
+  src: string;
+  alt: string;
+  caption?: string;
+};
+
 export type CtaBlock = {
   type: "cta";
   text: string;
@@ -27,7 +34,7 @@ export type CtaBlock = {
   href: string;
 };
 
-export type ResourceBlock = TextBlock | ListBlock | TableBlock | CtaBlock;
+export type ResourceBlock = TextBlock | ListBlock | TableBlock | ImageBlock | CtaBlock;
 
 export type ResourceArticle = {
   slug: string;
@@ -72,6 +79,7 @@ export function getArticleReadingTime(article: ResourceArticle) {
     if (block.type === "ordered-list" || block.type === "unordered-list") {
       return (block.items ?? block.text.split(/\r?\n/)).join(" ");
     }
+    if (block.type === "image") return `${block.alt} ${block.caption ?? ""}`;
     return block.text;
   }).join(" ");
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
