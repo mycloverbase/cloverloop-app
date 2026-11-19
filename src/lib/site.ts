@@ -36,7 +36,7 @@ export const publicLinks = {
   resources: [
     { label: "Marketing ideas tool", href: "/resources/marketing-ideas-tool" },
     { label: "How to sell digital products online", href: "/resources/how-to-sell-digital-products-online" },
-    { label: "Best platform to sell digital products in India", href: "/resources/best-platform-to-sell-digital-products-india-2026" },
+    { label: "Best platform to sell digital products in India", href: "/resources/best-platform-to-sell-digital-products-india-2027" },
     { label: "How to price digital products", href: "/resources/how-to-price-digital-products" },
     { label: "Digital product ideas and templates", href: "/resources/how-to-sell-templates-online" },
     { label: "UPI, Razorpay and payment fees", href: "/resources/accept-upi-payments-digital-products-razorpay" },
@@ -586,8 +586,8 @@ export const resourceCards = [
     category: "Guides",
   },
   {
-    slug: "best-platform-to-sell-digital-products-india-2026",
-    title: "Best Platform to Sell Digital Products in India (2026)",
+    slug: "best-platform-to-sell-digital-products-india-2027",
+    title: "Best Platform to Sell Digital Products in India (2027)",
     description:
       "Compare pricing, fees and features across nine platforms for selling digital products in India.",
     image: "/images/resources/digital-products.webp",

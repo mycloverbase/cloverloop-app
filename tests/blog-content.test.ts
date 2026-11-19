@@ -6,8 +6,8 @@ import { getArticleReadingTime } from "@/lib/resources";
 
 describe("creator economy blog articles", () => {
   it.each([
-    "how-much-do-content-creators-earn-in-india",
-    "indian-creator-economy-statistics",
+    "how-much-do-content-creators-earn-in-india-2027",
+    "indian-creator-economy-statistics-2027",
   ])("loads %s with readable content and available chart assets", (slug) => {
     const article = getBlogArticle(slug);
     if (!article) throw new Error(`Missing blog article: ${slug}`);
