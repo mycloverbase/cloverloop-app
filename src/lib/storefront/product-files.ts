@@ -1,6 +1,5 @@
 export const MAX_PRODUCT_FILE_SIZE = 100 * 1024 * 1024;
-export const PRODUCT_FILE_ACCEPT =
-  ".pdf,.mp3,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.epub,.zip,.txt,.rtf,.mp4,.wav,.jpg,.jpeg,.png,.webp";
+export const PRODUCT_FILE_ACCEPT = "";
 
 const supportedTypes: Record<string, { mimeType: string; aliases: string[] }> = {
   pdf: { mimeType: "application/pdf", aliases: [] },
@@ -30,6 +29,7 @@ const supportedTypes: Record<string, { mimeType: string; aliases: string[] }> = 
   jpeg: { mimeType: "image/jpeg", aliases: [] },
   png: { mimeType: "image/png", aliases: [] },
   webp: { mimeType: "image/webp", aliases: [] },
+  prst: { mimeType: "application/octet-stream", aliases: [] },
 };
 
 export type ProductFileMetadata = {
@@ -52,23 +52,31 @@ export function validateProductFileMetadata(
     .replace(/[\\/]/g, "")
     .replace(/[\u0000-\u001f\u007f]/g, "")
     .trim();
-  const extension = cleanName.split(".").pop()?.toLowerCase() ?? "";
-  const format = supportedTypes[extension];
-  if (!format) {
-    return { ok: false, message: "Choose a supported file format (PDF, MP3, DOC, DOCX, and more)." };
-  }
-  if (!Number.isSafeInteger(size) || size < 1 || size > MAX_PRODUCT_FILE_SIZE) {
-    return { ok: false, message: "Product files must be larger than 0 bytes and no larger than 100 MB." };
-  }
-  const normalizedType = mimeType.trim().toLowerCase();
-  if (normalizedType && normalizedType !== format.mimeType && !format.aliases.includes(normalizedType)) {
-    return { ok: false, message: "The selected file type does not match its file extension." };
-  }
+  
   if (!cleanName || cleanName.length > 255) {
     return { ok: false, message: "The product file name must be 255 characters or fewer." };
   }
+  
+  if (!Number.isSafeInteger(size) || size < 1 || size > MAX_PRODUCT_FILE_SIZE) {
+    return { ok: false, message: "Product files must be larger than 0 bytes and no larger than 100 MB." };
+  }
+  
+  const extension = cleanName.split(".").pop()?.toLowerCase() ?? "";
+  const format = supportedTypes[extension];
+  const normalizedMimeType = mimeType.trim().toLowerCase();
+  
+  if (format) {
+    if (normalizedMimeType && normalizedMimeType !== format.mimeType && !format.aliases.includes(normalizedMimeType)) {
+      return { ok: false, message: "The selected file type does not match its file extension." };
+    }
+    return {
+      ok: true,
+      value: { fileName: cleanName, extension, mimeType: format.mimeType, size },
+    };
+  }
+  
   return {
     ok: true,
-    value: { fileName: cleanName, extension, mimeType: format.mimeType, size },
+    value: { fileName: cleanName, extension, mimeType: normalizedMimeType || "application/octet-stream", size },
   };
 }
