@@ -170,7 +170,7 @@ export async function startRazorpayConnectionAction(formData: FormData): Promise
   });
   if (stateError) {
     console.error("Could not save a Razorpay OAuth state.", { code: stateError.code });
-    redirect(`${settingsPath}?razorpay=connect-error`);
+    redirect(`${settingsPath}?razorpay=${isCommissionAuthorisationRequired ? "consent-record-error" : "connect-error"}`);
   }
 
   const { error: auditError } = await admin.from("razorpay_connection_audit").insert({

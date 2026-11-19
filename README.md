@@ -207,15 +207,15 @@ The free product claim flow uses `SUPABASE_SERVICE_ROLE_KEY` and the existing Re
 
 The pricing source in `src/lib/pricing-plans.ts` matches these current terms (prices exclude applicable GST; provider processing fees are additional):
 
-| Plan | Monthly price | CloverLoop platform fee | Paid listings | Free listings | Monthly Gross Sales limit |
+| Plan | Monthly price | CloverLoop platform fee | Paid listings | Free listings | Cumulative lifetime Gross Sales cap |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Free | ₹0 | 0% up to ₹10,000/month | 1 | 5 lifetime per account | ₹10,000 per calendar month |
+| Free | ₹0 | 0% up to ₹10,000 cumulative Gross Sales | 1 | 5 lifetime per account | ₹10,000 |
 | Creator | ₹0 | 4% of Gross Sales | Unlimited | Unlimited | None |
 | Pro Creator | ₹2,999 | 0% | Unlimited | Unlimited | None |
 
-The database migrations `20261111190000_creator_plans_and_founding_programme.sql` and `20261111193000_free_monthly_gross_sales_limit.sql` add the audited plan and entitlement structures, referral attribution, programme allocation and subscription records. Free-plan Gross Sales are limited to ₹10,000 per calendar month; reaching that threshold requires an explicitly confirmed upgrade to Creator to continue selling. Creator listings are counted when first activated, not while a product is an unpublished draft. The plan entitlement view determines the effective platform fee and limits; Free-to-Creator activation uses an authenticated database RPC and requires the creator to confirm in the dashboard. Existing listings are not deleted or unpublished.
+The database migrations `20261111190000_creator_plans_and_founding_programme.sql`, `20261111193000_free_monthly_gross_sales_limit.sql` and `20261119070000_free_cumulative_gross_sales_limit.sql` add the audited plan and entitlement structures, referral attribution, programme allocation, subscription records and cumulative sales limit. Free-plan Gross Sales are limited to ₹10,000 across successful live sales over the creator account's lifetime; Test Mode transactions are excluded. Reaching that threshold requires an explicitly confirmed upgrade to Creator to continue selling. Creator listings are counted when first activated, not while a product is an unpublished draft. The plan entitlement view determines the effective platform fee and limits; Free-to-Creator activation uses an authenticated database RPC and requires the creator to confirm in the dashboard. Existing listings are not deleted or unpublished.
 
-The Free plan entitlement now exposes the ₹10,000 monthly cap, but sales accumulation and threshold enforcement are not operational: this repository still has no paid checkout or trusted paid-order ledger. Do not treat the upgrade prompt at the sales threshold as live until paid sales are recorded and the cap is enforced server-side.
+The server checks the cumulative total before creating a live checkout order, and the database enforces the same limit when inserting live orders. The checkout block is shown with an upgrade prompt; creators must explicitly confirm a plan change.
 
 The referral URL is `https://cloverloop.in/signup?ref=founder`. The `ref=founder` visit is recorded in a signed, HTTP-only cookie and committed server-side after successful account creation; a creator-controlled profile field cannot set the source. Storefront publication triggers one atomic allocation from slots 1–50. The qualification date and original storefront publication date are retained; unpublishing does not revoke a slot. The dashboard shows an allocation confirmation and expiry.
 

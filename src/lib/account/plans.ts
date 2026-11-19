@@ -10,20 +10,20 @@ export const creatorPlans: Record<
     commission: "0% platform transaction fee",
     features: [
       "1 paid product and 5 free product listings per account lifetime",
-      "₹10,000 Gross Sales limit per calendar month",
+      "₹10,000 cumulative Gross Sales limit per account lifetime",
     ],
   },
   creator: {
     name: "Creator",
     monthlyPrice: "₹0/month",
     commission: "4% of Gross Sales",
-    features: ["Unlimited paid and free product listings", "No monthly Gross Sales limit"],
+    features: ["Unlimited paid and free product listings", "No cumulative Gross Sales limit"],
   },
   pro_creator: {
     name: "Pro Creator",
     monthlyPrice: "₹2,999/month",
     commission: "0% platform transaction fee",
-    features: ["Unlimited paid and free product listings", "No monthly Gross Sales limit"],
+    features: ["Unlimited paid and free product listings", "No cumulative Gross Sales limit"],
   },
 };
 

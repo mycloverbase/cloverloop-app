@@ -14,11 +14,11 @@ The Creator plan is recommended for creators who want unlimited product listings
 
 | Plan | Monthly price | Platform transaction fee | Product listings |
 | --- | ---: | --- | --- |
-| Free | ₹0 | 0% up to ₹10,000 Gross Sales per calendar month | 1 paid and 5 free products per account lifetime |
-| Creator | ₹0 | 4%; no monthly Gross Sales limit | Unlimited paid and free products |
+| Free | ₹0 | 0% up to ₹10,000 cumulative Gross Sales per creator account lifetime | 1 paid and 5 free products per account lifetime |
+| Creator | ₹0 | 4%; no cumulative Gross Sales limit | Unlimited paid and free products |
 | Pro Creator | ₹2,999 | 0% | Unlimited paid and free products |
 
-Free has no CloverLoop platform transaction fee up to ₹10,000 Gross Sales per calendar month; reaching that amount requires an upgrade to Creator to continue selling. Creator has a 4% platform transaction fee and no monthly Gross Sales limit, and Pro Creator has a 0% platform transaction fee with a monthly subscription.
+Free has no CloverLoop platform transaction fee up to ₹10,000 cumulative Gross Sales across the creator account's lifetime; the total does not reset monthly. New orders that would push cumulative successful live sales over the limit are blocked, and an upgrade to Creator is required to continue selling. Creator has a 4% platform transaction fee and no cumulative Gross Sales limit, and Pro Creator has a 0% platform transaction fee with a monthly subscription.
 
 ## Payment provider charges
 

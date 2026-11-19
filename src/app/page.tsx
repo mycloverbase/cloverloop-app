@@ -213,18 +213,18 @@ export default function HomePage() {
             <article className="earnings-card">
               <h3>Free</h3>
               <p className="earnings-card-caption">₹0/month</p>
-              <p>0% CloverLoop platform fee up to ₹10,000 Gross Sales per calendar month.</p>
+              <p>0% CloverLoop platform fee up to ₹10,000 cumulative Gross Sales per creator account lifetime.</p>
               <p>1 paid and 5 free product listings per account lifetime.</p>
             </article>
             <article className="earnings-card">
               <h3>Creator · Recommended</h3>
               <p className="earnings-card-caption">₹0/month · 4%</p>
-              <p>Unlimited paid and free product listings, with no monthly Gross Sales limit.</p>
+              <p>Unlimited paid and free product listings, with no cumulative Gross Sales limit.</p>
             </article>
             <article className="earnings-card">
               <h3>Pro Creator</h3>
               <p className="earnings-card-caption">₹2,999/month · 0%</p>
-              <p>For established, higher-volume creators. Unlimited listings and no monthly Gross Sales limit.</p>
+              <p>For established, higher-volume creators. Unlimited listings and no cumulative Gross Sales limit.</p>
             </article>
           </div>
         </div>

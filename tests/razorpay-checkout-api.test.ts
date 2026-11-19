@@ -70,19 +70,29 @@ const orderRow = {
   should_create_provider_order: true,
 };
 
-function createAdmin(row = orderRow) {
-  const query = {
-    update: vi.fn(),
-    eq: vi.fn(),
-    is: vi.fn(),
-  };
-  query.update.mockReturnValue(query);
-  query.eq.mockReturnValue(query);
-  query.is.mockResolvedValue({ error: null });
-
+function createAdmin(row = orderRow, rpcError: { message: string } | null = null) {
   return {
-    rpc: vi.fn().mockResolvedValue({ data: [row], error: null }),
-    from: vi.fn().mockReturnValue(query),
+    rpc: vi.fn().mockResolvedValue({ data: rpcError ? null : [row], error: rpcError }),
+    from: vi.fn((table: string) => {
+      const query = {
+        update: vi.fn(),
+        select: vi.fn(),
+        eq: vi.fn(),
+        is: vi.fn(),
+        maybeSingle: vi.fn(),
+      };
+      query.update.mockReturnValue(query);
+      query.select.mockReturnValue(query);
+      query.eq.mockReturnValue(query);
+      query.is.mockResolvedValue({ error: null });
+      query.maybeSingle.mockResolvedValue({
+        data: table === "plan_entitlements"
+          ? { cumulative_gross_sales_limit_paise: null }
+          : null,
+        error: null,
+      });
+      return query;
+    }),
   };
 }
 
@@ -132,6 +142,29 @@ beforeEach(() => {
 });
 
 describe("POST /api/checkout/create-order", () => {
+  it("blocks orders that would exceed the creator's cumulative Free-plan sales limit", async () => {
+    const admin = createAdmin(orderRow, {
+      message: "free_cumulative_sales_limit_reached",
+    });
+    mocks.createSupabaseAdminClient.mockReturnValue(admin);
+
+    const response = await POST(
+      makeRequest({
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "buyer@example.com",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      error: "This creator has reached the Free plan sales limit and must change plans before accepting more purchases.",
+    });
+    expect(mocks.getRazorpayCheckoutConnection).not.toHaveBeenCalled();
+    expect(mocks.razorpayApiRequest).not.toHaveBeenCalled();
+  });
+
   it("uses the database price and server-derived creator instead of client values", async () => {
     const response = await POST(
       makeRequest({

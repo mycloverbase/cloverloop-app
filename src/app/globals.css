@@ -8470,6 +8470,13 @@ a {
   font-size: 0.87rem;
 }
 
+.razorpay-connection-reason {
+  margin: 0;
+  color: #52665a;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
 .razorpay-connection-actions {
   display: grid;
   gap: 16px;
@@ -8504,6 +8511,112 @@ a {
 .razorpay-consent-checkbox input {
   flex: 0 0 auto;
   margin-top: 4px;
+}
+
+.razorpay-consent-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-width: none;
+  max-height: min(90vh, 760px);
+  overflow: auto;
+  margin: auto;
+  border: 1px solid #dfe8e0;
+  border-radius: 15px;
+  background: #fff;
+  padding: 0;
+  color: #24372d;
+  box-shadow: 0 24px 70px rgb(20 48 34 / 22%);
+}
+
+.razorpay-consent-dialog::backdrop {
+  background: rgb(18 34 25 / 48%);
+  backdrop-filter: blur(2px);
+}
+
+.razorpay-consent-modal-content {
+  display: grid;
+  gap: 16px;
+  padding: clamp(18px, 4vw, 26px);
+}
+
+.razorpay-consent-modal-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.razorpay-consent-modal-heading h2 {
+  margin: 5px 0 0;
+  color: #1d3128;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.razorpay-consent-close {
+  display: grid;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #e3e9e4;
+  border-radius: 8px;
+  background: #fff;
+  color: #55655b;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.razorpay-consent-close:hover {
+  border-color: #b6cbbb;
+  background: #f5f8f5;
+}
+
+.razorpay-consent-intro {
+  margin: 0;
+  font-size: 0.89rem;
+}
+
+.razorpay-consent-form {
+  display: grid;
+  gap: 16px;
+}
+
+.razorpay-consent-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.razorpay-consent-fields label {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  color: #34493c;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.razorpay-consent-fields input {
+  width: 100%;
+  min-width: 0;
+}
+
+.razorpay-consent-checkbox {
+  color: #34493c;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.razorpay-consent-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.razorpay-consent-modal-actions button {
+  min-height: 42px;
 }
 
 .razorpay-connect-actions,
@@ -8559,6 +8672,18 @@ a {
   .razorpay-disconnect-button {
     width: 100%;
   }
+
+  .razorpay-consent-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .razorpay-consent-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .razorpay-consent-modal-actions button {
+    width: 100%;
+  }
 }
 
 .creator-dashboard .dashboard-overview-grid {
@@ -8582,6 +8707,106 @@ a {
   border-radius: 10px;
   background: #f8faf7;
   padding: 16px;
+}
+
+.creator-dashboard .plan-change-control {
+  display: grid;
+  width: 100%;
+  justify-items: start;
+  gap: 12px;
+}
+
+.plan-change-panel {
+  display: grid;
+  width: 100%;
+  gap: 12px;
+  border: 1px solid #dfe8df;
+  border-radius: 10px;
+  background: #fff;
+  padding: 14px;
+}
+
+.plan-change-panel > label {
+  margin: 0;
+  color: #34493c;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.plan-change-panel select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #d5dfd6;
+  border-radius: 7px;
+  background: #fff;
+  padding: 9px 11px;
+  color: #24372d;
+}
+
+.plan-change-confirmation,
+.plan-change-support,
+.plan-change-upcoming {
+  display: grid;
+  gap: 7px;
+  border-radius: 8px;
+  padding: 12px;
+  color: #3b5143;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.plan-change-confirmation {
+  border: 1px solid #d5e5d7;
+  background: #f1f7f1;
+}
+
+.plan-change-support {
+  border: 1px solid #ecdcb7;
+  background: #fff9ec;
+}
+
+.plan-change-upcoming {
+  border: 1px solid #e3e9e3;
+  background: #f7f9f7;
+}
+
+.plan-change-confirmation p,
+.plan-change-support p,
+.plan-change-upcoming p {
+  margin: 0;
+}
+
+.plan-change-confirmation-label {
+  color: #235a40;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.plan-change-support a,
+.plan-change-cancel {
+  width: fit-content;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #1d694d;
+  font: inherit;
+  font-size: 0.83rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.plan-change-cancel:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.plan-change-current {
+  margin: 0;
+  color: #58675e;
+  font-size: 0.84rem;
 }
 
 .creator-dashboard .dashboard-progress-track {

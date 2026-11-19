@@ -137,6 +137,7 @@ export default async function AccountSettingsPage({
           connection={razorpayConnection}
           applicationKey={razorpayApplication}
           creatorEmail={user.email ?? ""}
+          initialBusinessName={profile.display_name}
           statusMessage={razorpayStatus}
           statusServiceAvailable={razorpayStatusServiceAvailable}
         />

@@ -680,7 +680,7 @@ export const faqItems = [
   {
     question: "What are CloverLoop's platform transaction fees?",
     answer:
-      "Free has a 0% platform fee up to ₹10,000 Gross Sales per calendar month. Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
+      "Free has a 0% platform fee up to ₹10,000 cumulative Gross Sales per creator account lifetime. Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
   },
   {
     question: "Are payment gateway processing fees included in CloverLoop pricing?",
@@ -690,12 +690,12 @@ export const faqItems = [
   {
     question: "What are the available plans?",
     answer:
-      "Free is ₹0/month with a 0% platform fee up to ₹10,000 Gross Sales per calendar month, one paid product listing and five free product listings per account lifetime. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator is ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
+      "Free is ₹0/month with a 0% platform fee up to ₹10,000 cumulative Gross Sales per creator account lifetime, one paid product listing and five free product listings per account lifetime. Creator is ₹0/month with a 4% platform fee, unlimited paid and free listings, and no cumulative Gross Sales limit. Pro Creator is ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
   },
   {
     question: "How is the platform transaction fee calculated?",
     answer:
-      "The Free plan has a 0% platform fee up to ₹10,000 Gross Sales per calendar month. Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
+      "The Free plan has a 0% platform fee up to ₹10,000 cumulative Gross Sales per creator account lifetime. Creator has a 4% platform fee, and Pro Creator has a 0% platform fee with a ₹2,999 monthly subscription. Payment-provider processing charges are separate.",
   },
   {
     question: "Does the Free plan have a limit on free products?",

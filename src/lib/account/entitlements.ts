@@ -7,7 +7,7 @@ export type CreatorEntitlements = {
   platformFeePercentage: number;
   paidProductLimit: number | null;
   freeProductLimit: number | null;
-  monthlyGrossSalesLimitPaise: number | null;
+  cumulativeGrossSalesLimitPaise: number | null;
   founderAllocationNumber: number | null;
   founderActivatedAt: string | null;
   founderExpiresAt: string | null;
@@ -52,7 +52,7 @@ export async function getMyPlanEntitlements(
     platformFeePercentage: row.platform_fee_percentage,
     paidProductLimit: numberOrNull(row.paid_product_limit),
     freeProductLimit: numberOrNull(row.free_product_limit),
-    monthlyGrossSalesLimitPaise: numberOrNull(row.monthly_gross_sales_limit_paise),
+    cumulativeGrossSalesLimitPaise: numberOrNull(row.cumulative_gross_sales_limit_paise),
     founderAllocationNumber: numberOrNull(row.founder_allocation_number),
     founderActivatedAt: textOrNull(row.founder_activated_at),
     founderExpiresAt: textOrNull(row.founder_expires_at),

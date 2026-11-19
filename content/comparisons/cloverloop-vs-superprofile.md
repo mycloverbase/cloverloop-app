@@ -11,7 +11,7 @@ For a creator focused on digital downloads, compare CloverLoop's published plan 
 | Pricing item | CloverLoop | SuperProfile official pricing page |
 | --- | --- | --- |
 | Free entry | Free: ₹0/month; 0% platform fee; 1 paid and 5 free product listings per account lifetime | Starter: free; digital-product selling requires a paid plan |
-| Creator tier | Creator: ₹0/month + 4%; unlimited listings and no monthly Gross Sales limit | Creator: ₹99 first month, then ₹499/month; 5% platform fee for Indian subscribers |
+| Creator tier | Creator: ₹0/month + 4%; unlimited listings; no ₹10,000 lifetime cap | Creator: ₹99 first month, then ₹499/month; 5% platform fee for Indian subscribers |
 | Higher tier | Pro Creator: ₹2,999/month + 0%; unlimited listings | Pro: custom price |
 | Country and currency shown | INR pricing | India page shows INR pricing; global pricing and fee terms differ |
 | Payment processing | Provider charges are additional and payable separately by the creator | Check the current plan and payment terms for your account and country |

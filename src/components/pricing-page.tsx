@@ -26,11 +26,11 @@ const pricingFaqs = [
   },
   {
     question: "What is the difference between Free, Creator and Pro Creator?",
-    answer: "Free costs ₹0/month, has a 0% platform fee up to ₹10,000 Gross Sales per calendar month and includes one paid product listing and five free product listings per account lifetime. Creator costs ₹0/month with a 4% platform fee, unlimited paid and free listings, and no monthly Gross Sales limit. Pro Creator costs ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
+    answer: "Free costs ₹0/month, has a 0% platform fee up to ₹10,000 cumulative Gross Sales per creator account lifetime and includes one paid product listing and five free product listings per account lifetime. The cap does not reset monthly. Creator costs ₹0/month with a 4% platform fee, unlimited paid and free listings, and no cumulative Gross Sales limit. Pro Creator costs ₹2,999/month with a 0% platform fee and unlimited paid and free listings. Provider processing charges are separate.",
   },
   {
-    question: "What happens when I reach the Free plan's monthly Gross Sales limit?",
-    answer: "At ₹10,000 Gross Sales in a calendar month, the Free plan requires an upgrade to Creator to continue selling. Creator remains ₹0/month, charges a 4% platform transaction fee, and has no monthly Gross Sales limit. An upgrade requires your confirmation.",
+    question: "What happens when I reach the Free plan's cumulative Gross Sales limit?",
+    answer: "The Free plan's ₹10,000 cumulative Gross Sales limit is measured across the creator account's lifetime and does not reset monthly. New orders that would push the total over the cap are blocked, and the creator must upgrade to Creator to continue selling. Creator remains ₹0/month with a 4% platform transaction fee and no cumulative Gross Sales limit. An upgrade requires your confirmation.",
   },
   {
     question: "Does the calculator show guaranteed earnings?",
@@ -91,12 +91,12 @@ export function PricingPage() {
                 <p className="platform-fee-details">{plan.feeDetails}</p>
               </div>
               <TrackLink
-                href={plan.id === "free" ? "/signup" : `/dashboard#${plan.id === "creator" ? "creator-upgrade" : "pro-upgrade"}`}
+                href={plan.id === "free" ? "/signup" : "/dashboard#plan-change"}
                 event="pricing_cta_click"
                 eventValue={plan.name}
                 className={`button ${"recommended" in plan && plan.recommended ? "" : "button-secondary"}`}
               >
-                {plan.id === "free" ? "Create an account" : `Upgrade to ${plan.name}`} <ArrowRight size={17} />
+                {plan.id === "free" ? "Create an account" : `Change to ${plan.name}`} <ArrowRight size={17} />
               </TrackLink>
               <div className="plan-includes">
                 <h3>Plan includes</h3>
@@ -138,13 +138,13 @@ export function PricingPage() {
           <header className="pricing-earnings-heading">
             <h2 id="pricing-earnings-title">How platform fees and subscriptions work</h2>
             <p>
-              Free has a 0% platform fee up to ₹10,000 Gross Sales per calendar month. Creator has a 4% platform fee with no monthly subscription.
+              Free has a 0% platform fee up to ₹10,000 cumulative Gross Sales per creator account lifetime. Creator has a 4% platform fee with no monthly subscription.
               Pro Creator has a 0% platform fee and costs ₹2,999/month.
             </p>
           </header>
           <p className="pricing-earnings-accounting">
             Payment-provider charges and applicable taxes are separate. Free includes one paid and five
-            free product listings per account lifetime and a ₹10,000 Gross Sales limit per calendar month.
+            free product listings per account lifetime and a ₹10,000 cumulative Gross Sales limit that does not reset monthly.
           </p>
         </section>
 

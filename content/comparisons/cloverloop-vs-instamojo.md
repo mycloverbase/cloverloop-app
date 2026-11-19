@@ -11,7 +11,7 @@ Instamojo may suit sellers who need its broader ecommerce workflow, while Clover
 | Pricing item | CloverLoop | Instamojo current Online Store pricing |
 | --- | --- | --- |
 | Entry plan | Free: ₹0/month; 0% platform fee; 1 paid and 5 free product listings per account lifetime | Lite: ₹0/year; 5% + ₹3 listed transaction fee |
-| Middle plan | Creator: ₹0/month + 4%; unlimited listings and no monthly Gross Sales limit | Starter: ₹6,999/year; 5% + ₹3 listed transaction fee |
+| Middle plan | Creator: ₹0/month + 4%; unlimited listings; no ₹10,000 lifetime cap | Starter: ₹6,999/year; 5% + ₹3 listed transaction fee |
 | Higher plan | Pro Creator: ₹2,999/month + 0%; unlimited listings | Growth: ₹14,999/year or ₹2,999/month; 2% + ₹3 listed transaction fee |
 | Payment model | Provider processing charges are separate and payable by the creator | Instamojo online-store pricing uses its payment system; check the transaction breakdown shown for your account |
 | Product focus | Digital-product creator storefronts | Broader online-store plans |

@@ -5,10 +5,7 @@ import { ArrowRight, CircleCheck, CircleHelp, Package, Store, UserRound } from "
 import { creatorPlans } from "@/lib/account/plans";
 import { getAvatarSignedUrl, getCreatorName, requireCreatorContext } from "@/lib/account/server";
 import { getMyPlanEntitlements } from "@/lib/account/entitlements";
-import {
-  UpgradeToCreatorButton,
-  UpgradeToProCreatorButton,
-} from "@/components/dashboard/plan-upgrade-controls";
+import { ChangeMyPlanControl } from "@/components/dashboard/plan-upgrade-controls";
 import {
   getRazorpayOAuthMode,
   selectRazorpayApplication,
@@ -95,9 +92,9 @@ export default async function DashboardPage({
   const productCount = productCountResponse.count ?? 0;
   const plan = creatorPlans[entitlements.plan];
   const monthlyPlanPrice = `₹${(entitlements.monthlyPricePaise / 100).toLocaleString("en-IN")}/month`;
-  const monthlyGrossSalesLimit = entitlements.monthlyGrossSalesLimitPaise === null
+  const cumulativeGrossSalesLimit = entitlements.cumulativeGrossSalesLimitPaise === null
     ? null
-    : `₹${(entitlements.monthlyGrossSalesLimitPaise / 100).toLocaleString("en-IN")}`;
+    : `₹${(entitlements.cumulativeGrossSalesLimitPaise / 100).toLocaleString("en-IN")}`;
   const checklist = completionItems(profile);
   const completed = checklist.filter((item) => item.complete).length;
   const completionPercentage = Math.round((completed / checklist.length) * 100);
@@ -226,29 +223,19 @@ export default async function DashboardPage({
             {entitlements.plan === "free" ? " (free product allowance is lifetime)" : ""}.
           </p>
           <p>
-            {monthlyGrossSalesLimit
-              ? `Monthly Gross Sales limit: ${monthlyGrossSalesLimit} per calendar month. Upgrade to Creator to continue selling after reaching the limit.`
-              : "No monthly Gross Sales limit."}
+            {cumulativeGrossSalesLimit
+              ? `Cumulative Gross Sales limit: ${cumulativeGrossSalesLimit} per creator account lifetime. Upgrade to Creator to continue selling after reaching the limit.`
+              : "No cumulative Gross Sales limit."}
           </p>
-          {entitlements.plan === "free" ? (
-            <section id="creator-upgrade" className="dashboard-plan-upgrade">
-              <h3>Unlock unlimited product listings</h3>
-              <p>Upgrade to Creator to publish unlimited paid and free products, remove the ₹10,000 monthly Gross Sales limit, and pay a 4% platform transaction fee.</p>
-              <UpgradeToCreatorButton />
-            </section>
-          ) : entitlements.plan === "creator" ? (
-            <section id="pro-upgrade" className="dashboard-plan-upgrade">
-              <h3>Upgrade to Pro Creator</h3>
-              <p>Eliminate CloverLoop&apos;s platform transaction fee with Pro Creator for ₹2,999/month, excluding applicable GST.</p>
-              <UpgradeToProCreatorButton />
-              <p>Payment-provider processing charges are additional. Subscription setup is not available until a provider is configured.</p>
-            </section>
-          ) : (
+          <section id="plan-change" className="dashboard-plan-upgrade">
+            <ChangeMyPlanControl currentPlan={entitlements.plan} />
+          </section>
+          {entitlements.plan === "pro_creator" ? (
             <p>
               Pro subscription: {entitlements.subscriptionStatus ?? "Active"}
               {entitlements.nextBillingAt ? ` · Next billing date ${founderDate(entitlements.nextBillingAt)}` : ""}
             </p>
-          )}
+          ) : null}
           {entitlements.plan !== "pro_creator" && entitlements.subscriptionStatus ? (
             <p>
               Pro subscription status: {entitlements.subscriptionStatus}

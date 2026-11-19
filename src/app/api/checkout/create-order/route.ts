@@ -71,6 +71,59 @@ async function releaseProviderCreationClaim(
   if (error) console.error("Razorpay order creation claim could not be released.");
 }
 
+async function checkCumulativeFreeSalesLimit(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  order: CheckoutOrderRow,
+): Promise<"allowed" | "limit-reached" | "unavailable"> {
+  const { data: entitlement, error: entitlementError } = await admin
+    .from("plan_entitlements")
+    .select("cumulative_gross_sales_limit_paise")
+    .eq("creator_id", order.creator_id)
+    .maybeSingle();
+  if (entitlementError || !entitlement) {
+    console.error("Could not verify the creator's cumulative sales limit.", {
+      code: entitlementError?.code ?? "not_found",
+    });
+    return "unavailable";
+  }
+
+  const salesLimit = entitlement.cumulative_gross_sales_limit_paise;
+  if (salesLimit === null) return "allowed";
+  if (typeof salesLimit !== "number" || !Number.isSafeInteger(salesLimit) || salesLimit < 0) {
+    console.error("The creator's cumulative sales limit was invalid.");
+    return "unavailable";
+  }
+
+  const { data: paidOrders, error: paidOrdersError } = await admin
+    .from("razorpay_checkout_orders")
+    .select("amount_paise")
+    .eq("creator_id", order.creator_id)
+    .eq("environment", "live")
+    .eq("order_status", "paid")
+    .eq("payment_status", "captured");
+  if (paidOrdersError || !paidOrders) {
+    console.error("Could not total the creator's successful live sales.", {
+      code: paidOrdersError?.code ?? "not_found",
+    });
+    return "unavailable";
+  }
+
+  const successfulGrossSales = paidOrders.reduce((total, paidOrder) => {
+    if (typeof paidOrder.amount_paise !== "number" || !Number.isSafeInteger(paidOrder.amount_paise)) {
+      return Number.NaN;
+    }
+    return total + paidOrder.amount_paise;
+  }, 0);
+  if (!Number.isSafeInteger(successfulGrossSales)) {
+    console.error("The creator's successful live sales total was invalid.");
+    return "unavailable";
+  }
+
+  return successfulGrossSales + order.amount_paise > salesLimit
+    ? "limit-reached"
+    : "allowed";
+}
+
 export async function POST(request: Request) {
   const environment = getRazorpayOAuthMode();
   if (!isRazorpayCheckoutEnabled(environment)) {
@@ -167,6 +220,14 @@ export async function POST(request: Request) {
   );
 
   if (rpcError) {
+    if (rpcError.message.includes("free_cumulative_sales_limit_reached")) {
+      return jsonResponse(
+        {
+          error: "This creator has reached the Free plan sales limit and must change plans before accepting more purchases.",
+        },
+        409,
+      );
+    }
     if (rpcError.message.includes("product_not_available")) {
       return jsonResponse({ error: "This product is no longer available." }, 404);
     }
@@ -189,6 +250,24 @@ export async function POST(request: Request) {
     return jsonResponse({ error: "Unable to start checkout." }, 500);
   }
   const order = rowValue;
+
+  if (environment === "live") {
+    const salesLimitStatus = await checkCumulativeFreeSalesLimit(admin, order);
+    if (salesLimitStatus !== "allowed") {
+      if (order.should_create_provider_order && !order.razorpay_order_id) {
+        await releaseProviderCreationClaim(admin, order.order_id);
+      }
+      if (salesLimitStatus === "limit-reached") {
+        return jsonResponse(
+          {
+            error: "This creator has reached the Free plan sales limit and must change plans before accepting more purchases.",
+          },
+          409,
+        );
+      }
+      return jsonResponse({ error: "Checkout is temporarily unavailable." }, 503);
+    }
+  }
 
   const connection = await getRazorpayCheckoutConnection(order.creator_id, environment);
   if (!connection) {

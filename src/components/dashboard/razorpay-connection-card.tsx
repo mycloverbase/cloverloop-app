@@ -1,6 +1,5 @@
 import {
   disconnectRazorpayConnectionAction,
-  startRazorpayConnectionAction,
 } from "@/app/dashboard/razorpay/actions";
 import {
   isRazorpayConnectionUsable,
@@ -9,6 +8,7 @@ import {
   type RazorpayOAuthReadiness,
 } from "@/lib/razorpay/oauth";
 import { RazorpayActionButton } from "@/components/dashboard/razorpay-action-button";
+import { RazorpayConnectFlow } from "@/components/dashboard/razorpay-connect-flow";
 
 type RazorpayConnectionSummary = {
   accountId: string;
@@ -81,11 +81,15 @@ const queryMessages: Record<string, { message: string; tone: "success" | "warnin
     tone: "error",
   },
   "commission-consent-required": {
-    message: "Accept the Creator Plan commission disclosure and provide the requested details before connecting.",
+    message: "Please verify your details and confirm consent before continuing.",
     tone: "warning",
   },
+  "consent-record-error": {
+    message: "We couldn’t save your consent, so Razorpay was not opened. Please review the details and try again.",
+    tone: "error",
+  },
   "migration-error": {
-    message: "The Razorpay application migration could not be recorded. Please retry or contact support.",
+    message: "We couldn’t prepare the updated Razorpay connection. Please retry or contact support.",
     tone: "error",
   },
   "plan-changed": {
@@ -99,6 +103,7 @@ export function RazorpayConnectionCard({
   connection,
   applicationKey,
   creatorEmail,
+  initialBusinessName,
   statusMessage,
   statusServiceAvailable,
 }: {
@@ -106,6 +111,7 @@ export function RazorpayConnectionCard({
   connection: RazorpayConnectionSummary | null;
   applicationKey: RazorpayApplicationKey | null;
   creatorEmail: string;
+  initialBusinessName: string;
   statusMessage: string | undefined;
   statusServiceAvailable: boolean;
 }) {
@@ -174,7 +180,19 @@ export function RazorpayConnectionCard({
 
       {applicationMismatch ? (
         <p className="dashboard-message dashboard-message-warning" role="status">
-          This connection needs an update. Reconnect Razorpay to continue.
+          Your plan has changed. Reconnect to apply the updated commission settings before accepting payments.
+        </p>
+      ) : connection && !tokenIsCurrent && connection.status !== "disconnected" ? (
+        <p className="dashboard-message dashboard-message-warning" role="status">
+          Your Razorpay connection needs renewing. Reconnect to continue accepting payments.
+        </p>
+      ) : !connection ? (
+        <p className="razorpay-connection-reason">
+          Connect your Razorpay account to prepare your storefront for payments.
+        </p>
+      ) : connection.status === "disconnected" ? (
+        <p className="razorpay-connection-reason">
+          Your Razorpay account is disconnected. Connect again to accept payments.
         </p>
       ) : null}
 
@@ -184,46 +202,16 @@ export function RazorpayConnectionCard({
 
       <div className="razorpay-connection-actions">
         {!tokenIsCurrent ? (
-          <form className="razorpay-connect-form" action={startRazorpayConnectionAction}>
-            {requiresCommissionConsent ? (
-              <div className="razorpay-consent">
-                <p>
-                  I authorise CloverLoop to charge an additional platform commission of 4% on eligible successful transactions, plus applicable GST. I understand that this commission will be automatically deducted through Razorpay settlements, in addition to standard Razorpay payment gateway charges. I agree to the applicable platform commission and refund terms.
-                </p>
-                <label>
-                  Legal or business name
-                  <input name="businessName" type="text" required minLength={2} maxLength={120} autoComplete="organization" />
-                </label>
-                <label>
-                  Registered Razorpay email
-                  <input
-                    name="razorpayEmail"
-                    type="email"
-                    required
-                    maxLength={254}
-                    autoComplete="email"
-                    defaultValue={creatorEmail}
-                  />
-                </label>
-                <label className="razorpay-consent-checkbox">
-                  <input name="commissionConsent" type="checkbox" value="yes" required />
-                  {" "}I explicitly accept the additional 4% platform commission, applicable GST, and the applicable platform commission and refund terms.
-                </label>
-              </div>
-            ) : null}
-            <div className="razorpay-connect-actions">
-              <RazorpayActionButton
-                className="button"
-                disabled={!readiness.available || !statusServiceAvailable || !applicationKey}
-                label={applicationMismatch || connection?.status === "reconnect_required" || connection?.status === "revoked"
-                  ? "Reconnect Razorpay"
-                  : "Connect Razorpay"}
-                pendingLabel={connection && (applicationMismatch || connection.status === "reconnect_required" || connection.status === "revoked")
-                  ? "Reconnecting..."
-                  : "Connecting..."}
-              />
-            </div>
-          </form>
+          <RazorpayConnectFlow
+            requiresCommissionConsent={requiresCommissionConsent}
+            readinessAvailable={readiness.available}
+            statusServiceAvailable={statusServiceAvailable}
+            applicationKeyAvailable={Boolean(applicationKey)}
+            applicationMismatch={applicationMismatch}
+            reconnectRequired={Boolean(connection && connection.status !== "disconnected")}
+            creatorEmail={creatorEmail}
+            initialBusinessName={initialBusinessName}
+          />
         ) : null}
         {canDisconnect ? (
           <form className="razorpay-disconnect-form" action={disconnectRazorpayConnectionAction}>

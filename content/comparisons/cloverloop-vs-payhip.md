@@ -11,7 +11,7 @@ Compare the monthly subscription, currency conversion and applicable taxes along
 | Pricing item | CloverLoop | Payhip |
 | --- | --- | --- |
 | Free plan | ₹0/month; 0% platform fee; 1 paid and 5 free product listings per account lifetime | US$0/month + 5%; unlimited products |
-| Middle plan | Creator: ₹0/month + 4%; unlimited listings and no monthly Gross Sales limit | Plus: US$29/month + 2% listed fee |
+| Middle plan | Creator: ₹0/month + 4%; unlimited listings; no ₹10,000 lifetime cap | Plus: US$29/month + 2% listed fee |
 | Zero-platform-fee tier | Pro Creator: ₹2,999/month + 0%; unlimited listings | Pro: US$99/month + 0% Payhip transaction fee |
 | Payment processing | Provider charges are additional and payable separately by the creator | Stripe/PayPal processing fees are additional |
 | Tax and currency | INR plan pricing; applicable GST on CloverLoop commission | USD plan pricing; confirm processor availability and any applicable tax for your country |
