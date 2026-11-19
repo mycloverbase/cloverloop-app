@@ -43,7 +43,7 @@ Do not set the FOUR_PERCENT Live credentials until the production application, f
 
 ## 3. Database and application deployment
 
-1. Back up the database and apply `supabase/migrations/20261118190000_razorpay_dual_applications.sql` to a staging database first.
+1. Back up the database and apply `supabase/migrations/20261118190000_razorpay_dual_applications.sql` followed by `supabase/migrations/20261119003000_fix_razorpay_consent_id_ambiguity.sql` to a staging database first.
 2. Verify the migration completes and the service-role RPCs, RLS restrictions, triggers, and indexes are present.
 3. Confirm existing connection rows are retained and are marked ZERO_FEE without forcing reconnection.
 4. Deploy the application after the migration is applied. OAuth callbacks and order creation depend on the new database columns and RPCs.

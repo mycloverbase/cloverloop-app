@@ -283,7 +283,7 @@ declare
   entitlement_row public.plan_entitlements%rowtype;
   existing_row public.creator_razorpay_connections%rowtype;
   saved_creator_id uuid;
-  consent_id uuid;
+  saved_consent_id uuid;
 begin
   if requested_creator_id is null
     or requested_razorpay_account_id is null
@@ -461,15 +461,15 @@ begin
       requested_state_hash
     )
     on conflict (state_hash) do nothing
-    returning id into consent_id;
+    returning id into saved_consent_id;
 
-    if consent_id is null then
-      select consent.id into consent_id
+    if saved_consent_id is null then
+      select consent.id into saved_consent_id
       from public.razorpay_commission_consents consent
       where consent.state_hash = requested_state_hash;
     end if;
 
-    if consent_id is null then
+    if saved_consent_id is null then
       raise exception 'Creator commission consent could not be recorded';
     end if;
 
@@ -477,7 +477,7 @@ begin
       consent_id, creator_id, recipient_email, creator_email
     )
     values (
-      consent_id, requested_creator_id,
+      saved_consent_id, requested_creator_id,
       case
         when requested_partnerships_email ~* '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$'
           then requested_partnerships_email
