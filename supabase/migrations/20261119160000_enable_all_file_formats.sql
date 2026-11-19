@@ -1,9 +1,6 @@
 -- Enable all file formats for product uploads
 -- Removes file format restrictions to support .prst and other file types
 
--- Recreate the storefront_products table with updated constraints
--- that accept any alphanumeric file extension instead of just the predefined list
-
 -- Step 1: Create a temporary table with the new constraints
 create table public.storefront_products_new (
   id uuid primary key default gen_random_uuid(),
@@ -13,7 +10,7 @@ create table public.storefront_products_new (
   name text not null check (char_length(btrim(name)) between 1 and 100),
   description text not null check (char_length(btrim(description)) between 1 and 5000),
   category text check (category is null or char_length(btrim(category)) <= 50),
-  subcategory text,
+  subcategory text not null default 'Digital Downloads' check (char_length(btrim(subcategory)) between 1 and 80),
   is_free boolean not null default false,
   price_paise bigint not null default 0
     check (price_paise between 0 and 9007199254740991)
@@ -69,9 +66,21 @@ create table public.storefront_products_new (
   check (first_listed_at is not null or (not counted_as_free and not counted_as_paid))
 );
 
--- Step 2: Copy all data from old table to new table
-insert into public.storefront_products_new
-select * from public.storefront_products;
+-- Step 2: Copy all data from old table to new table with explicit columns
+insert into public.storefront_products_new (
+  id, storefront_id, user_id, product_type, name, description, category, subcategory,
+  is_free, price_paise, is_active, cover_image_path, file_path, retired_file_path,
+  file_name, file_size, file_mime_type, pending_file_path, pending_file_name,
+  pending_file_expires_at, first_listed_at, counted_as_free, counted_as_paid,
+  deleted_at, created_at, updated_at
+)
+select
+  id, storefront_id, user_id, product_type, name, description, category, subcategory,
+  is_free, price_paise, is_active, cover_image_path, file_path, retired_file_path,
+  file_name, file_size, file_mime_type, pending_file_path, pending_file_name,
+  pending_file_expires_at, first_listed_at, counted_as_free, counted_as_paid,
+  deleted_at, created_at, updated_at
+from public.storefront_products;
 
 -- Step 3: Drop old table (which will cascade to triggers and policies)
 drop table public.storefront_products cascade;
@@ -160,4 +169,5 @@ begin
   return upload_path;
 end;
 $$;
+
 
