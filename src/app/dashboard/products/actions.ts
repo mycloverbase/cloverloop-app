@@ -14,6 +14,7 @@ type ProductInput = {
   name: string;
   description: string;
   category: string;
+  subcategory: string;
   isFree: boolean;
   pricePaise: number;
   coverImagePath: string | null;
@@ -75,6 +76,9 @@ function parseProductInput(value: unknown): ProductInput | null {
     typeof input.category !== "string" ||
     input.category.trim().length < 1 ||
     input.category.trim().length > 50 ||
+    typeof input.subcategory !== "string" ||
+    input.subcategory.trim().length < 1 ||
+    input.subcategory.trim().length > 80 ||
     typeof input.isFree !== "boolean" ||
     typeof input.pricePaise !== "number" ||
     !Number.isSafeInteger(input.pricePaise) ||
@@ -92,6 +96,7 @@ function parseProductInput(value: unknown): ProductInput | null {
     name: input.name.trim(),
     description: input.description.trim(),
     category: input.category.trim(),
+    subcategory: input.subcategory.trim(),
     isFree: input.isFree,
     pricePaise,
     coverImagePath: input.coverImagePath as string | null,
@@ -210,6 +215,7 @@ export async function createProductDraftAction(
     requested_name: product.name,
     requested_description: product.description,
     requested_category: product.category,
+    requested_subcategory: product.subcategory,
     requested_is_free: product.isFree,
     requested_price_paise: product.pricePaise,
     requested_cover_image_path: product.coverImagePath,
@@ -269,6 +275,7 @@ export async function saveProductAction(productId: string, input: unknown): Prom
     requested_name: product.name,
     requested_description: product.description,
     requested_category: product.category,
+    requested_subcategory: product.subcategory,
     requested_is_free: product.isFree,
     requested_price_paise: product.pricePaise,
     requested_cover_image_path: product.coverImagePath,

@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     "/api/launch-checklist": ["./public/downloads/cloverloop-link-in-bio-launch-checklist.pdf"],
   },
   experimental: {
+    agentUpgrade: "security",
     serverActions: {
       bodySizeLimit: "11mb",
     },

@@ -3,7 +3,7 @@ import { ProductManager } from "@/components/storefront/product-manager";
 import { PaymentSetupWarning } from "@/components/dashboard/payment-setup-warning";
 import { requireCreatorContext } from "@/lib/account/server";
 import { getMyPlanEntitlements } from "@/lib/account/entitlements";
-import { getCreatorStorefront } from "@/lib/storefront/server";
+import { getCreatorStorefront, getStorefrontSubcategoryOptions } from "@/lib/storefront/server";
 import { getRazorpayCheckoutConnectionStatus } from "@/lib/razorpay/checkout";
 
 export const metadata: Metadata = {
@@ -48,6 +48,7 @@ export default async function CreatorProductsPage() {
   const { supabase, user } = await requireCreatorContext();
   const [
     storefront,
+    subcategoryOptions,
     freeListingCount,
     paidListingCount,
     claimStatsResponse,
@@ -56,6 +57,7 @@ export default async function CreatorProductsPage() {
     paymentConnectionStatus,
   ] = await Promise.all([
     getCreatorStorefront(supabase, user.id),
+    getStorefrontSubcategoryOptions(supabase),
     getListingCount(supabase, user.id, "counted_as_free"),
     getListingCount(supabase, user.id, "counted_as_paid"),
     supabase.rpc("get_my_free_product_claim_stats"),
@@ -88,6 +90,7 @@ export default async function CreatorProductsPage() {
         storefrontUsername={storefront?.username ?? null}
         storefrontStatus={storefront?.status ?? null}
         initialProducts={storefront?.products ?? []}
+        subcategoryOptions={subcategoryOptions}
         plan={entitlements.plan}
         initialFreeListingCount={freeListingCount}
         initialPaidListingCount={paidListingCount}

@@ -387,7 +387,7 @@ function ProfileAvatarEditor({
           <span className="dashboard-card-label">Profile picture</span>
           <h2 id="profile-picture-title">Your photo</h2>
         </div>
-        <p>JPG, PNG or WebP, up to 5 MB. Your image is stored privately with access restricted to your account.</p>
+        <p>JPG, PNG or WebP, up to 5 MB. Your image stays in private storage and appears on your public storefront when selected there.</p>
       </div>
       <div className="dashboard-avatar-editor">
         <div className="dashboard-avatar-preview" aria-label="Profile picture preview">

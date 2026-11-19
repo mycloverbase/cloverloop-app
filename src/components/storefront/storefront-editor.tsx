@@ -193,7 +193,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
       }
       if (result.storefrontId) setStorefrontId(result.storefrontId);
       let savedInput = input;
-      if (result.path && input.profileImagePath === null && draftRef.current.profileImagePath === null) {
+      if (result.path && draftRef.current.profileImagePath === input.profileImagePath) {
         const nextDraft = { ...draftRef.current, profileImagePath: result.path };
         draftRef.current = nextDraft;
         setDraft(nextDraft);

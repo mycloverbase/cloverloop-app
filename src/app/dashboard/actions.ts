@@ -3,9 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
-import { copyProfilePhoto, removeStorefrontAsset } from "@/lib/account/profile-photo-storage";
 import type { ActionResult, SocialLink } from "@/lib/account/types";
 
 type AuthenticatedClient =
@@ -283,41 +281,10 @@ export async function saveCreatorAvatarAction(avatarPath: string | null): Promis
     return { ok: false, message: "The profile image could not be saved. Please try again." };
   }
 
-  let storefrontImagePath: string | null = null;
-  let storageAdmin: ReturnType<typeof createSupabaseAdminClient> = null;
-  if (avatarPath && storefront && storefront.status !== "deletion_pending") {
-    storageAdmin = createSupabaseAdminClient();
-    if (!storageAdmin) {
-      return { ok: false, message: "Profile-photo synchronization is not configured. Please contact support." };
-    }
-
-    storefrontImagePath = `${crypto.randomUUID()}.webp`;
-    try {
-      await copyProfilePhoto(
-        storageAdmin,
-        "creator-avatars",
-        avatarPath,
-        "storefront-assets",
-        storefrontImagePath,
-      );
-    } catch (copyError) {
-      console.error("Could not copy the creator avatar to the storefront.", copyError);
-      return { ok: false, message: "The profile image could not be synchronized with your storefront." };
-    }
-
-    const { error: registerError } = await auth.supabase.rpc("register_storefront_asset", {
-      requested_storefront_id: storefront.id,
-      requested_path: storefrontImagePath,
-    });
-    if (registerError) {
-      console.error("Could not register the synchronized storefront image.", registerError);
-      const { error: cleanupError } = await storageAdmin.storage
-        .from("storefront-assets")
-        .remove([storefrontImagePath]);
-      if (cleanupError) console.error("Could not clean up an unregistered storefront image.", cleanupError);
-      return { ok: false, message: "The profile image could not be synchronized with your storefront." };
-    }
-  }
+  const storefrontImagePath =
+    avatarPath && storefront && storefront.status !== "deletion_pending"
+      ? avatarPath
+      : null;
 
   const { error } = await auth.supabase.rpc("sync_my_creator_photo", {
     requested_avatar_path: avatarPath,
@@ -325,9 +292,6 @@ export async function saveCreatorAvatarAction(avatarPath: string | null): Promis
   });
   if (error) {
     console.error("Could not synchronize the creator and storefront profile photos.", error);
-    if (storageAdmin && storefront && storefrontImagePath) {
-      await removeStorefrontAsset(storageAdmin, auth.userId, storefront.id, storefrontImagePath);
-    }
     return { ok: false, message: "The profile image could not be saved and synchronized. Please try again." };
   }
 

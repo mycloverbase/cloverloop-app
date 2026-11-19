@@ -2,34 +2,6 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export async function copyProfilePhoto(
-  admin: SupabaseClient,
-  sourceBucket: string,
-  sourcePath: string,
-  destinationBucket: string,
-  destinationPath: string,
-): Promise<void> {
-  const { data: image, error: downloadError } = await admin.storage
-    .from(sourceBucket)
-    .download(sourcePath);
-  if (downloadError || !image) {
-    console.error("Could not read an image for profile-photo synchronization.", downloadError);
-    throw new Error("The profile photo could not be copied. Please try again.");
-  }
-
-  const { error: uploadError } = await admin.storage
-    .from(destinationBucket)
-    .upload(destinationPath, image, {
-      contentType: "image/webp",
-      cacheControl: "3600",
-      upsert: false,
-    });
-  if (uploadError) {
-    console.error("Could not write an image for profile-photo synchronization.", uploadError);
-    throw new Error("The profile photo could not be copied. Please try again.");
-  }
-}
-
 export async function removeCreatorAvatar(
   admin: SupabaseClient,
   avatarPath: string | null,

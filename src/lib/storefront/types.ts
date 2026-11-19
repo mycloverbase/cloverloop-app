@@ -23,6 +23,7 @@ export type StorefrontProductDisplay = {
   name: string;
   description: string;
   category: string;
+  subcategory: string;
   productType: "digital";
   isFree: boolean;
   pricePaise: number;
@@ -46,6 +47,11 @@ export type CreatorStorefrontProduct = StorefrontProductDisplay & {
   countedAsFree: boolean;
   countedAsPaid: boolean;
   createdAt: string;
+};
+
+export type StorefrontSubcategoryOption = {
+  category: string;
+  name: string;
 };
 
 export type StorefrontCustomization = {

@@ -8,6 +8,7 @@ const productRow = {
   name: "Digital Marketing Guide",
   description: "A practical creator guide.",
   category: "Education",
+  subcategory: "Learning Resources",
   product_type: "digital",
   is_free: false,
   price_paise: 29900,
@@ -78,6 +79,7 @@ describe("published storefront product lookup", () => {
     expect(result?.product).toMatchObject({
       id: productId,
       pricePaise: 29900,
+      subcategory: "Learning Resources",
       fileName: "guide.pdf",
       fileSize: 2048,
       fileMimeType: "application/pdf",
@@ -105,6 +107,18 @@ describe("published storefront product lookup", () => {
         productId,
       );
       expect(result?.product.category).toBe("Other");
+    }
+  });
+
+  it("uses the fallback subcategory when published data is missing or blank", async () => {
+    for (const subcategory of [null, "  "]) {
+      const { client } = makeSupabase({ product: { ...productRow, subcategory } });
+      const result = await getPublishedStorefrontProduct(
+        client as never,
+        "test-creator",
+        productId,
+      );
+      expect(result?.product.subcategory).toBe("Digital Downloads");
     }
   });
 

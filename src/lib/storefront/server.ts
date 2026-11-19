@@ -1,4 +1,5 @@
 import type { createSupabasePublicClient } from "@/lib/supabase/public";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   type PublicStorefront,
   type PublicStorefrontDisplay,
@@ -9,6 +10,7 @@ import {
   type StorefrontDisplay,
   type StorefrontRecord,
   type StorefrontTheme,
+  type StorefrontSubcategoryOption,
 } from "@/lib/storefront/types";
 import { parseStorefrontDraft } from "@/lib/storefront/validation";
 
@@ -98,6 +100,9 @@ function parseCreatorProduct(value: unknown): CreatorStorefrontProduct | null {
     name: value.name,
     description: value.description,
     category: typeof value.category === "string" && value.category.trim() ? value.category : "Other",
+    subcategory: typeof value.subcategory === "string" && value.subcategory.trim()
+      ? value.subcategory
+      : "Digital Downloads",
     productType: "digital",
     isFree: value.is_free,
     pricePaise,
@@ -130,6 +135,9 @@ function parsePublicProduct(value: unknown): StorefrontProductDisplay | null {
     name: value.name,
     description: value.description,
     category: typeof value.category === "string" && value.category.trim() ? value.category : "Other",
+    subcategory: typeof value.subcategory === "string" && value.subcategory.trim()
+      ? value.subcategory
+      : "Digital Downloads",
     productType: "digital",
     isFree: value.is_free,
     pricePaise,
@@ -143,6 +151,26 @@ function storefrontImageUrl(
 ): string | null {
   if (!path) return null;
   return supabase.storage.from("storefront-assets").getPublicUrl(path).data.publicUrl;
+}
+
+async function storefrontProfileImageUrl(
+  supabase: StorefrontSupabaseClient,
+  path: string | null,
+  signer: NonNullable<ReturnType<typeof createSupabaseAdminClient>> | StorefrontSupabaseClient = supabase,
+): Promise<string | null> {
+  if (!path) return null;
+  if (!path.includes("/")) return storefrontImageUrl(supabase, path);
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.webp$/i.test(path)) {
+    throw new Error("The storefront profile image path returned by Supabase is invalid.");
+  }
+  const { data, error } = await signer.storage
+    .from("creator-avatars")
+    .createSignedUrl(path, 60 * 60 * 12);
+  if (error || !data?.signedUrl) {
+    console.error("Could not sign the shared storefront profile image.", error);
+    throw new Error("The storefront profile image could not be loaded. Please try again.");
+  }
+  return data.signedUrl;
 }
 
 function addCustomizationImageUrls(
@@ -176,7 +204,7 @@ export async function getCreatorStorefront(
   if (!storefront) throw new Error("The storefront data returned by Supabase is invalid.");
   const { data: productRows, error: productsError } = await supabase
     .from("storefront_products")
-    .select("id,storefront_id,name,description,category,product_type,is_free,price_paise,is_active,cover_image_path,file_name,file_size,file_mime_type,first_listed_at,counted_as_free,counted_as_paid,created_at")
+    .select("id,storefront_id,name,description,category,subcategory,product_type,is_free,price_paise,is_active,cover_image_path,file_name,file_size,file_mime_type,first_listed_at,counted_as_free,counted_as_paid,created_at")
     .eq("storefront_id", storefront.id)
     .is("deleted_at", null)
     .order("created_at", { ascending: false });
@@ -192,7 +220,7 @@ export async function getCreatorStorefront(
       coverImageUrl: storefrontImageUrl(supabase, product.coverImagePath),
     };
   });
-  const profileImageUrl = storefrontImageUrl(supabase, storefront.profile_image_path);
+  const profileImageUrl = await storefrontProfileImageUrl(supabase, storefront.profile_image_path);
   const bannerImageUrl = storefrontImageUrl(supabase, storefront.banner_image_path);
   const customization = addCustomizationImageUrls(supabase, { ...storefront.customization, products: [] });
   return { ...storefront, profileImageUrl, bannerImageUrl, products, customization };
@@ -236,7 +264,7 @@ export async function getPublishedStorefront(
   };
   const { data: productRows, error: productsError } = await supabase
     .from("published_storefront_products")
-    .select("id,name,description,category,product_type,is_free,price_paise,cover_image_path")
+    .select("id,name,description,category,subcategory,product_type,is_free,price_paise,cover_image_path")
     .eq("username", publicStorefront.username)
     .order("name", { ascending: true });
   if (productsError) {
@@ -252,7 +280,11 @@ export async function getPublishedStorefront(
       coverImageUrl: storefrontImageUrl(supabase, coverImagePath),
     };
   });
-  const profileImageUrl = storefrontImageUrl(supabase, publicStorefront.profile_image_path);
+  const profileImageUrl = await storefrontProfileImageUrl(
+    supabase,
+    publicStorefront.profile_image_path,
+    createSupabaseAdminClient() ?? undefined,
+  );
   const bannerImageUrl = storefrontImageUrl(supabase, publicStorefront.banner_image_path);
   const customization = addCustomizationImageUrls(supabase, { ...publicStorefront.customization, products: [] });
   return { ...publicStorefront, profileImageUrl, bannerImageUrl, products, customization };
@@ -271,7 +303,7 @@ export async function getPublishedStorefrontProduct(
 
   const { data, error } = await supabase
     .from("published_storefront_products")
-    .select("id,name,description,category,product_type,is_free,price_paise,cover_image_path,file_name,file_size,file_mime_type")
+    .select("id,name,description,category,subcategory,product_type,is_free,price_paise,cover_image_path,file_name,file_size,file_mime_type")
     .eq("username", storefront.username)
     .eq("id", productId)
     .maybeSingle();
@@ -279,6 +311,7 @@ export async function getPublishedStorefrontProduct(
     console.error("Could not load the published storefront product.", error);
     throw new Error("The product could not be loaded. Please try again.");
   }
+
   if (!data) return null;
 
   const product = parsePublicProduct(data);
@@ -297,4 +330,23 @@ export async function getPublishedStorefrontProduct(
       fileMimeType: typeof data.file_mime_type === "string" ? data.file_mime_type : null,
     },
   };
+}
+
+export async function getStorefrontSubcategoryOptions(
+  supabase: StorefrontSupabaseClient,
+): Promise<StorefrontSubcategoryOption[]> {
+  const { data, error } = await supabase
+    .from("storefront_product_subcategories")
+    .select("category,name")
+    .order("category", { ascending: true })
+    .order("name", { ascending: true });
+  if (error) {
+    console.error("Could not load product subcategory options.", error);
+    throw new Error("Product categories could not be loaded. Please try again.");
+  }
+  return (data ?? []).flatMap((row) =>
+    typeof row.category === "string" && typeof row.name === "string"
+      ? [{ category: row.category, name: row.name }]
+      : [],
+  );
 }

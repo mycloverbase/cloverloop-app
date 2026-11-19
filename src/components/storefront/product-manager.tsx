@@ -29,20 +29,23 @@ import {
   saveProductAction,
 } from "@/app/dashboard/products/actions";
 import { ImageCropUploader } from "@/components/storefront/image-crop-uploader";
-import { StorefrontProductCard } from "@/components/storefront/public-storefront";
+import { StorefrontProductCard } from "@/components/storefront/storefront-product-card";
 import type { CreatorPlanKey } from "@/lib/account/types";
 import {
   PRODUCT_FILE_ACCEPT,
   validateProductFileMetadata,
 } from "@/lib/storefront/product-files";
+import { PRODUCT_CATEGORIES, PRODUCT_SUBCATEGORIES } from "@/lib/storefront/product-categories";
 import { uploadProductFile } from "@/lib/storefront/product-upload";
-import type { CreatorStorefrontProduct } from "@/lib/storefront/types";
+import type { CreatorStorefrontProduct, StorefrontSubcategoryOption } from "@/lib/storefront/types";
 
 type ProductForm = {
   id: string | null;
   name: string;
   description: string;
   category: string;
+  subcategory: string;
+  isCustomSubcategory: boolean;
   coverImagePath: string | null;
   coverImageUrl: string | null;
   isFree: boolean;
@@ -60,20 +63,8 @@ type ProductForm = {
 };
 
 type ProductTypeOption = "digital" | "course" | "subscription" | "session";
-type ProductField = "name" | "description" | "category" | "price" | "file";
-
-const productCategories = [
-  "Education & Learning",
-  "Music",
-  "Business & Finance",
-  "Design & Creativity",
-  "Marketing",
-  "Technology",
-  "Productivity",
-  "Lifestyle",
-  "Health & Fitness",
-  "Other",
-];
+type ProductField = "name" | "description" | "category" | "subcategory" | "price" | "file";
+const CUSTOM_SUBCATEGORY = "__add_custom_subcategory__";
 
 const productTypes: {
   id: ProductTypeOption;
@@ -93,6 +84,7 @@ type ProductManagerProps = {
   storefrontUsername: string | null;
   storefrontStatus: string | null;
   initialProducts: CreatorStorefrontProduct[];
+  subcategoryOptions: StorefrontSubcategoryOption[];
   plan: CreatorPlanKey;
   initialFreeListingCount: number;
   initialPaidListingCount: number;
@@ -104,6 +96,8 @@ function blankForm(): ProductForm {
     name: "",
     description: "",
     category: "",
+    subcategory: "",
+    isCustomSubcategory: false,
     coverImagePath: null,
     coverImageUrl: null,
     isFree: false,
@@ -128,6 +122,7 @@ function formFromProduct(product: CreatorStorefrontProduct): ProductForm {
     name: product.name,
     description: product.description,
     category: product.category ?? "",
+    subcategory: product.subcategory ?? "",
     coverImagePath: product.coverImagePath,
     coverImageUrl: product.coverImageUrl,
     isFree: product.isFree,
@@ -166,12 +161,16 @@ export function ProductManager({
   storefrontUsername,
   storefrontStatus,
   initialProducts,
+  subcategoryOptions,
   plan,
   initialFreeListingCount,
   initialPaidListingCount,
 }: ProductManagerProps) {
   const router = useRouter();
   const [products, setProducts] = useState(initialProducts);
+  const [productSearch, setProductSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [subcategoryFilter, setSubcategoryFilter] = useState("all");
   const [freeListingCount, setFreeListingCount] = useState(initialFreeListingCount);
   const [paidListingCount, setPaidListingCount] = useState(initialPaidListingCount);
   const [form, setForm] = useState<ProductForm | null>(null);
@@ -190,6 +189,26 @@ export function ProductManager({
   const canCreateLeadMagnet = !limitedPlan || freeListingCount < 5;
   const canCreatePaidProduct = !limitedPlan || paidListingCount < 1;
   const percentage = (count: number, limit: number) => Math.min(100, Math.round((count / limit) * 100));
+  const categoriesInProducts = [...new Set(products.map((product) => product.category))].sort();
+  const filterCategories = [...new Set([...PRODUCT_CATEGORIES, ...categoriesInProducts])];
+  const subcategoriesForForm = form
+    ? [...new Set([
+      ...(PRODUCT_SUBCATEGORIES[form.category] ?? []),
+      ...subcategoryOptions
+        .filter((option) => option.category === form.category)
+        .map((option) => option.name),
+    ])]
+    : [];
+  const subcategoriesForFilter = categoryFilter === "all"
+    ? [...new Set(products.map((product) => product.subcategory))].sort()
+    : [...new Set(products
+      .filter((product) => product.category === categoryFilter)
+      .map((product) => product.subcategory))].sort();
+  const filteredProducts = products.filter((product) =>
+    (categoryFilter === "all" || product.category === categoryFilter) &&
+    (subcategoryFilter === "all" || product.subcategory === subcategoryFilter) &&
+    `${product.name} ${product.description}`.toLowerCase().includes(productSearch.trim().toLowerCase()),
+  );
 
   useEffect(() => {
     if (!form || !shouldScrollToNewForm.current) return;
@@ -237,6 +256,7 @@ export function ProductManager({
       if ("name" in update) delete next.name;
       if ("description" in update) delete next.description;
       if ("category" in update) delete next.category;
+      if ("subcategory" in update) delete next.subcategory;
       if ("price" in update || "isFree" in update) delete next.price;
       if ("file" in update) delete next.file;
       return next;
@@ -285,6 +305,10 @@ export function ProductManager({
       rejectForm("Product category is required. Choose a category before saving.", "category");
       return;
     }
+    if (!form.subcategory.trim() || form.subcategory.trim().length > 80) {
+      rejectForm("Product subcategory is required. Choose or enter a subcategory before saving.", "subcategory");
+      return;
+    }
     const pricePaise = form.isFree ? 0 : parsePrice(form.price);
     if (!form.isFree && pricePaise === null) {
       rejectForm("Enter a valid selling price in INR, greater than ₹0 with up to two decimal places.", "price");
@@ -322,6 +346,7 @@ export function ProductManager({
         name: form.name.trim(),
         description: form.description.trim(),
         category: form.category.trim(),
+        subcategory: form.subcategory.trim(),
         isFree: form.isFree,
         pricePaise: pricePaise ?? 0,
         coverImagePath: form.coverImagePath,
@@ -365,6 +390,7 @@ export function ProductManager({
         name: input.name,
         description: input.description,
         category: input.category,
+        subcategory: input.subcategory,
         productType: "digital",
         isFree: input.isFree,
         pricePaise: input.pricePaise,
@@ -406,6 +432,7 @@ export function ProductManager({
       name: product.name,
       description: product.description,
       category: product.category,
+      subcategory: product.subcategory,
       isFree: product.isFree,
       pricePaise: product.pricePaise,
       coverImagePath: product.coverImagePath,
@@ -595,7 +622,11 @@ export function ProductManager({
                 <span>Category <em>Required</em></span>
                 <select
                   value={form.category}
-                  onChange={(event) => patchForm({ category: event.target.value })}
+                  onChange={(event) => patchForm({
+                    category: event.target.value,
+                    subcategory: "",
+                    isCustomSubcategory: false,
+                  })}
                   disabled={busy}
                   required
                   data-product-field="category"
@@ -603,9 +634,53 @@ export function ProductManager({
                   aria-describedby={fieldErrors.category ? "product-category-error" : undefined}
                 >
                   <option value="">Select a category</option>
-                  {productCategories.map((category) => <option key={category} value={category}>{category}</option>)}
+                  {form.category && !PRODUCT_CATEGORIES.includes(form.category)
+                    ? <option value={form.category}>{form.category}</option>
+                    : null}
+                  {PRODUCT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                 </select>
                 {fieldErrors.category ? <small id="product-category-error" className="product-field-error">{fieldErrors.category}</small> : null}
+              </label>
+              <label className="dashboard-field">
+                <span>Subcategory <em>Required</em></span>
+                <select
+                  value={form.isCustomSubcategory || (
+                    form.subcategory !== "" && !subcategoriesForForm.includes(form.subcategory)
+                  ) ? CUSTOM_SUBCATEGORY : form.subcategory}
+                  onChange={(event) => {
+                    if (event.target.value === CUSTOM_SUBCATEGORY) {
+                      patchForm({ isCustomSubcategory: true, subcategory: "" });
+                    } else {
+                      patchForm({ isCustomSubcategory: false, subcategory: event.target.value });
+                    }
+                  }}
+                  disabled={busy || !form.category}
+                  required={!form.isCustomSubcategory}
+                  data-product-field="subcategory"
+                  aria-invalid={Boolean(fieldErrors.subcategory)}
+                  aria-describedby={fieldErrors.subcategory ? "product-subcategory-error" : undefined}
+                >
+                  <option value="">Select a subcategory</option>
+                  {subcategoriesForForm.map((subcategory) => (
+                    <option key={subcategory} value={subcategory}>{subcategory}</option>
+                  ))}
+                  <option value={CUSTOM_SUBCATEGORY}>Add a custom subcategory…</option>
+                </select>
+                {form.isCustomSubcategory || (
+                  form.subcategory !== "" && !subcategoriesForForm.includes(form.subcategory)
+                ) ? (
+                  <input
+                    maxLength={80}
+                    value={form.subcategory}
+                    onChange={(event) => patchForm({ subcategory: event.target.value, isCustomSubcategory: true })}
+                    placeholder="Enter a subcategory"
+                    disabled={busy}
+                    data-product-field="subcategory"
+                    aria-invalid={Boolean(fieldErrors.subcategory)}
+                    aria-describedby={fieldErrors.subcategory ? "product-subcategory-error" : undefined}
+                  />
+                ) : null}
+                {fieldErrors.subcategory ? <small id="product-subcategory-error" className="product-field-error">{fieldErrors.subcategory}</small> : null}
               </label>
             </div>
           </section>
@@ -732,8 +807,38 @@ export function ProductManager({
       ) : null}
 
       {products.length ? (
-        <section className="product-list" aria-label="Your products">
-          {products.map((product) => (
+        <>
+          <div className="product-list-filters" aria-label="Filter products">
+            <label className="dashboard-field">
+              <span>Search products</span>
+              <input value={productSearch} onChange={(event) => setProductSearch(event.target.value)} placeholder="Search name or description" />
+            </label>
+            <label className="dashboard-field">
+              <span>Category</span>
+              <select
+                value={categoryFilter}
+                onChange={(event) => {
+                  setCategoryFilter(event.target.value);
+                  setSubcategoryFilter("all");
+                }}
+              >
+                <option value="all">All categories</option>
+                {filterCategories.map((category) => <option key={category} value={category}>{category}</option>)}
+              </select>
+            </label>
+            <label className="dashboard-field">
+              <span>Subcategory</span>
+              <select value={subcategoryFilter} onChange={(event) => setSubcategoryFilter(event.target.value)}>
+                <option value="all">All subcategories</option>
+                {subcategoriesForFilter.map((subcategory) => (
+                  <option key={subcategory} value={subcategory}>{subcategory}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          {filteredProducts.length ? (
+            <section className="product-list" aria-label="Your products">
+              {filteredProducts.map((product) => (
             <article className="product-list-card" key={product.id}>
               <div className="product-list-cover-wrap">
                 <div className="product-list-cover">
@@ -755,6 +860,7 @@ export function ProductManager({
                 <div className="product-list-classification">
                   <span>{product.isFree ? "Lead Magnet" : "Paid Product"}</span>
                   {product.category ? <span>{product.category}</span> : null}
+                  {product.subcategory ? <span>{product.subcategory}</span> : null}
                 </div>
                 <div className="product-list-details">
                   <strong>{product.isFree ? "No cost" : rupeePrice(product.pricePaise)}</strong>
@@ -789,8 +895,12 @@ export function ProductManager({
                 </div>
               </div>
             </article>
-          ))}
-        </section>
+              ))}
+            </section>
+          ) : (
+            <p className="product-manager-note">No products match these filters.</p>
+          )}
+        </>
       ) : storefrontId ? (
         <div className="product-manager-empty">
           <h2>No products yet</h2>
