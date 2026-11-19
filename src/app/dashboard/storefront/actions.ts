@@ -136,7 +136,7 @@ export async function saveStorefrontAction(input: unknown): Promise<StorefrontAc
 
   const needsAvatarCleanup =
     profile.avatar_path !== null && profile.avatar_path !== avatarPathToSave;
-  const storageAdmin = needsAvatarCleanup ? createSupabaseAdminClient() : null;
+  let storageAdmin = needsAvatarCleanup ? createSupabaseAdminClient() : null;
   if (needsAvatarCleanup && !storageAdmin) {
     return { ok: false, message: "Profile-photo synchronization is not configured. Please contact support." };
   }
@@ -145,9 +145,13 @@ export async function saveStorefrontAction(input: unknown): Promise<StorefrontAc
 
   try {
     let imageUrl: string | undefined;
-    if (imagePathToSave) {
+    if (imagePathToSave && imagePathToSave !== parsed.value.profileImagePath) {
       if (isCreatorAvatarPath(imagePathToSave, auth.userId)) {
-        const { data: signedImage, error: signedImageError } = await auth.supabase.storage
+        if (!storageAdmin) storageAdmin = createSupabaseAdminClient();
+        if (!storageAdmin) {
+          return { ok: false, message: "Secure profile image previews are not configured. Please contact support." };
+        }
+        const { data: signedImage, error: signedImageError } = await storageAdmin.storage
           .from("creator-avatars")
           .createSignedUrl(imagePathToSave, 60 * 60 * 12);
         if (signedImageError || !signedImage?.signedUrl) {
@@ -399,7 +403,7 @@ export async function uploadStorefrontImageAction(formData: FormData): Promise<S
 
   let imageUrl: string;
   if (kind === "profile") {
-    const { data: signedImage, error: signedImageError } = await auth.supabase.storage
+    const { data: signedImage, error: signedImageError } = await storageAdmin.storage
       .from("creator-avatars")
       .createSignedUrl(imagePath, 60 * 60 * 12);
     if (signedImageError || !signedImage?.signedUrl) {
