@@ -43,6 +43,7 @@ afterEach(() => {
 describe("Razorpay commission authorization email queue", () => {
   it("sends the compliance email to Razorpay, copies the creator, and stores the provider message ID", async () => {
     const admin = createAdmin();
+    vi.stubEnv("RAZORPAY_PARTNERSHIPS_CC_EMAIL", "anmol.agrawal@razorpay.com");
     const fetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)) as {
         to: string[];
@@ -55,7 +56,7 @@ describe("Razorpay commission authorization email queue", () => {
         "Idempotency-Key": "razorpay-commission-consent-1",
       });
       expect(body.to).toEqual(["partnerships@razorpay.example"]);
-      expect(body.cc).toEqual(["creator@example.test"]);
+      expect(body.cc).toEqual(["creator@example.test", "anmol.agrawal@razorpay.com"]);
       expect(body.subject).toContain("acc_ABC123");
       expect(body.html).toContain("Creator &amp; Co");
       expect(body.html).toContain("https://cloverloop.in/images/brand/logo.png");

@@ -34,6 +34,7 @@ Also configure and verify:
 - [ ] `NEXT_PUBLIC_SITE_URL` matches the deployed site origin and registered callback.
 - [ ] `RAZORPAY_TOKEN_ENCRYPTION_KEY` remains the existing valid base64-encoded 32-byte key. Do not rotate it as part of this deployment.
 - [ ] `RAZORPAY_PARTNERSHIPS_EMAIL` is the approved Razorpay recipient for Creator commission authorization email.
+- [ ] Optionally set `RAZORPAY_PARTNERSHIPS_CC_EMAIL=anmol.agrawal@razorpay.com` to copy the partnership manager; the creator remains copied automatically.
 - [ ] `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are configured and the sender is verified in Resend.
 - [ ] Optionally set `RAZORPAY_COMMISSION_EMAIL_ALERT_TO` for terminal email delivery failures.
 - [ ] Existing `RAZORPAY_OAUTH_CLIENT_ID`, `RAZORPAY_OAUTH_CLIENT_SECRET`, and `RAZORPAY_PARTNER_WEBHOOK_SECRET` remain configured as ZERO_FEE-only compatibility fallbacks until legacy deployments and connections are verified.

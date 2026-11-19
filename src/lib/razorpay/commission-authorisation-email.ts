@@ -252,6 +252,7 @@ export async function processRazorpayCommissionAuthorisationEmailQueue(
   let failedCount = 0;
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.RESEND_FROM_EMAIL?.trim();
+  const partnershipsCcEmail = process.env.RAZORPAY_PARTNERSHIPS_CC_EMAIL?.trim();
   for (const candidate of data) {
     const claim = parseClaim(candidate);
     if (!claim) {
@@ -265,6 +266,14 @@ export async function processRazorpayCommissionAuthorisationEmailQueue(
     if (apiKey && from && claim.recipient_email) {
       try {
         const email = emailBody(claim);
+        const cc = [claim.creator_email];
+        if (
+          partnershipsCcEmail &&
+          partnershipsCcEmail.toLowerCase() !== claim.creator_email.trim().toLowerCase() &&
+          partnershipsCcEmail.toLowerCase() !== claim.recipient_email.trim().toLowerCase()
+        ) {
+          cc.push(partnershipsCcEmail);
+        }
         response = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -275,7 +284,7 @@ export async function processRazorpayCommissionAuthorisationEmailQueue(
           body: JSON.stringify({
             from,
             to: [claim.recipient_email],
-            cc: [claim.creator_email],
+            cc,
             subject: email.subject,
             html: email.html,
             text: email.text,
