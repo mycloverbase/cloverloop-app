@@ -8825,6 +8825,75 @@ a {
   margin: 0 0 22px;
 }
 
+.dashboard-sales-overview {
+  margin: 0 0 28px;
+}
+
+.dashboard-sales-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.dashboard-sales-heading h2 {
+  margin: 5px 0 0;
+  color: var(--forest);
+  font-size: 1.25rem;
+  line-height: 1.35;
+}
+
+.dashboard-sales-period,
+.dashboard-sales-caption {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.dashboard-sales-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dashboard-sales-card {
+  display: flex;
+  min-height: 162px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-top: 3px solid #4d876b;
+  padding: 24px;
+}
+
+.dashboard-sales-card-copy {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.dashboard-sales-value {
+  overflow-wrap: anywhere;
+  color: var(--forest);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 720;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.dashboard-sales-icon {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  background: #edf4ed;
+  color: #2d694d;
+}
+
 .dashboard-account-stat {
   display: flex;
   min-width: 0;
@@ -9580,6 +9649,22 @@ a {
   .dashboard-account-overview {
     grid-template-columns: 1fr;
     gap: 9px;
+  }
+
+  .dashboard-sales-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .dashboard-sales-grid {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .dashboard-sales-card {
+    min-height: 138px;
+    padding: 20px;
   }
 
   .dashboard-account-stat {

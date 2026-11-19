@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CircleCheck, CircleHelp, Package, Store, UserRound } from "lucide-react";
+import {
+  ArrowRight,
+  CircleCheck,
+  CircleHelp,
+  IndianRupee,
+  Package,
+  ShoppingBag,
+  Store,
+  UserRound,
+} from "lucide-react";
 import { creatorPlans } from "@/lib/account/plans";
 import { getAvatarSignedUrl, getCreatorName, requireCreatorContext } from "@/lib/account/server";
 import { getMyPlanEntitlements } from "@/lib/account/entitlements";
@@ -12,6 +21,7 @@ import {
 } from "@/lib/razorpay/oauth";
 import { getRazorpayCheckoutConnectionStatus } from "@/lib/razorpay/checkout";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { formatSalesOverview } from "@/lib/dashboard/sales-overview";
 
 export const metadata: Metadata = {
   title: "Dashboard | CloverLoop",
@@ -66,7 +76,13 @@ export default async function DashboardPage({
     }
   }
   const name = getCreatorName(profile.display_name, user.email ?? "");
-  const [entitlements, storefrontResponse, productCountResponse, avatarUrl] = await Promise.all([
+  const [
+    entitlements,
+    storefrontResponse,
+    productCountResponse,
+    avatarUrl,
+    salesOverviewResponse,
+  ] = await Promise.all([
     getMyPlanEntitlements(supabase),
     supabase
       .from("creator_storefronts")
@@ -79,6 +95,7 @@ export default async function DashboardPage({
       .eq("user_id", user.id)
       .is("deleted_at", null),
     getAvatarSignedUrl(supabase, profile.avatar_path),
+    supabase.rpc("get_my_sales_overview"),
   ]);
   if (storefrontResponse.error) {
     console.error("Could not load creator storefront status.", storefrontResponse.error);
@@ -87,6 +104,17 @@ export default async function DashboardPage({
   if (productCountResponse.error) {
     console.error("Could not load creator product listing count.", productCountResponse.error);
     throw new Error("Your product listing count could not be loaded. Please try again.");
+  }
+  if (salesOverviewResponse.error) {
+    console.error("Could not load creator sales overview.", {
+      code: salesOverviewResponse.error.code,
+    });
+    throw new Error("Your sales overview could not be loaded. Please try again.");
+  }
+  const salesOverview = formatSalesOverview(salesOverviewResponse.data);
+  if (!salesOverview) {
+    console.error("Creator sales overview returned an invalid response.");
+    throw new Error("Your sales overview could not be loaded. Please try again.");
   }
   const storefront = storefrontResponse.data;
   const productCount = productCountResponse.count ?? 0;
@@ -182,6 +210,38 @@ export default async function DashboardPage({
           <Link href="/dashboard/settings">Go to Settings to connect or reconnect Razorpay</Link> before accepting payments.
         </p>
       ) : null}
+
+      <section className="dashboard-sales-overview" aria-labelledby="dashboard-sales-overview-title">
+        <div className="dashboard-sales-heading">
+          <div>
+            <span className="dashboard-card-label">At a glance</span>
+            <h2 id="dashboard-sales-overview-title">Sales Overview</h2>
+          </div>
+          <span className="dashboard-sales-period">All-time successful live payments</span>
+        </div>
+        <div className="dashboard-sales-grid">
+          <article className="dashboard-card dashboard-sales-card">
+            <div className="dashboard-sales-card-copy">
+              <span className="dashboard-card-label">Revenue</span>
+              <strong className="dashboard-sales-value">{salesOverview.revenue}</strong>
+              <span className="dashboard-sales-caption">Total Gross Sales (INR)</span>
+            </div>
+            <span className="dashboard-sales-icon" aria-hidden="true">
+              <IndianRupee size={23} />
+            </span>
+          </article>
+          <article className="dashboard-card dashboard-sales-card">
+            <div className="dashboard-sales-card-copy">
+              <span className="dashboard-card-label">Sales</span>
+              <strong className="dashboard-sales-value">{salesOverview.sales}</strong>
+              <span className="dashboard-sales-caption">Successful transactions</span>
+            </div>
+            <span className="dashboard-sales-icon" aria-hidden="true">
+              <ShoppingBag size={23} />
+            </span>
+          </article>
+        </div>
+      </section>
 
       {entitlements.founderAllocationNumber !== null ? (
         <section className="dashboard-founder-banner" aria-labelledby="founder-banner-title">
