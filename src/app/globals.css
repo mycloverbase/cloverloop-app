@@ -11803,3 +11803,65 @@ a {
     padding: 16px;
   }
 }
+
+.creator-dashboard .admin-overview-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.creator-dashboard .admin-overview-card {
+  display: flex;
+  min-height: 184px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 18px;
+}
+
+.admin-overview-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  background: #eef4ed;
+  color: var(--forest);
+}
+
+.admin-overview-card .dashboard-card-label {
+  letter-spacing: 0.025em;
+  text-transform: none;
+}
+
+.admin-overview-value {
+  color: var(--forest);
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.admin-overview-period {
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.admin-tools-heading {
+  margin: 30px 0 14px;
+  color: var(--forest);
+  font-size: 1.2rem;
+}
+
+@media (max-width: 760px) {
+  .creator-dashboard .admin-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .creator-dashboard .admin-overview-card {
+    min-height: 170px;
+    padding: 16px;
+  }
+}
