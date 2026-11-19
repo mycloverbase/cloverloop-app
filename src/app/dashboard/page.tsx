@@ -9,6 +9,12 @@ import {
   UpgradeToCreatorButton,
   UpgradeToProCreatorButton,
 } from "@/components/dashboard/plan-upgrade-controls";
+import {
+  getRazorpayOAuthMode,
+  selectRazorpayApplication,
+} from "@/lib/razorpay/oauth";
+import { getRazorpayCheckoutConnectionStatus } from "@/lib/razorpay/checkout";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
   title: "Dashboard | CloverLoop",
@@ -102,6 +108,40 @@ export default async function DashboardPage({
       : storefront
         ? "Draft"
         : "Not set up";
+  let razorpayNeedsAttention = false;
+  if (storefront?.status === "published") {
+    const admin = createSupabaseAdminClient();
+    const environment = getRazorpayOAuthMode();
+    if (!admin || !environment) {
+      razorpayNeedsAttention = true;
+    } else {
+      const { data: connection, error } = await admin
+        .from("creator_razorpay_connections")
+        .select("application_key,commission_rate,connection_status,token_expires_at")
+        .eq("creator_id", user.id)
+        .eq("environment", environment)
+        .maybeSingle();
+      if (error) {
+        console.error("Could not check the published storefront's Razorpay connection.", {
+          code: error.code,
+        });
+        throw new Error("Your Razorpay connection status could not be checked. Please try again.");
+      }
+
+      const expectedApplication = selectRazorpayApplication(
+        entitlements.plan,
+        entitlements.platformFeePercentage,
+        entitlements.founderStatus,
+      );
+      const checkoutConnectionStatus = await getRazorpayCheckoutConnectionStatus(user.id, environment);
+      razorpayNeedsAttention = !connection ||
+        connection.connection_status !== "connected" ||
+        checkoutConnectionStatus !== "connected" ||
+        !expectedApplication ||
+        connection.application_key !== expectedApplication ||
+        connection.commission_rate !== (expectedApplication === "FOUR_PERCENT" ? 4 : 0);
+    }
+  }
   const founderDate = (value: string | null) => value
     ? new Date(value).toLocaleDateString("en-IN", { dateStyle: "long", timeZone: "Asia/Kolkata" })
     : "—";
@@ -137,6 +177,12 @@ export default async function DashboardPage({
       {referralStatus === "save-error" ? (
         <p className="dashboard-message dashboard-message-warning" role="alert">
           Your account is ready, but referral attribution could not be saved. Contact CloverLoop support before publishing your storefront.
+        </p>
+      ) : null}
+      {razorpayNeedsAttention ? (
+        <p className="dashboard-message dashboard-message-warning" role="status">
+          Your storefront is published, but Razorpay is disconnected or needs reconnection.{" "}
+          <Link href="/dashboard/settings">Go to Settings to connect or reconnect Razorpay</Link> before accepting payments.
         </p>
       ) : null}
 

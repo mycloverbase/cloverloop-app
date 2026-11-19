@@ -53,7 +53,6 @@ export default async function AccountSettingsPage({
     : razorpayStatusValue;
   const razorpayEnvironment = getRazorpayOAuthMode();
   const admin = createSupabaseAdminClient();
-  let razorpayPlan: string | null = null;
   let razorpayApplication: RazorpayApplicationKey | null = null;
   let razorpayEntitlementServiceAvailable = Boolean(admin);
   let razorpayConnection = null;
@@ -70,7 +69,6 @@ export default async function AccountSettingsPage({
       });
       razorpayEntitlementServiceAvailable = false;
     } else {
-      razorpayPlan = typeof entitlement.plan_key === "string" ? entitlement.plan_key : null;
       razorpayApplication = selectRazorpayApplication(
         entitlement.plan_key,
         entitlement.platform_fee_percentage,
@@ -137,7 +135,6 @@ export default async function AccountSettingsPage({
         <RazorpayConnectionCard
           readiness={readiness}
           connection={razorpayConnection}
-          plan={razorpayPlan}
           applicationKey={razorpayApplication}
           creatorEmail={user.email ?? ""}
           statusMessage={razorpayStatus}

@@ -8389,6 +8389,178 @@ a {
   letter-spacing: 0.09em;
 }
 
+.creator-dashboard .razorpay-connection-card {
+  display: grid;
+  gap: 18px;
+}
+
+.razorpay-connection-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.razorpay-connection-heading h2 {
+  margin-top: 5px;
+}
+
+.razorpay-connection-heading p {
+  margin: 7px 0 0;
+  font-size: 0.87rem;
+}
+
+.razorpay-status-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 7px 11px;
+  font-size: 0.79rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.razorpay-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.razorpay-status-connected {
+  border-color: #d3e8d9;
+  background: #edf7ef;
+  color: #286744;
+}
+
+.razorpay-status-attention {
+  border-color: #f0dfb8;
+  background: #fff8e9;
+  color: #815c16;
+}
+
+.razorpay-status-neutral {
+  border-color: #e2e8e3;
+  background: #f4f6f4;
+  color: #58675e;
+}
+
+.razorpay-account-id {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #e4ebe5;
+  border-radius: 9px;
+  background: #f8faf8;
+  padding: 12px 14px;
+}
+
+.razorpay-account-id > span {
+  color: #69776f;
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.razorpay-account-id code {
+  overflow-wrap: anywhere;
+  color: #254c39;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.87rem;
+}
+
+.razorpay-connection-actions {
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid #e8ede8;
+  padding-top: 16px;
+}
+
+.razorpay-connect-form {
+  display: grid;
+  gap: 16px;
+}
+
+.razorpay-consent {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #e1e9e2;
+  border-radius: 9px;
+  background: #f8faf8;
+  padding: 14px;
+}
+
+.razorpay-consent p {
+  margin: 0;
+}
+
+.razorpay-consent-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.razorpay-consent-checkbox input {
+  flex: 0 0 auto;
+  margin-top: 4px;
+}
+
+.razorpay-connect-actions,
+.razorpay-disconnect-form {
+  display: flex;
+  align-items: center;
+}
+
+.razorpay-disconnect-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid #e8c9c4;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 13px;
+  color: #963c32;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.razorpay-disconnect-button:hover:not(:disabled) {
+  border-color: #d9aaa3;
+  background: #fff6f4;
+}
+
+.razorpay-disconnect-button:focus-visible {
+  outline: 3px solid rgb(150 60 50 / 24%);
+  outline-offset: 2px;
+}
+
+.razorpay-disconnect-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 560px) {
+  .razorpay-connection-heading {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .razorpay-connect-actions,
+  .razorpay-disconnect-form {
+    width: 100%;
+  }
+
+  .razorpay-connect-actions .button,
+  .razorpay-disconnect-button {
+    width: 100%;
+  }
+}
+
 .creator-dashboard .dashboard-overview-grid {
   gap: 16px;
   margin-bottom: 14px;

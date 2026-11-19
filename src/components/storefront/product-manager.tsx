@@ -520,9 +520,46 @@ export function ProductManager({
               <X size={17} aria-hidden="true" />
             </button>
           </div>
+          {form.productType === "digital" ? (
+            <section className="product-form-section product-content-section" aria-labelledby="product-content-title">
+              <div className="product-form-section-heading">
+                <span className="product-form-step">01</span>
+                <div><h3 id="product-content-title">Product content</h3><p>Upload the file customers will receive.</p></div>
+              </div>
+              <div className="product-content-fields">
+                <div className="product-file-field">
+                  <label className="dashboard-field" htmlFor="product-file-upload">
+                    <span>Product file <em>Required for new products</em></span>
+                    <input
+                      id="product-file-upload"
+                      type="file"
+                      accept={PRODUCT_FILE_ACCEPT}
+                      onChange={(event) => patchForm({ file: event.target.files?.[0] ?? null })}
+                      disabled={busy}
+                      data-product-field="file"
+                      aria-invalid={Boolean(fieldErrors.file)}
+                      aria-describedby={fieldErrors.file ? "product-file-error" : "product-file-help"}
+                    />
+                    {form.fileName ? (
+                      <small>Current file: {form.fileName}{form.fileSize !== null ? ` · ${formatFileSize(form.fileSize)}` : ""}</small>
+                    ) : null}
+                    {form.file ? <small>Selected file: {form.file.name} · {formatFileSize(form.file.size)}</small> : null}
+                    <small id="product-file-help">PDF, MP3, DOC, DOCX and more. Maximum 100 MB.</small>
+                    {fieldErrors.file ? <small id="product-file-error" className="product-field-error">{fieldErrors.file}</small> : null}
+                  </label>
+                  {uploadProgress !== null ? (
+                    <div className="product-upload-progress" role="status" aria-live="polite">
+                      <div><span>Uploading product file</span><strong>{uploadProgress}%</strong></div>
+                      <progress max={100} value={uploadProgress} />
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </section>
+          ) : null}
           <section className="product-form-section" aria-labelledby="product-information-title">
             <div className="product-form-section-heading">
-              <span className="product-form-step">01</span>
+              <span className="product-form-step">02</span>
               <div><h3 id="product-information-title">Product information</h3><p>Give your product a clear name and useful details.</p></div>
             </div>
             <div className="product-information-grid">
@@ -575,7 +612,7 @@ export function ProductManager({
 
           <section className="product-form-section" aria-labelledby="product-appearance-title">
             <div className="product-form-section-heading">
-              <span className="product-form-step">02</span>
+              <span className="product-form-step">03</span>
               <div><h3 id="product-appearance-title">Product appearance</h3><p>A cover image helps your product stand out.</p></div>
             </div>
             <div className="product-cover-upload-area">
@@ -592,7 +629,7 @@ export function ProductManager({
 
           <section className="product-form-section" aria-labelledby="product-type-title">
             <div className="product-form-section-heading">
-              <span className="product-form-step">03</span>
+              <span className="product-form-step">04</span>
               <div><h3 id="product-type-title">Product type</h3><p>Choose the format you want to offer.</p></div>
             </div>
             <div className="product-choice-grid product-type-grid" role="group" aria-label="Product type">
@@ -619,44 +656,6 @@ export function ProductManager({
               </p>
             ) : null}
           </section>
-
-          {form.productType === "digital" ? (
-            <section className="product-form-section product-content-section" aria-labelledby="product-content-title">
-              <div className="product-form-section-heading">
-                <span className="product-form-step">04</span>
-                <div><h3 id="product-content-title">Product content</h3><p>Upload the file customers will receive.</p></div>
-              </div>
-              <div className="product-content-fields">
-                <div className="product-file-field">
-                  <label className="dashboard-field" htmlFor="product-file-upload">
-                    <span>Product file <em>Required for new products</em></span>
-                    <input
-                      id="product-file-upload"
-                      type="file"
-                      accept={PRODUCT_FILE_ACCEPT}
-                      onChange={(event) => patchForm({ file: event.target.files?.[0] ?? null })}
-                      disabled={busy}
-                      data-product-field="file"
-                      aria-invalid={Boolean(fieldErrors.file)}
-                      aria-describedby={fieldErrors.file ? "product-file-error" : "product-file-help"}
-                    />
-                    {form.fileName ? (
-                      <small>Current file: {form.fileName}{form.fileSize !== null ? ` · ${formatFileSize(form.fileSize)}` : ""}</small>
-                    ) : null}
-                    {form.file ? <small>Selected file: {form.file.name} · {formatFileSize(form.file.size)}</small> : null}
-                    <small id="product-file-help">PDF, MP3, DOC, DOCX and more. Maximum 100 MB.</small>
-                    {fieldErrors.file ? <small id="product-file-error" className="product-field-error">{fieldErrors.file}</small> : null}
-                  </label>
-                  {uploadProgress !== null ? (
-                    <div className="product-upload-progress" role="status" aria-live="polite">
-                      <div><span>Uploading product file</span><strong>{uploadProgress}%</strong></div>
-                      <progress max={100} value={uploadProgress} />
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </section>
-          ) : null}
 
           <section className="product-form-section" aria-labelledby="product-pricing-title">
             <div className="product-form-section-heading">
