@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { track } from "@/lib/analytics";
+import { createAuthCallbackUrl } from "@/lib/auth-callback-url";
 import { safeInternalPath } from "@/lib/auth-redirect";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -16,16 +17,6 @@ import {
 type AuthMode = "login" | "signup";
 const AUTH_FLOW_KEY = "cloverloop-auth-flow";
 const AUTH_METHOD_KEY = "cloverloop-auth-method";
-
-function authCallbackUrl(nextPath: string, marketingConsent?: boolean) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || window.location.origin;
-  const callback = new URL("/auth/callback", siteUrl);
-  callback.searchParams.set("next", nextPath);
-  if (marketingConsent !== undefined) {
-    callback.searchParams.set("marketing_consent", marketingConsent ? "1" : "0");
-  }
-  return callback.toString();
-}
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter();
@@ -124,7 +115,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               marketing_emails: marketingConsent,
               ...(marketingConsent ? { marketing_consent_at: new Date().toISOString() } : {}),
             },
-            emailRedirectTo: authCallbackUrl(onboardingPath, marketingConsent),
+            emailRedirectTo: createAuthCallbackUrl(window.location.origin, onboardingPath, marketingConsent),
           },
         });
         if (authError) throw authError;
@@ -198,7 +189,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         setPending(false);
         return;
       }
-      const callbackUrl = authCallbackUrl(
+      const callbackUrl = createAuthCallbackUrl(
+        window.location.origin,
         safeNext,
         mode === "signup" ? marketingConsent : marketingConsentTouched ? marketingConsent : undefined,
       );

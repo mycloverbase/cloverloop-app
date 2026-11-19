@@ -11,6 +11,7 @@ import {
   LogOut,
   MessageCircle,
   Package,
+  ShieldCheck,
   Settings,
   Store,
   Tag,
@@ -33,6 +34,7 @@ type DashboardShellProps = {
   creatorName: string;
   email: string;
   avatarUrl: string | null;
+  isAdmin: boolean;
   children: ReactNode;
 };
 
@@ -67,7 +69,7 @@ function initials(name: string) {
   return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "C";
 }
 
-export function DashboardShell({ creatorName, email, avatarUrl, children }: DashboardShellProps) {
+export function DashboardShell({ creatorName, email, avatarUrl, isAdmin, children }: DashboardShellProps) {
   const pathname = usePathname();
   const accountMenuRef = useRef<HTMLDetailsElement>(null);
   const mobileMoreMenuRef = useRef<HTMLDetailsElement>(null);
@@ -84,6 +86,9 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
   }, []);
   const unsavedContext = useMemo(() => ({ setUnsavedChanges }), [setUnsavedChanges]);
   const hasUnsavedChanges = unsavedSources.size > 0;
+  const visibleNavigation = isAdmin
+    ? [...navigation, { href: "/dashboard/admin", label: "Admin", icon: ShieldCheck }]
+    : navigation;
 
   useEffect(() => {
     if (accountMenuRef.current) accountMenuRef.current.open = false;
@@ -165,7 +170,7 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
               </div>
             </div>
             <nav aria-label="Creator dashboard">
-              {navigation.map(({ href, label, icon: Icon }) => {
+              {visibleNavigation.map(({ href, label, icon: Icon }) => {
                 const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
                 return (
                   <Link
@@ -189,7 +194,7 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
           </main>
         </div>
         <nav className="dashboard-mobile-nav" aria-label="Primary creator dashboard">
-          {navigation
+          {visibleNavigation
             .filter(({ href }) => ["/dashboard", "/dashboard/products", "/dashboard/storefront"].includes(href))
             .map(({ href, label, icon: Icon }) => {
               const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
@@ -207,7 +212,7 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
             })}
           <details className="dashboard-mobile-more" ref={mobileMoreMenuRef}>
             <summary className={
-              navigation.some(({ href }) => href !== "/dashboard" && !["/dashboard/products", "/dashboard/storefront"].includes(href) &&
+              visibleNavigation.some(({ href }) => href !== "/dashboard" && !["/dashboard/products", "/dashboard/storefront"].includes(href) &&
                 (href === "/pricing" ? pathname === href : pathname.startsWith(href)))
                 ? "dashboard-mobile-nav-link active"
                 : "dashboard-mobile-nav-link"
@@ -216,7 +221,7 @@ export function DashboardShell({ creatorName, email, avatarUrl, children }: Dash
               <span>More</span>
             </summary>
             <div className="dashboard-mobile-more-menu">
-              {navigation
+              {visibleNavigation
                 .filter(({ href }) => !["/dashboard", "/dashboard/products", "/dashboard/storefront"].includes(href))
                 .map(({ href, label, icon: Icon }) => {
                   const active = href === "/pricing" ? pathname === href : pathname.startsWith(href);

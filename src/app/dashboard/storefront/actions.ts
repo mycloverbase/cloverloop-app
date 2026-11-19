@@ -328,7 +328,7 @@ export async function deleteStorefrontAction(): Promise<StorefrontActionResult> 
   if (loadError) console.error("Could not load the storefront deletion deadline.", loadError);
   return {
     ok: true,
-    message: "Your storefront is unavailable and scheduled for permanent deletion in 30 days. It cannot be restored.",
+    message: "Your storefront is unavailable and scheduled for permanent deletion in 30 days. Contact support before the deadline if you need it recovered.",
     ...(typeof data?.delete_after === "string" ? { deleteAfter: data.delete_after } : {}),
   };
 }

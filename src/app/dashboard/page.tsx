@@ -151,14 +151,14 @@ export default async function DashboardPage({
           <p>
             {entitlements.founderStatus === "active"
               ? entitlements.plan === "pro_creator"
-                ? "Your storefront is live. The programme benefit waives the platform fee for six months; your separately authorised Pro subscription remains active."
-                : "Your storefront is live. You have six months of unlimited Creator membership with 0% platform transaction fees."
+                ? "Your storefront is live. The programme benefit waives the platform fee for the term shown below; your separately authorised Pro subscription remains active."
+                : "Your storefront is live. Your Founding Creator benefit includes unlimited Creator membership with 0% platform transaction fees for the term shown below."
               : entitlements.plan === "pro_creator"
                 ? "Your Founding Creator benefit has expired. Pro Creator remains active at 0%; if that subscription ends, the standard Creator platform fee applies."
                 : "Your Creator plan and unlimited listings continue. The standard 4% platform transaction fee now applies."}
           </p>
           <p>
-            Allocation #{entitlements.founderAllocationNumber} · Activated {founderDate(entitlements.founderActivatedAt)} ·
+            Activated {founderDate(entitlements.founderActivatedAt)} ·
             {" "}Expires {founderDate(entitlements.founderExpiresAt)} · Effective platform fee {entitlements.platformFeePercentage}%.
           </p>
         </section>

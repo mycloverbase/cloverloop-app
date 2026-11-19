@@ -459,7 +459,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
           )}
           {status === "deletion_pending" && deleteAfter ? (
             <p className="storefront-delete-note">
-              This storefront cannot be restored and will be permanently deleted after{" "}
+              This storefront will be permanently deleted after{" "}
               {new Intl.DateTimeFormat("en-IN", { dateStyle: "long", timeZone: "Asia/Kolkata" }).format(new Date(deleteAfter))}.
             </p>
           ) : null}
@@ -489,7 +489,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
 
       {status === "deletion_pending" ? (
         <p className="dashboard-message dashboard-message-warning" role="status">
-          Your storefront is unavailable while deletion is pending. Restoration is not available.
+          Your storefront is unavailable while deletion is pending. Contact support before the deletion deadline to request recovery.
         </p>
       ) : (
         <>
@@ -827,7 +827,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                 ? "Your storefront will be public immediately at the URL below. You can unpublish it at any time."
                 : dialogAction === "unpublish"
                   ? "Visitors will see a standard 404 at your storefront URL until you publish it again."
-                  : "Your storefront will become unavailable now. Its username stays reserved for 30 days, then its data and images are permanently deleted. There is no restore option."}
+                  : "Your storefront will become unavailable now. Its username stays reserved for 30 days, then its data and images are permanently deleted. Contact support before the deadline if you need it recovered."}
             </p>
             {dialogAction === "publish" ? <code>{publicUrl}</code> : null}
             <div className="storefront-dialog-actions">

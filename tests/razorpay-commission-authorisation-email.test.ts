@@ -58,8 +58,26 @@ describe("Razorpay commission authorization email queue", () => {
       expect(body.cc).toEqual(["creator@example.test"]);
       expect(body.subject).toContain("acc_ABC123");
       expect(body.html).toContain("Creator &amp; Co");
+      expect(body.html).toContain("https://cloverloop.in/images/brand/logo.png");
+      expect(body.html).toContain("@media only screen and (max-width:620px)");
+      expect(body.html).toContain("Subscription plan");
+      expect(body.html).toContain("Creator Plan");
+      expect(body.text).toContain("Creator legal/business name: Creator & Co");
+      expect(body.text).toContain("Subscription plan: Creator Plan");
+      expect(body.text).toContain("4% + applicable GST");
       expect(body.text).toContain("additional platform commission of 4%");
       expect(body.text).not.toContain("access_token");
+      for (const hiddenValue of [
+        "creator-1",
+        "client-four",
+        "creator-4-percent-v1",
+        "CloverLoop creator ID",
+        "Razorpay Application ID",
+        "Accepted terms version",
+      ]) {
+        expect(body.html).not.toContain(hiddenValue);
+        expect(body.text).not.toContain(hiddenValue);
+      }
       return Response.json({ id: "resend-message-1" });
     });
     vi.stubGlobal("fetch", fetch);

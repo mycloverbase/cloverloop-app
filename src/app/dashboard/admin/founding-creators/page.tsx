@@ -1,186 +1,146 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { AdminCreatorLookup } from "@/app/dashboard/admin/creator-lookup";
 import { requireCreatorContext } from "@/lib/account/server";
-import {
-  manuallyEnrolFounderCreatorAction,
-  overrideFounderAttributionAction,
-} from "@/app/dashboard/admin/actions";
 
 export const metadata: Metadata = {
   title: "Founding Creator administration | CloverLoop",
   robots: { index: false, follow: false },
 };
 
-type FounderCreatorReport = {
-  founderRegistrations: number;
-  publishedReferredCreators: number;
-  allocated: number;
-  remaining: number;
-  creators: {
-    creatorId: string;
-    creatorName: string;
-    creatorEmail: string | null;
-    referralSource: string;
-    attributionMethod: string;
-    storefrontId: string | null;
-    storefrontName: string | null;
-    storefrontUsername: string | null;
-    storefrontPublishedAt: string | null;
-    allocationNumber: number | null;
-    activatedAt: string | null;
-    expiresAt: string | null;
-    programmeStatus: string;
-  }[];
-  audit: {
-    id: string;
-    creatorId: string;
-    action: string;
-    reason: string | null;
-    actorUserId: string | null;
-    createdAt: string;
-  }[];
+type EntitlementAuditEntry = {
+  id: string;
+  creatorEmail: string;
+  action: "added" | "removed";
+  allocationNumber: number;
+  reason: string;
+  actorEmail: string | null;
+  activatedAt: string;
+  expiresAt: string;
+  createdAt: string;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function displayDate(value: string | null): string {
-  return value
-    ? new Date(value).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })
-    : "—";
+function parseAudit(value: unknown): EntitlementAuditEntry[] | null {
+  if (!Array.isArray(value)) return null;
+  const entries: EntitlementAuditEntry[] = [];
+  for (const row of value) {
+    if (
+      !isRecord(row) ||
+      typeof row.id !== "string" ||
+      typeof row.creator_email !== "string" ||
+      (row.action !== "added" && row.action !== "removed") ||
+      typeof row.allocation_number !== "number" ||
+      typeof row.reason !== "string" ||
+      (row.actor_email !== null && typeof row.actor_email !== "string") ||
+      typeof row.activated_at !== "string" ||
+      typeof row.expires_at !== "string" ||
+      typeof row.created_at !== "string"
+    ) return null;
+    entries.push({
+      id: row.id,
+      creatorEmail: row.creator_email,
+      action: row.action,
+      allocationNumber: row.allocation_number,
+      reason: row.reason,
+      actorEmail: row.actor_email,
+      activatedAt: row.activated_at,
+      expiresAt: row.expires_at,
+      createdAt: row.created_at,
+    });
+  }
+  return entries;
 }
 
-function parseReport(value: unknown): FounderCreatorReport | null {
-  if (
-    !isRecord(value) ||
-    typeof value.founderRegistrations !== "number" ||
-    typeof value.publishedReferredCreators !== "number" ||
-    typeof value.allocated !== "number" ||
-    typeof value.remaining !== "number" ||
-    !Array.isArray(value.creators) ||
-    !Array.isArray(value.audit)
-  ) return null;
-  return value as FounderCreatorReport;
+function displayDate(value: string): string {
+  return new Date(value).toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Kolkata",
+  });
+}
+
+function resultMessage(result: string | undefined): string {
+  switch (result) {
+    case "added":
+      return "Founding Creator entitlement added for three months.";
+    case "removed":
+      return "Founding Creator entitlement removed. The benefit ended immediately.";
+    case "already_active":
+      return "This creator already has an active Founding Creator entitlement. No change was made.";
+    case "not_active":
+      return "This creator has no active Founding Creator entitlement to remove.";
+    case "capacity_reached":
+      return "All 50 Founding Creator programme slots have been allocated.";
+    case "subscription_managed":
+      return "This creator has a paid subscription. Change it through the payment provider before granting Founding Creator.";
+    case "not_found":
+      return "The creator account could not be found. Fetch the details again and retry.";
+    case "invalid":
+      return "Enter a reason of 5–500 characters.";
+    case "failed":
+      return "The entitlement change could not be completed. No successful action was recorded.";
+    default:
+      return "";
+  }
 }
 
 export default async function FoundingCreatorsAdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ result?: string; allocation?: string }>;
+  searchParams: Promise<{ result?: string }>;
 }) {
   const { supabase, user } = await requireCreatorContext();
   if (user.app_metadata?.role !== "admin") redirect("/dashboard");
 
-  const { data, error } = await supabase.rpc("admin_founding_programme_report");
+  const { data, error } = await supabase.rpc("admin_founding_creator_entitlement_audit");
   if (error) {
-    console.error("Could not load the Founding Creator Programme report.", error);
-    throw new Error("The Founding Creator Programme report could not be loaded.");
+    console.error("Could not load successful Founding Creator entitlement actions.", error);
+    throw new Error("Founding Creator entitlement history could not be loaded.");
   }
-  const report = parseReport(data);
-  if (!report) throw new Error("The Founding Creator Programme report was invalid.");
+  const audit = parseAudit(data);
+  if (!audit) throw new Error("Founding Creator entitlement history was invalid.");
+
   const params = await searchParams;
-  const resultMessage = params.result === "attribution-updated"
-    ? "Referral attribution updated."
-    : params.result === "enrolled"
-      ? `Creator enrolled in allocation #${params.allocation ?? "?"}.`
-      : params.result === "failed" || params.result === "enrolment-failed"
-        ? "The operation could not be completed. Check the creator eligibility and programme capacity."
-        : params.result === "invalid"
-          ? "Enter a valid creator ID and a reason of 5–500 characters."
-          : "";
+  const message = resultMessage(params.result);
 
   return (
     <div className="dashboard-page-content">
       <header className="dashboard-page-heading">
         <div>
           <span className="eyebrow">Admin-only</span>
-          <h1>Founding Creator Programme</h1>
-          <p>Monitor verified referrals, storefront publication, allocations and audit history.</p>
+          <h1>Founding Creator</h1>
+          <p>Look up a creator by registered email, then add or remove their entitlement.</p>
         </div>
       </header>
-      {resultMessage ? <p className="dashboard-message" role="status">{resultMessage}</p> : null}
-      <section className="dashboard-card" aria-labelledby="founder-manual-attribution-title">
-        <h2 id="founder-manual-attribution-title">Manual attribution correction</h2>
-        <p>Use only for verified exceptions. This does not bypass the 50-slot allocation limit.</p>
-        <form action={overrideFounderAttributionAction} className="dashboard-admin-form">
-          <label className="dashboard-field">
-            <span>Creator account UUID</span>
-            <input name="creator_id" required pattern="[0-9a-fA-F-]{36}" />
-          </label>
-          <label className="dashboard-field">
-            <span>Correction</span>
-            <select name="source" defaultValue="founder">
-              <option value="founder">Attribute to founder link (verified manual override)</option>
-              <option value="removed">Remove incorrect attribution</option>
-            </select>
-          </label>
-          <label className="dashboard-field">
-            <span>Reason</span>
-            <input name="reason" minLength={5} maxLength={500} required />
-          </label>
-          <button className="dashboard-small-button" type="submit">Save manual correction</button>
-        </form>
+      {message ? <p className="dashboard-message" role="status">{message}</p> : null}
+      <section className="dashboard-card">
+        <p>
+          An admin grant does not require a referral or published storefront. It uses one of
+          the 50 programme slots and provides a three-month benefit. Creators with an active
+          paid subscription cannot be granted through this tool.
+        </p>
       </section>
-      <section className="dashboard-overview-grid" aria-label="Programme totals">
-        <article className="dashboard-card"><span className="dashboard-card-label">Founder registrations</span><h2>{report.founderRegistrations}</h2></article>
-        <article className="dashboard-card"><span className="dashboard-card-label">Published referred storefronts</span><h2>{report.publishedReferredCreators}</h2></article>
-        <article className="dashboard-card"><span className="dashboard-card-label">Allocated slots</span><h2>{report.allocated} / 50</h2><p>{report.remaining} remaining</p></article>
-      </section>
-
-      <section className="dashboard-card" aria-labelledby="founder-creators-list-title">
-        <h2 id="founder-creators-list-title">Referred creators</h2>
-        {report.creators.length ? report.creators.map((creator) => (
-          <article className="dashboard-card" key={creator.creatorId}>
-            <h3>{creator.creatorName} · {creator.creatorEmail ?? "No email"}</h3>
-            <p>Creator ID: {creator.creatorId}</p>
-            <p>Referral: {creator.referralSource} ({creator.attributionMethod}) · Storefront: {creator.storefrontUsername ? `/${creator.storefrontUsername}` : "not created"}</p>
-            <p>Published: {displayDate(creator.storefrontPublishedAt)} · Status: {creator.programmeStatus}</p>
-            <p>
-              Allocation: {creator.allocationNumber ?? "—"} · Activated: {displayDate(creator.activatedAt)} ·
-              {" "}Expires: {displayDate(creator.expiresAt)}
-            </p>
-            {creator.programmeStatus === "not_qualified" && creator.storefrontId ? (
-              <form action={manuallyEnrolFounderCreatorAction} className="dashboard-admin-form">
-                <input type="hidden" name="creator_id" value={creator.creatorId} />
-                <label className="dashboard-field">
-                  <span>Manual enrolment reason</span>
-                  <input name="reason" minLength={5} maxLength={500} required />
-                </label>
-                <button className="dashboard-small-button" type="submit">Manually enrol (uses one of 50 slots)</button>
-              </form>
-            ) : null}
-            <form action={overrideFounderAttributionAction} className="dashboard-admin-form">
-              <input type="hidden" name="creator_id" value={creator.creatorId} />
-              <label className="dashboard-field">
-                <span>Correct referral attribution</span>
-                <select name="source" defaultValue="founder">
-                  <option value="founder">Founder</option>
-                  <option value="removed">Remove incorrect attribution</option>
-                </select>
-              </label>
-              <label className="dashboard-field">
-                <span>Correction reason</span>
-                <input name="reason" minLength={5} maxLength={500} required />
-              </label>
-              <button className="dashboard-small-button" type="submit">Save attribution correction</button>
-            </form>
-          </article>
-        )) : <p>No founder-referred registrations yet.</p>}
-      </section>
+      <AdminCreatorLookup mode="founding-creators" />
 
       <section className="dashboard-card" aria-labelledby="founder-audit-title">
-        <h2 id="founder-audit-title">Recent audit history</h2>
-        {report.audit.length ? (
+        <h2 id="founder-audit-title">Recent successful entitlement actions</h2>
+        <p>Only completed additions and removals appear here. Earlier referral and correction audit records are preserved.</p>
+        {audit.length ? (
           <ul>
-            {report.audit.map((entry) => (
+            {audit.map((entry) => (
               <li key={entry.id}>
-                {displayDate(entry.createdAt)} · {entry.action} · Creator {entry.creatorId}
-                {entry.reason ? ` · ${entry.reason}` : ""}
+                {displayDate(entry.createdAt)} · {entry.action === "added" ? "Added" : "Removed"} ·
+                {" "}{entry.creatorEmail} · allocation #{entry.allocationNumber} · by {entry.actorEmail ?? "admin"}
+                {" "}· benefit window {displayDate(entry.activatedAt)}–{displayDate(entry.expiresAt)}
+                {" "}· {entry.reason}
               </li>
             ))}
           </ul>
-        ) : <p>No programme changes have been recorded.</p>}
+        ) : <p>No successful add/remove actions have been recorded.</p>}
       </section>
     </div>
   );

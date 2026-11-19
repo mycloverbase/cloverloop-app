@@ -16,7 +16,12 @@ export default async function DashboardLayout({ children }: Readonly<{ children:
   const avatarUrl = await getAvatarSignedUrl(supabase, profile.avatar_path);
 
   return (
-    <DashboardShell creatorName={creatorName} email={email} avatarUrl={avatarUrl}>
+    <DashboardShell
+      creatorName={creatorName}
+      email={email}
+      avatarUrl={avatarUrl}
+      isAdmin={user.app_metadata?.role === "admin"}
+    >
       {children}
     </DashboardShell>
   );

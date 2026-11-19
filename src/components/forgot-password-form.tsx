@@ -2,12 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
+import { createAuthCallbackUrl } from "@/lib/auth-callback-url";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-
-function authCallbackUrl(nextPath: string) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || window.location.origin;
-  return `${siteUrl}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-}
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -48,7 +44,7 @@ export function ForgotPasswordForm() {
         setIsRecovery(false);
       } else {
         const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: authCallbackUrl("/forgot-password"),
+          redirectTo: createAuthCallbackUrl(window.location.origin, "/forgot-password"),
         });
         if (authError) throw authError;
         setMessage("If an account exists for that email, a password reset link is on its way.");

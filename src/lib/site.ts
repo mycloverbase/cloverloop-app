@@ -276,13 +276,13 @@ export const companyPages: Record<
   "founding-creators": {
     title: "Founding Creator Programme | CloverLoop",
     description:
-      "Join CloverLoop's Founding Creator Programme for six months of unlimited Creator listings and a 0% platform fee.",
+      "Join CloverLoop's Founding Creator Programme for three months of unlimited Creator listings and a 0% platform fee.",
     heading: "Founding Creator Programme",
     paragraphs: [
       "The Founding Creator Programme is an entitlement overlay on CloverLoop's Creator plan, not a paid subscription.",
       "The first 50 eligible creators must register through the founder referral link and successfully publish their storefront. Creating an account or publishing an individual product does not qualify on its own.",
-      "Once allocated, members receive unlimited paid and free product listings with a 100% waiver of the standard 4% CloverLoop platform transaction fee for six calendar months. Payment-provider charges and applicable taxes remain separate.",
-      "After the six-month period, the Creator plan and unlimited listings continue with the standard 4% platform fee. CloverLoop will not start a subscription automatically. Temporary storefront unpublishing does not revoke an allocated place.",
+      "Once allocated, members receive unlimited paid and free product listings with a 100% waiver of the standard 4% CloverLoop platform transaction fee for three calendar months. Payment-provider charges and applicable taxes remain separate.",
+      "After the three-month period, the Creator plan and unlimited listings continue with the standard 4% platform fee. CloverLoop will not start a subscription automatically. Temporary storefront unpublishing does not revoke an allocated place.",
     ],
   },
   "help-center": {
