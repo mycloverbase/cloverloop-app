@@ -170,4 +170,32 @@ begin
 end;
 $$;
 
+-- Step 9: Recreate the published_storefront_products view that was dropped by cascade
+create or replace view public.published_storefront_products
+with (security_barrier = true)
+as
+select
+  storefront.username,
+  product.storefront_id,
+  product.id,
+  product.name,
+  product.description,
+  product.category,
+  product.product_type,
+  product.is_free,
+  product.price_paise,
+  product.cover_image_path,
+  product.file_name,
+  product.file_size,
+  product.file_mime_type,
+  product.subcategory
+from public.storefront_products product
+join public.creator_storefronts storefront on storefront.id = product.storefront_id
+where storefront.status = 'published'
+  and storefront.deleted_at is null
+  and product.is_active
+  and product.deleted_at is null;
+
+revoke all on public.published_storefront_products from public, authenticated;
+grant select on public.published_storefront_products to anon, authenticated;
 
