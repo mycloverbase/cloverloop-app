@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   checkFreeProductRateLimit: vi.fn(),
   getFreeProductDeliveryConfig: vi.fn(),
   getRazorpayCheckoutConnection: vi.fn(),
-  getRazorpayOAuthConfig: vi.fn(),
+  getRazorpayApplicationConfig: vi.fn(),
   getRazorpayOAuthMode: vi.fn(),
   hashCheckoutToken: vi.fn(),
   isRazorpayCheckoutEnabled: vi.fn(),
@@ -37,7 +37,7 @@ vi.mock("@/lib/razorpay/checkout", () => ({
 }));
 
 vi.mock("@/lib/razorpay/oauth", () => ({
-  getRazorpayOAuthConfig: mocks.getRazorpayOAuthConfig,
+  getRazorpayApplicationConfig: mocks.getRazorpayApplicationConfig,
   getRazorpayOAuthMode: mocks.getRazorpayOAuthMode,
 }));
 
@@ -102,8 +102,12 @@ beforeEach(() => {
   vi.stubEnv("RAZORPAY_OAUTH_MODE", "test");
   mocks.isRazorpayCheckoutEnabled.mockReturnValue(true);
   mocks.getRazorpayOAuthMode.mockImplementation(() => process.env.RAZORPAY_OAUTH_MODE);
-  mocks.getRazorpayOAuthConfig.mockImplementation((environment: string) => ({
-    clientId: "configured-client",
+  mocks.getRazorpayApplicationConfig.mockImplementation((
+    applicationKey: string,
+    environment: string,
+  ) => ({
+    applicationKey,
+    clientId: `configured-${applicationKey}`,
     environment,
   }));
   mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(true);
@@ -218,6 +222,30 @@ describe("POST /api/checkout/create-order", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect((await response.json()).publicKey).toBe("rzp_test_public");
+  });
+
+  it("allows a Creator checkout when only the FOUR_PERCENT OAuth app is configured", async () => {
+    mocks.getRazorpayApplicationConfig.mockImplementation((
+      applicationKey: string,
+      environment: string,
+    ) => applicationKey === "FOUR_PERCENT"
+      ? { applicationKey, clientId: "four-percent-client", environment }
+      : null);
+
+    const response = await POST(
+      makeRequest({
+        productId: orderRow.product_id,
+        storefrontUsername: orderRow.storefront_username,
+        email: "buyer@example.com",
+        checkoutToken: "85ab1e94-38c3-4f4f-a20d-fc2f9192b33e",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.getRazorpayApplicationConfig).toHaveBeenCalledWith(
+      "FOUR_PERCENT",
+      "test",
+    );
   });
 
   it("creates a Live Mode order only with its Live Mode connection and persists the environment", async () => {

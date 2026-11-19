@@ -63,6 +63,7 @@ vi.mock("@/lib/razorpay/purchase-email", () => ({
 }));
 
 import { POST } from "@/app/api/webhooks/razorpay/route";
+import { POST as postCreatorWebhook } from "@/app/api/webhooks/razorpay/creator/route";
 
 const eventPayload = {
   event: "payment.captured",
@@ -81,8 +82,9 @@ function makePartnerRequest(
   payload: unknown = eventPayload,
   body = JSON.stringify(payload),
   eventId = "event_TEST123",
+  path = "/api/webhooks/razorpay",
 ) {
-  return new Request("https://cloverloop.test/api/webhooks/razorpay", {
+  return new Request(`https://cloverloop.test${path}`, {
     method: "POST",
     headers: {
       "x-razorpay-signature": "partner-signature",
@@ -255,6 +257,29 @@ afterEach(() => {
 });
 
 describe("POST /api/webhooks/razorpay application-level fulfillment", () => {
+  it("supports the configured /creator webhook path with the same verification and processing", async () => {
+    const { admin, eventQuery } = createPartnerAdmin();
+    mocks.createSupabaseAdminClient.mockReturnValue(admin);
+    mocks.isRazorpayPartnerWebhookFulfillmentEnabled.mockReturnValue(true);
+    mocks.verifyRazorpayWebhookSignature.mockImplementation(
+      (_body: string, signature: string | null, secret: string) =>
+        signature === "partner-signature" && secret === "partner-secret",
+    );
+
+    const response = await postCreatorWebhook(
+      makePartnerRequest(eventPayload, undefined, "event_CREATOR123", "/api/webhooks/razorpay/creator"),
+    );
+
+    expect(response.status).toBe(200);
+    expect(eventQuery.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event_id: "event_CREATOR123",
+        application_key: "ZERO_FEE",
+      }),
+    );
+    expect(mocks.after).toHaveBeenCalledOnce();
+  });
+
   it("persists a signed captured event before scheduling fulfillment", async () => {
     const { admin, eventQuery } = createPartnerAdmin();
     const info = vi.spyOn(console, "info").mockImplementation(() => {});

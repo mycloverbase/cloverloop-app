@@ -14,7 +14,7 @@ import {
   razorpayApiRequest,
 } from "@/lib/razorpay/checkout";
 import {
-  getRazorpayOAuthConfig,
+  getRazorpayApplicationConfig,
   getRazorpayOAuthMode,
 } from "@/lib/razorpay/oauth";
 
@@ -77,7 +77,13 @@ export async function POST(request: Request) {
     return jsonResponse({ error: "Checkout is not available." }, 503);
   }
 
-  if (!environment || !getRazorpayOAuthConfig(environment)) {
+  if (
+    !environment ||
+    (
+      !getRazorpayApplicationConfig("ZERO_FEE", environment) &&
+      !getRazorpayApplicationConfig("FOUR_PERCENT", environment)
+    )
+  ) {
     return jsonResponse({ error: "Razorpay checkout is not configured." }, 503);
   }
   if (!isRazorpayPartnerWebhookFulfillmentEnabled(environment)) {
