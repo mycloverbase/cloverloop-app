@@ -7052,7 +7052,7 @@ a {
 
 .storefront-section {
   border-bottom: 1px solid color-mix(in srgb, var(--store-primary) 13%, transparent);
-  padding: 36px 0;
+  padding: 20px 0;
 }
 
 .storefront-section h2 {
@@ -7888,6 +7888,11 @@ a {
 .storefront-footer a {
   color: #748078;
   font-size: 0.75rem;
+}
+
+.storefront-footer a + a {
+  display: block;
+  margin-top: 8px;
 }
 
 .storefront-footer a:hover {

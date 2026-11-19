@@ -234,6 +234,7 @@ export function PublicStorefront({ store }: { store: StorefrontView }) {
           <a href="https://cloverloop.in" rel="noopener noreferrer">
             Powered by CloverLoop
           </a>
+          <Link href="/signup">Start your own store</Link>
         </footer>
       </div>
     </main>
