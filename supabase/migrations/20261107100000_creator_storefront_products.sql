@@ -39,21 +39,21 @@ create table public.storefront_products (
     file_path is null
     or file_path ~ (
       '^' || user_id::text || '/' || id::text
-      || '/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.(pdf|mp3|doc|docx|ppt|pptx|xls|xlsx|epub|zip|txt|rtf|mp4|wav|jpg|jpeg|png|webp)$'
+      || '/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.[a-zA-Z0-9]+$'
     )
   ),
   check (
     retired_file_path is null
     or retired_file_path ~ (
       '^' || user_id::text || '/' || id::text
-      || '/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.(pdf|mp3|doc|docx|ppt|pptx|xls|xlsx|epub|zip|txt|rtf|mp4|wav|jpg|jpeg|png|webp)$'
+      || '/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.[a-zA-Z0-9]+$'
     )
   ),
   check (
     pending_file_path is null
     or pending_file_path ~ (
       '^' || user_id::text || '/' || id::text
-      || '/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.(pdf|mp3|doc|docx|ppt|pptx|xls|xlsx|epub|zip|txt|rtf|mp4|wav|jpg|jpeg|png|webp)$'
+      || '/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.[a-zA-Z0-9]+$'
     )
   ),
   check (not is_active or (file_path is not null and deleted_at is null)),
@@ -247,7 +247,6 @@ begin
     raise exception 'Authentication required';
   end if;
   if safe_extension is null
-    or safe_extension not in ('pdf', 'mp3', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'epub', 'zip', 'txt', 'rtf', 'mp4', 'wav', 'jpg', 'jpeg', 'png', 'webp')
     or requested_file_name is null
     or char_length(btrim(requested_file_name)) not between 1 and 255
     or requested_file_name ~ '[[:cntrl:]]'
