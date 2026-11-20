@@ -323,7 +323,7 @@ function ProfileAvatarEditor({
         setCurrentUrl(signedUrl.signedUrl);
         setPreviewUrl(null);
         setDimensions(null);
-        setMessage("Profile image updated.");
+        setMessage(result.message);
         if (currentPath && currentPath !== path) {
           const { error: removeError } = await supabase.storage
             .from("creator-avatars")
@@ -372,7 +372,7 @@ function ProfileAvatarEditor({
           setMessage("Profile picture removed from your account, but its stored file could not be deleted. Contact support.");
           return;
         }
-        setMessage("Profile image removed.");
+        setMessage(result.message);
       } catch (removeError) {
         console.error("Could not remove creator profile image.", removeError);
         setError("The profile image could not be removed. Check your connection and try again.");
@@ -387,7 +387,7 @@ function ProfileAvatarEditor({
           <span className="dashboard-card-label">Profile picture</span>
           <h2 id="profile-picture-title">Your photo</h2>
         </div>
-        <p>JPG, PNG or WebP, up to 5 MB. Your image stays in private storage and appears on your public storefront when selected there.</p>
+        <p>JPG, PNG or WebP, up to 5 MB. Your creator photo stays private; a public storefront copy of each saved photo is also stored.</p>
       </div>
       <div className="dashboard-avatar-editor">
         <div className="dashboard-avatar-preview" aria-label="Profile picture preview">

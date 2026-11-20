@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
+import { removeCreatorAvatarStorefrontAsset, uploadCreatorAvatarStorefrontAsset } from "@/lib/account/profile-photo-storage";
 import type { ActionResult, SocialLink } from "@/lib/account/types";
 
 type AuthenticatedClient =
@@ -271,6 +273,16 @@ export async function saveCreatorAvatarAction(avatarPath: string | null): Promis
     return { ok: false, message: "That profile image could not be saved." };
   }
 
+  const { data: previousProfile, error: profileError } = await auth.supabase
+    .from("creator_profiles")
+    .select("avatar_path")
+    .eq("user_id", auth.userId)
+    .maybeSingle();
+  if (profileError || !previousProfile) {
+    if (profileError) console.error("Could not load the previous creator profile image.", profileError);
+    return { ok: false, message: "The profile image could not be saved. Please try again." };
+  }
+
   const { data: storefront, error: storefrontError } = await auth.supabase
     .from("creator_storefronts")
     .select("id,status,username")
@@ -279,6 +291,24 @@ export async function saveCreatorAvatarAction(avatarPath: string | null): Promis
   if (storefrontError) {
     console.error("Could not load the storefront for profile-photo synchronization.", storefrontError);
     return { ok: false, message: "The profile image could not be saved. Please try again." };
+  }
+
+  const needsStorageAdmin = avatarPath !== null || previousProfile.avatar_path !== null;
+  const storageAdmin = needsStorageAdmin ? createSupabaseAdminClient() : null;
+  if (needsStorageAdmin && !storageAdmin) {
+    return { ok: false, message: "Profile image storage is not configured. Please contact support." };
+  }
+  if (avatarPath && storageAdmin) {
+    const { data: avatarImage, error: downloadError } = await storageAdmin.storage
+      .from("creator-avatars")
+      .download(avatarPath);
+    if (downloadError || !avatarImage) {
+      console.error("Could not load the uploaded creator profile image.", downloadError);
+      return { ok: false, message: "The profile image could not be prepared for your storefront." };
+    }
+    if (!(await uploadCreatorAvatarStorefrontAsset(storageAdmin, avatarPath, avatarImage))) {
+      return { ok: false, message: "The public storefront copy of your profile image could not be saved." };
+    }
   }
 
   const storefrontImagePath =
@@ -295,11 +325,22 @@ export async function saveCreatorAvatarAction(avatarPath: string | null): Promis
     return { ok: false, message: "The profile image could not be saved and synchronized. Please try again." };
   }
 
+  const cleanupWarning =
+    previousProfile.avatar_path !== null &&
+    previousProfile.avatar_path !== avatarPath &&
+    storageAdmin !== null &&
+    !(await removeCreatorAvatarStorefrontAsset(storageAdmin, previousProfile.avatar_path));
+
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/profile");
   revalidatePath("/dashboard/storefront");
   if (storefront?.username) revalidatePath(`/${storefront.username}`);
-  return { ok: true, message: "Profile image updated." };
+  return {
+    ok: true,
+    message: cleanupWarning
+      ? "Profile image updated, but the previous public storefront image could not be removed."
+      : "Profile image updated.",
+  };
 }
 
 export async function submitCreatorFeedbackAction(formData: FormData): Promise<ActionResult> {

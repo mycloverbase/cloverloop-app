@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_STOREFRONT_CUSTOMIZATION } from "@/lib/storefront/types";
-import { getPublishedStorefrontProduct } from "@/lib/storefront/server";
+import { getPublishedStorefront, getPublishedStorefrontProduct } from "@/lib/storefront/server";
 
 const productId = "95ab1e94-38c3-4f4f-a20d-fc2f9192b33e";
 const productRow = {
@@ -18,14 +18,19 @@ const productRow = {
   file_mime_type: "application/pdf",
 };
 
-function makeSupabase(options: { product?: Record<string, unknown> | null; storefront?: boolean } = {}) {
+function makeSupabase(options: {
+  product?: Record<string, unknown> | null;
+  storefront?: boolean;
+  profileImagePath?: string | null;
+} = {}) {
   const productSelections: string[] = [];
+  const storageBuckets: string[] = [];
   const rows = new Map<string, Record<string, unknown> | null>([
     ["published_storefronts", options.storefront === false ? null : {
       store_name: "Test Creator",
       username: "test-creator",
       description: "Creator storefront.",
-      profile_image_path: null,
+      profile_image_path: options.profileImagePath ?? null,
       banner_image_path: null,
       theme: "minimal",
       customization: DEFAULT_STOREFRONT_CUSTOMIZATION,
@@ -60,15 +65,31 @@ function makeSupabase(options: { product?: Record<string, unknown> | null; store
       return builder;
     }),
     storage: {
-      from: vi.fn(() => ({
+      from: vi.fn((bucket: string) => {
+        storageBuckets.push(bucket);
+        return {
         getPublicUrl: vi.fn((path: string) => ({
-          data: { publicUrl: `https://storage.example.test/${path}` },
+          data: { publicUrl: `https://storage.example.test/${bucket}/${path}` },
         })),
-      })),
+        };
+      }),
     },
   };
-  return { client, productSelections };
+  return { client, productSelections, storageBuckets };
 }
+
+describe("published storefront profile image URLs", () => {
+  it("uses a stable public storefront asset URL for shared creator avatars", async () => {
+    const avatarPath = "320f03e0-472b-4d61-9a52-f330db41f1ba/9a72ce31-50ad-4acf-b857-fd3c4f8d8895.webp";
+    const { client, storageBuckets } = makeSupabase({ profileImagePath: avatarPath });
+
+    const result = await getPublishedStorefront(client as never, "test-creator");
+
+    expect(result?.profileImageUrl).toBe(`https://storage.example.test/storefront-assets/${avatarPath}`);
+    expect(storageBuckets).toContain("storefront-assets");
+    expect(storageBuckets).not.toContain("creator-avatars");
+  });
+});
 
 describe("published storefront product lookup", () => {
   it("returns public details and safe file metadata for an active published product", async () => {

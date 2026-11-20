@@ -1,5 +1,4 @@
 import type { createSupabasePublicClient } from "@/lib/supabase/public";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   type PublicStorefront,
   type PublicStorefrontDisplay,
@@ -153,24 +152,15 @@ function storefrontImageUrl(
   return supabase.storage.from("storefront-assets").getPublicUrl(path).data.publicUrl;
 }
 
-async function storefrontProfileImageUrl(
+function storefrontProfileImageUrl(
   supabase: StorefrontSupabaseClient,
   path: string | null,
-  signer: NonNullable<ReturnType<typeof createSupabaseAdminClient>> | StorefrontSupabaseClient = supabase,
-): Promise<string | null> {
+): string | null {
   if (!path) return null;
-  if (!path.includes("/")) return storefrontImageUrl(supabase, path);
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.webp$/i.test(path)) {
+  if (!/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.webp|[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.webp)$/i.test(path)) {
     throw new Error("The storefront profile image path returned by Supabase is invalid.");
   }
-  const { data, error } = await signer.storage
-    .from("creator-avatars")
-    .createSignedUrl(path, 60 * 60 * 12);
-  if (error || !data?.signedUrl) {
-    console.error("Could not sign the shared storefront profile image.", error);
-    throw new Error("The storefront profile image could not be loaded. Please try again.");
-  }
-  return data.signedUrl;
+  return storefrontImageUrl(supabase, path);
 }
 
 function addCustomizationImageUrls(
@@ -220,7 +210,7 @@ export async function getCreatorStorefront(
       coverImageUrl: storefrontImageUrl(supabase, product.coverImagePath),
     };
   });
-  const profileImageUrl = await storefrontProfileImageUrl(supabase, storefront.profile_image_path);
+  const profileImageUrl = storefrontProfileImageUrl(supabase, storefront.profile_image_path);
   const bannerImageUrl = storefrontImageUrl(supabase, storefront.banner_image_path);
   const customization = addCustomizationImageUrls(supabase, { ...storefront.customization, products: [] });
   return { ...storefront, profileImageUrl, bannerImageUrl, products, customization };
@@ -280,11 +270,7 @@ export async function getPublishedStorefront(
       coverImageUrl: storefrontImageUrl(supabase, coverImagePath),
     };
   });
-  const profileImageUrl = await storefrontProfileImageUrl(
-    supabase,
-    publicStorefront.profile_image_path,
-    createSupabaseAdminClient() ?? undefined,
-  );
+  const profileImageUrl = storefrontProfileImageUrl(supabase, publicStorefront.profile_image_path);
   const bannerImageUrl = storefrontImageUrl(supabase, publicStorefront.banner_image_path);
   const customization = addCustomizationImageUrls(supabase, { ...publicStorefront.customization, products: [] });
   return { ...publicStorefront, profileImageUrl, bannerImageUrl, products, customization };

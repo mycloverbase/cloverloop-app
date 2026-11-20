@@ -39,15 +39,11 @@ function configureAction({
   currentAvatarPath?: string | null;
   previousImagePath?: string | null;
 }) {
-  const signedUrl = vi.fn(async () => ({
-    data: { signedUrl: "https://storage.example.test/signed-avatar" },
-    error: null,
+  const authStorageFrom = vi.fn(() => ({
+    getPublicUrl: vi.fn((path: string) => ({
+      data: { publicUrl: `https://storage.example.test/storefront-assets/${path}` },
+    })),
   }));
-  const adminClient = {
-    storage: { from: vi.fn(() => ({ createSignedUrl: signedUrl })) },
-  };
-  mocks.createSupabaseAdminClient.mockReturnValue(adminClient);
-  const authStorageFrom = vi.fn(() => ({ createSignedUrl: signedUrl }));
   const rpc = vi.fn(async () => ({ data: storefrontId, error: null }));
   const supabase = {
     auth: {
@@ -76,7 +72,7 @@ function configureAction({
   };
   mocks.createSupabaseServerClient.mockResolvedValue(supabase);
   mocks.creatorAgreementIsAccepted.mockResolvedValue(true);
-  return { adminClient, authStorageFrom, rpc, signedUrl };
+  return { authStorageFrom, rpc };
 }
 
 function storefrontInput(profileImagePath: string | null) {
@@ -95,9 +91,9 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("saveStorefrontAction profile image signing", () => {
-  it("does not re-sign an unchanged private profile image", async () => {
-    const { authStorageFrom, rpc, signedUrl } = configureAction({
+describe("saveStorefrontAction public profile image URLs", () => {
+  it("does not regenerate the URL for an unchanged profile image", async () => {
+    const { authStorageFrom, rpc } = configureAction({
       inputImagePath: avatarPath,
     });
 
@@ -106,12 +102,11 @@ describe("saveStorefrontAction profile image signing", () => {
     expect(result.ok).toBe(true);
     expect(rpc).toHaveBeenCalledOnce();
     expect(authStorageFrom).not.toHaveBeenCalled();
-    expect(signedUrl).not.toHaveBeenCalled();
     expect(mocks.createSupabaseAdminClient).not.toHaveBeenCalled();
   });
 
-  it("uses the admin signer when adopting the saved profile image into the storefront", async () => {
-    const { adminClient, authStorageFrom, rpc, signedUrl } = configureAction({
+  it("uses the stable public storefront URL when adopting the saved profile image", async () => {
+    const { authStorageFrom, rpc } = configureAction({
       inputImagePath: null,
       previousImagePath: null,
     });
@@ -121,11 +116,9 @@ describe("saveStorefrontAction profile image signing", () => {
     expect(result).toMatchObject({
       ok: true,
       path: avatarPath,
-      imageUrl: "https://storage.example.test/signed-avatar",
+      imageUrl: `https://storage.example.test/storefront-assets/${avatarPath}`,
     });
-    expect(adminClient.storage.from).toHaveBeenCalledWith("creator-avatars");
-    expect(signedUrl).toHaveBeenCalledWith(avatarPath, 60 * 60 * 12);
-    expect(authStorageFrom).not.toHaveBeenCalled();
+    expect(authStorageFrom).toHaveBeenCalledWith("storefront-assets");
     expect(rpc).toHaveBeenCalledOnce();
   });
 });

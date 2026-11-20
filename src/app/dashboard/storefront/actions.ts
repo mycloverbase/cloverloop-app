@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { removeCreatorAvatar } from "@/lib/account/profile-photo-storage";
+import {
+  removeCreatorAvatar,
+  removeStorefrontAsset,
+  uploadCreatorAvatarStorefrontAsset,
+} from "@/lib/account/profile-photo-storage";
 import type { StorefrontActionResult } from "@/lib/storefront/types";
 import { parseStorefrontDraft, safeImageCrop } from "@/lib/storefront/validation";
 
@@ -136,7 +140,7 @@ export async function saveStorefrontAction(input: unknown): Promise<StorefrontAc
 
   const needsAvatarCleanup =
     profile.avatar_path !== null && profile.avatar_path !== avatarPathToSave;
-  let storageAdmin = needsAvatarCleanup ? createSupabaseAdminClient() : null;
+  const storageAdmin = needsAvatarCleanup ? createSupabaseAdminClient() : null;
   if (needsAvatarCleanup && !storageAdmin) {
     return { ok: false, message: "Profile-photo synchronization is not configured. Please contact support." };
   }
@@ -146,24 +150,9 @@ export async function saveStorefrontAction(input: unknown): Promise<StorefrontAc
   try {
     let imageUrl: string | undefined;
     if (imagePathToSave && imagePathToSave !== parsed.value.profileImagePath) {
-      if (isCreatorAvatarPath(imagePathToSave, auth.userId)) {
-        if (!storageAdmin) storageAdmin = createSupabaseAdminClient();
-        if (!storageAdmin) {
-          return { ok: false, message: "Secure profile image previews are not configured. Please contact support." };
-        }
-        const { data: signedImage, error: signedImageError } = await storageAdmin.storage
-          .from("creator-avatars")
-          .createSignedUrl(imagePathToSave, 60 * 60 * 12);
-        if (signedImageError || !signedImage?.signedUrl) {
-          console.error("Could not prepare the shared creator profile photo.", signedImageError);
-          return { ok: false, message: "The profile image could not be prepared. Please try again." };
-        }
-        imageUrl = signedImage.signedUrl;
-      } else {
-        imageUrl = auth.supabase.storage
-          .from("storefront-assets")
-          .getPublicUrl(imagePathToSave).data.publicUrl;
-      }
+      imageUrl = auth.supabase.storage
+        .from("storefront-assets")
+        .getPublicUrl(imagePathToSave).data.publicUrl;
     }
 
     const { data, error } = await auth.supabase.rpc("save_my_storefront_with_avatar", {
@@ -388,33 +377,29 @@ export async function uploadStorefrontImageAction(formData: FormData): Promise<S
     return { ok: false, message: "The image could not be uploaded. Please try again." };
   }
 
-  if (kind !== "profile") {
-    const { error: registerError } = await auth.supabase.rpc("register_storefront_asset", {
-      requested_storefront_id: storefrontId,
-      requested_path: imagePath,
-    });
-    if (registerError) {
-      console.error("Could not register a storefront image.", registerError);
-      const { error: cleanupError } = await storageAdmin.storage.from(bucket).remove([imagePath]);
-      if (cleanupError) console.error("Could not clean up an unregistered storefront image.", cleanupError);
-      return { ok: false, message: "The uploaded image could not be attached to this storefront." };
-    }
+  if (kind === "profile" && !(await uploadCreatorAvatarStorefrontAsset(storageAdmin, imagePath, image))) {
+    const { error: cleanupError } = await storageAdmin.storage.from(bucket).remove([imagePath]);
+    if (cleanupError) console.error("Could not clean up an unmirrored creator avatar.", cleanupError);
+    return { ok: false, message: "The public storefront copy of the profile image could not be saved." };
   }
 
-  let imageUrl: string;
-  if (kind === "profile") {
-    const { data: signedImage, error: signedImageError } = await storageAdmin.storage
-      .from("creator-avatars")
-      .createSignedUrl(imagePath, 60 * 60 * 12);
-    if (signedImageError || !signedImage?.signedUrl) {
-      console.error("Could not prepare an uploaded shared creator profile photo.", signedImageError);
+  const { error: registerError } = await auth.supabase.rpc("register_storefront_asset", {
+    requested_storefront_id: storefrontId,
+    requested_path: imagePath,
+  });
+  if (registerError) {
+    console.error("Could not register a storefront image.", registerError);
+    if (kind === "profile") {
+      await removeStorefrontAsset(storageAdmin, auth.userId, storefrontId, imagePath);
+      const { error: privateCleanupError } = await storageAdmin.storage.from(bucket).remove([imagePath]);
+      if (privateCleanupError) console.error("Could not clean up an unregistered creator avatar.", privateCleanupError);
+    } else {
       const { error: cleanupError } = await storageAdmin.storage.from(bucket).remove([imagePath]);
-      if (cleanupError) console.error("Could not clean up an unpreviewable creator avatar.", cleanupError);
-      return { ok: false, message: "The uploaded image could not be prepared for preview." };
+      if (cleanupError) console.error("Could not clean up an unregistered storefront image.", cleanupError);
     }
-    imageUrl = signedImage.signedUrl;
-  } else {
-    imageUrl = auth.supabase.storage.from(bucket).getPublicUrl(imagePath).data.publicUrl;
+    return { ok: false, message: "The uploaded image could not be attached to this storefront." };
   }
+
+  const imageUrl = auth.supabase.storage.from("storefront-assets").getPublicUrl(imagePath).data.publicUrl;
   return { ok: true, message: "Image uploaded.", path: imagePath, imageUrl };
 }
