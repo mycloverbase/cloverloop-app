@@ -151,7 +151,7 @@ export const requireCreatorContext = cache(async function requireCreatorContext(
   return { supabase, user, profile };
 });
 
-export async function getAvatarSignedUrl(
+export const getAvatarSignedUrl = cache(async function getAvatarSignedUrl(
   client: AccountSupabaseClient,
   avatarPath: string | null,
 ): Promise<string | null> {
@@ -164,4 +164,4 @@ export async function getAvatarSignedUrl(
     return null;
   }
   return data.signedUrl;
-}
+});

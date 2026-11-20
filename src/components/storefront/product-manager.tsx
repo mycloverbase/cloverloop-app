@@ -183,7 +183,7 @@ export function ProductManager({
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const formErrorRef = useRef<HTMLDivElement>(null);
   const productFormRef = useRef<HTMLFormElement>(null);
-  const shouldScrollToNewForm = useRef(false);
+  const formScrollTarget = useRef<"top" | "editor" | null>(null);
 
   const limitedPlan = plan === "free";
   const canCreateLeadMagnet = !limitedPlan || freeListingCount < 5;
@@ -211,15 +211,20 @@ export function ProductManager({
   );
 
   useEffect(() => {
-    if (!form || !shouldScrollToNewForm.current) return;
-    shouldScrollToNewForm.current = false;
+    if (!form || !formScrollTarget.current) return;
+    const scrollTarget = formScrollTarget.current;
+    formScrollTarget.current = null;
     window.requestAnimationFrame(() => {
+      if (scrollTarget === "top") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
       const heading = productFormRef.current?.querySelector<HTMLElement>(".product-editor-heading");
       if (!heading) return;
       const stickyHeader = document.querySelector<HTMLElement>(".dashboard-topbar");
       const topOffset = Math.max(stickyHeader?.getBoundingClientRect().bottom ?? 0, 0) + 12;
       const scrollDistance = heading.getBoundingClientRect().top - topOffset;
-      if (scrollDistance > 0) window.scrollBy({ top: scrollDistance, behavior: "smooth" });
+      if (Math.abs(scrollDistance) > 1) window.scrollBy({ top: scrollDistance, behavior: "smooth" });
     });
   }, [form]);
 
@@ -228,7 +233,7 @@ export function ProductManager({
     setFormError("");
     setFieldErrors({});
     setFeedback("");
-    shouldScrollToNewForm.current = true;
+    formScrollTarget.current = "editor";
     setForm(blankForm());
   }
 
@@ -237,10 +242,12 @@ export function ProductManager({
     setFormError("");
     setFieldErrors({});
     setFeedback("");
+    formScrollTarget.current = "top";
     setForm(formFromProduct(product));
   }
 
   function closeForm() {
+    formScrollTarget.current = null;
     setForm(null);
     setError("");
     setFormError("");

@@ -6,6 +6,7 @@ import {
   FOUNDER_REFERRAL_COOKIE,
   verifyFounderReferralCookie,
 } from "@/lib/referrals/server";
+import { isReservedStorefrontUsername } from "@/lib/storefront/reserved-usernames";
 
 export async function proxy(request: NextRequest) {
   const config = getSupabaseConfig();
@@ -38,7 +39,7 @@ export async function proxy(request: NextRequest) {
   }
 
   const storefrontUsername = /^\/([^/.]+)$/.exec(pathname)?.[1];
-  if (storefrontUsername) {
+  if (storefrontUsername && !isReservedStorefrontUsername(storefrontUsername)) {
     const { data: redirectUsername, error } = await supabase.rpc("storefront_redirect_target", {
       requested_username: storefrontUsername,
     });
