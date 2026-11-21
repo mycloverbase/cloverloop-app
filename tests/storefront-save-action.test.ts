@@ -23,7 +23,7 @@ vi.mock("@/lib/account/profile-photo-storage", () => ({
 }));
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
 
-import { saveStorefrontAction } from "@/app/dashboard/storefront/actions";
+import { publishStorefrontAction, saveStorefrontAction } from "@/app/dashboard/storefront/actions";
 import { DEFAULT_STOREFRONT_CUSTOMIZATION } from "@/lib/storefront/types";
 
 const userId = "320f03e0-472b-4d61-9a52-f330db41f1ba";
@@ -34,17 +34,19 @@ function configureAction({
   inputImagePath,
   currentAvatarPath = avatarPath,
   previousImagePath = inputImagePath,
+  rpcError = null,
 }: {
   inputImagePath: string | null;
   currentAvatarPath?: string | null;
   previousImagePath?: string | null;
+  rpcError?: { code: string; message: string } | null;
 }) {
   const authStorageFrom = vi.fn(() => ({
     getPublicUrl: vi.fn((path: string) => ({
       data: { publicUrl: `https://storage.example.test/storefront-assets/${path}` },
     })),
   }));
-  const rpc = vi.fn(async () => ({ data: storefrontId, error: null }));
+  const rpc = vi.fn(async () => ({ data: storefrontId, error: rpcError }));
   const supabase = {
     auth: {
       getUser: vi.fn(async () => ({ data: { user: { id: userId } }, error: null })),
@@ -62,6 +64,10 @@ function configureAction({
                 profile_image_path: previousImagePath,
               }
             : { avatar_path: currentAvatarPath },
+          error: null,
+        })),
+        single: vi.fn(async () => ({
+          data: { username: "test-store" },
           error: null,
         })),
       };
@@ -120,5 +126,24 @@ describe("saveStorefrontAction public profile image URLs", () => {
     });
     expect(authStorageFrom).toHaveBeenCalledWith("storefront-assets");
     expect(rpc).toHaveBeenCalledOnce();
+  });
+});
+
+describe("publishStorefrontAction", () => {
+  it("explains that an active paid product is required", async () => {
+    configureAction({
+      inputImagePath: avatarPath,
+      rpcError: {
+        code: "23514",
+        message: "Choose at least one active paid product before publishing.",
+      },
+    });
+
+    const result = await publishStorefrontAction();
+
+    expect(result).toEqual({
+      ok: false,
+      message: "Add and activate at least one paid product before publishing your storefront.",
+    });
   });
 });

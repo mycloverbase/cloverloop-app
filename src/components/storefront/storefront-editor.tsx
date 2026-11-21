@@ -143,6 +143,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
     () => initialStorefront?.products.filter((product) => product.isActive) ?? [],
     [initialStorefront?.products],
   );
+  const hasActivePaidProduct = activeProducts.some((product) => !product.isFree && product.pricePaise > 0);
   const completion = optionalCompletion(draft, activeProducts.length > 0);
   const publicUrl = `https://cloverloop.in/${draft.username || "your-store"}`;
 
@@ -731,7 +732,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
               <section className="storefront-step-fields storefront-final-preview" aria-labelledby="storefront-final-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-final-title">Preview your storefront</h3>
-                    <p>Check both screen sizes. Optional details can stay blank; a store name, username and profile image are required to publish.</p>
+                    <p>Check both screen sizes. New storefronts need a store name, username, profile image and at least one active paid product. Existing published storefronts can publish changes without one.</p>
                   </div>
                   <div className="storefront-preview-controls" role="group" aria-label="Preview device">
                     <button type="button" className={previewDevice === "desktop" ? "selected" : ""} onClick={() => setPreviewDevice("desktop")}>Desktop</button>
@@ -743,6 +744,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                     <span className={draft.storeName.trim() ? "complete" : ""}><Check size={15} /> Store name</span>
                     <span className={draft.username.trim() ? "complete" : ""}><Check size={15} /> Store username</span>
                     <span className={draft.profileImagePath ? "complete" : ""}><Check size={15} /> Profile image</span>
+                    <span className={hasActivePaidProduct || status === "published" ? "complete" : ""}><Check size={15} /> Active paid product</span>
                   </div>
                   <p className="storefront-final-note">Sample cards are marked Coming Soon, cannot be opened and do not accept payments.</p>
               </section>
@@ -770,6 +772,10 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                     onClick={() => {
                       if (!draft.storeName.trim() || !draft.username.trim() || !draft.profileImagePath) {
                         setError("Add a store name, username and profile image before publishing.");
+                        return;
+                      }
+                      if (status !== "published" && !hasActivePaidProduct) {
+                        setError("Add and activate at least one paid product in Manage products before publishing.");
                         return;
                       }
                       setDialogAction("publish");

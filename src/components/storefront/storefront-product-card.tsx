@@ -12,8 +12,8 @@ export function StorefrontProductCard({
   const price = product.isFree
     ? "No cost"
     : new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(product.pricePaise / 100);
-  return (
-    <article className="storefront-product-card" id={`product-${product.id}`}>
+  const cardContent = (
+    <>
       {product.coverImageUrl ? (
         <Image
           src={product.coverImageUrl}
@@ -38,23 +38,36 @@ export function StorefrontProductCard({
           <strong>{price}</strong>
           <span>{product.isFree ? "Lead Magnet" : "Digital product"}</span>
         </div>
-        {storefrontUsername ? (
-          <Link
-            className="storefront-product-action"
-            href={`/${encodeURIComponent(storefrontUsername)}/product/${product.id}`}
-          >
-            View Product
-          </Link>
-        ) : product.isFree ? (
-          <button className="storefront-product-action" type="button" disabled>
-            Lead Magnet delivery coming soon
-          </button>
-        ) : (
-          <span className="storefront-product-action" aria-disabled="true">
-            Product unavailable
-          </span>
-        )}
+        {!storefrontUsername ? (
+          product.isFree ? (
+            <button className="storefront-product-action" type="button" disabled>
+              Lead Magnet delivery coming soon
+            </button>
+          ) : (
+            <span className="storefront-product-action" aria-disabled="true">
+              Product unavailable
+            </span>
+          )
+        ) : null}
       </div>
+    </>
+  );
+
+  if (storefrontUsername) {
+    return (
+      <Link
+        className="storefront-product-card"
+        href={`/${encodeURIComponent(storefrontUsername)}/product/${product.id}`}
+        id={`product-${product.id}`}
+      >
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return (
+    <article className="storefront-product-card" id={`product-${product.id}`}>
+      {cardContent}
     </article>
   );
 }

@@ -49,6 +49,9 @@ function databaseMessage(error: { code?: string; message?: string }): string {
   if (error.message?.includes("profile image")) {
     return "Add and save a profile image before publishing your storefront.";
   }
+  if (error.message?.includes("paid product")) {
+    return "Add and activate at least one paid product before publishing your storefront.";
+  }
   if (error.code === "23514") return "Some storefront details are invalid. Review the form and try again.";
   console.error("A storefront database action failed.", error);
   return "Your storefront could not be updated. Please try again.";
