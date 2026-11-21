@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { creatorAgreementIsAccepted } from "@/lib/account/creator-agreement-consent";
+import { normalizeProfileBio, PROFILE_BIO_MAX_LENGTH } from "@/lib/account/profile-bio";
 import { removeCreatorAvatarStorefrontAsset, uploadCreatorAvatarStorefrontAsset } from "@/lib/account/profile-photo-storage";
 import type { ActionResult, SocialLink } from "@/lib/account/types";
 
@@ -107,7 +108,7 @@ function parseSocialLinks(value: string): Validation<SocialLink[]> {
 function profileInput(formData: FormData) {
   const displayName = readText(formData, "display_name");
   const username = readText(formData, "username").toLowerCase();
-  const bio = readText(formData, "bio");
+  const bio = normalizeProfileBio(readText(formData, "bio"));
   const location = readText(formData, "location");
   const contactNumber = readText(formData, "contact_number");
   if (!displayName || displayName.length > 80) {
@@ -116,7 +117,9 @@ function profileInput(formData: FormData) {
   if (!/^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/.test(username)) {
     return { ok: false as const, message: "Username must be 3–30 characters using letters, numbers, underscores or hyphens." };
   }
-  if (bio.length > 1200) return { ok: false as const, message: "About must be 1,200 characters or fewer." };
+  if (bio.length > PROFILE_BIO_MAX_LENGTH) {
+    return { ok: false as const, message: "About must be 1,200 characters or fewer." };
+  }
   if (location.length > 80) return { ok: false as const, message: "Location must be 80 characters or fewer." };
   if (
     contactNumber &&

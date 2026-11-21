@@ -8,6 +8,7 @@ import { useDashboardUnsavedChanges } from "@/components/dashboard/dashboard-she
 import { SocialLinksEditor } from "@/components/storefront/social-links-editor";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { CreatorProfile } from "@/lib/account/types";
+import { normalizeProfileBio, PROFILE_BIO_MAX_LENGTH } from "@/lib/account/profile-bio";
 import {
   STOREFRONT_SOCIAL_PLATFORMS,
   type StorefrontSocialLink,
@@ -26,7 +27,7 @@ function formFromProfile(profile: CreatorProfile): ProfileForm {
   return {
     displayName: profile.display_name,
     username: profile.username ?? "",
-    bio: profile.bio,
+    bio: normalizeProfileBio(profile.bio),
     location: profile.location ?? "",
     contactNumber: profile.contact_number ?? "",
     socialLinks: profile.social_links.map((link, index) => {
@@ -171,7 +172,7 @@ export function ProfileEditor({
           <textarea
             name="bio"
             rows={4}
-            maxLength={1200}
+            maxLength={PROFILE_BIO_MAX_LENGTH}
             placeholder="Tell people what you create and what they can expect from your work."
             value={form.bio}
             onChange={(event) => update("bio", event.target.value)}
