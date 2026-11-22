@@ -123,8 +123,6 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewDevice, setPreviewDevice] = useState<DevicePreview>("desktop");
   const [dialogAction, setDialogAction] = useState<DialogAction>(null);
   const [copied, setCopied] = useState(false);
   const [publishedStoreUrl, setPublishedStoreUrl] = useState<string | null>(null);
@@ -423,6 +421,33 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
   const optionalLabel = `${completion} of 5 optional fields complete`;
   const isPublished = status === "published";
 
+  function openDesktopPreview() {
+    const channelId = crypto.randomUUID();
+    const channel = new BroadcastChannel(channelId);
+    const timeoutId = window.setTimeout(() => {
+      channel.close();
+      setError("The desktop preview could not be connected. Please reopen it.");
+    }, 30_000);
+
+    channel.onmessage = (event: MessageEvent<{ type?: string }>) => {
+      if (event.data?.type !== "ready") return;
+      channel.postMessage({ type: "store", store: previewStore });
+      window.clearTimeout(timeoutId);
+      window.setTimeout(() => channel.close(), 1000);
+    };
+
+    const previewWindow = window.open(`/storefront-preview/${channelId}`, "_blank");
+    if (!previewWindow) {
+      window.clearTimeout(timeoutId);
+      channel.close();
+      setError("Allow pop-ups to open the desktop preview, then try again.");
+      return;
+    }
+
+    previewWindow.opener = null;
+    setError("");
+  }
+
   return (
     <div className="storefront-management">
       <header className="dashboard-page-heading storefront-management-heading">
@@ -431,9 +456,9 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
           <h1>Storefront</h1>
           <p>Set up one shareable page for your creator identity and upcoming work.</p>
         </div>
-        {storefrontId && status !== "deletion_pending" ? (
-          <button type="button" className="button button-secondary" onClick={() => setPreviewOpen(true)}>
-            Preview
+        {status !== "deletion_pending" ? (
+          <button type="button" className="button button-secondary" onClick={openDesktopPreview}>
+            <ExternalLink size={16} aria-hidden="true" /> Desktop Preview
           </button>
         ) : null}
       </header>
@@ -732,13 +757,9 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
               <section className="storefront-step-fields storefront-final-preview" aria-labelledby="storefront-final-title">
                   <div className="storefront-step-intro">
                     <h3 id="storefront-final-title">Preview your storefront</h3>
-                    <p>Check both screen sizes. New storefronts need a store name, username, profile image and at least one active paid product. Existing published storefronts can publish changes without one.</p>
+                    <p>Preview the mobile storefront here, or open a full-size desktop preview. New storefronts need a store name, username, profile image and at least one active paid product. Existing published storefronts can publish changes without one.</p>
                   </div>
-                  <div className="storefront-preview-controls" role="group" aria-label="Preview device">
-                    <button type="button" className={previewDevice === "desktop" ? "selected" : ""} onClick={() => setPreviewDevice("desktop")}>Desktop</button>
-                    <button type="button" className={previewDevice === "mobile" ? "selected" : ""} onClick={() => setPreviewDevice("mobile")}>Mobile</button>
-                  </div>
-                  <StorefrontPreviewFrame store={previewStore} device={previewDevice} />
+                  <StorefrontPreviewFrame store={previewStore} device="mobile" />
                   <div className="storefront-publish-checklist">
                     <strong>Before publishing</strong>
                     <span className={draft.storeName.trim() ? "complete" : ""}><Check size={15} /> Store name</span>
@@ -797,24 +818,6 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
           ) : null}
         </>
       )}
-
-      {previewOpen ? (
-        <div className="storefront-dialog-backdrop" role="presentation" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) setPreviewOpen(false);
-        }}>
-          <section className="storefront-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="storefront-preview-title">
-            <div className="storefront-dialog-heading">
-              <div><span className="dashboard-card-label">Live design preview</span><h2 id="storefront-preview-title">Preview storefront</h2></div>
-              <button type="button" className="dashboard-icon-button" onClick={() => setPreviewOpen(false)} aria-label="Close preview">×</button>
-            </div>
-            <div className="storefront-preview-controls" role="group" aria-label="Preview device">
-              <button type="button" className={previewDevice === "desktop" ? "selected" : ""} onClick={() => setPreviewDevice("desktop")}>Desktop</button>
-              <button type="button" className={previewDevice === "mobile" ? "selected" : ""} onClick={() => setPreviewDevice("mobile")}>Mobile</button>
-            </div>
-            <StorefrontPreviewFrame store={previewStore} device={previewDevice} />
-          </section>
-        </div>
-      ) : null}
 
       {dialogAction ? (
         <div className="storefront-dialog-backdrop">
@@ -1032,7 +1035,9 @@ export function StorefrontPreviewFrame({
   device: DevicePreview;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const previewFrameRef = useRef<HTMLDivElement>(null);
   const [previewRoot, setPreviewRoot] = useState<HTMLElement | null>(null);
+  const [deviceScale, setDeviceScale] = useState(1);
   const onFrameLoad = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
     const root = frameDocument?.getElementById("storefront-preview-root");
@@ -1061,17 +1066,58 @@ export function StorefrontPreviewFrame({
     onFrameLoad();
   }, [onFrameLoad]);
 
+  useEffect(() => {
+    if (device !== "mobile") return;
+    const previewFrame = previewFrameRef.current;
+    if (!previewFrame) return;
+
+    const updateScale = () => {
+      const availableWidth = previewFrame.clientWidth - 32;
+      const availableHeight = previewFrame.clientHeight - 32;
+      if (availableWidth <= 0 || availableHeight <= 0) return;
+      setDeviceScale(Math.max(0.1, Math.min(1, availableWidth / 430, availableHeight / 884)));
+    };
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(previewFrame);
+    updateScale();
+    return () => observer.disconnect();
+  }, [device]);
+
   return (
-    <div className={`storefront-preview-frame storefront-preview-${device}`}>
-      <iframe
-        ref={iframeRef}
-        title={`${device === "mobile" ? "Mobile" : "Desktop"} storefront preview`}
-        width={device === "mobile" ? 390 : 1024}
-        height={720}
-        srcDoc={'<!doctype html><html><head></head><body style="margin:0"><div id="storefront-preview-root"></div></body></html>'}
-        onLoad={onFrameLoad}
-      />
-      {previewRoot ? createPortal(<PublicStorefront store={store} />, previewRoot) : null}
+    <div ref={previewFrameRef} className={`storefront-preview-frame storefront-preview-${device}`}>
+      {device === "mobile" ? (
+        <div
+          className="storefront-preview-device-scale"
+          style={{ width: 430 * deviceScale, height: 884 * deviceScale }}
+        >
+          <div className="storefront-preview-device" style={{ transform: `scale(${deviceScale})` }}>
+            <div className="storefront-preview-screen">
+              <iframe
+                ref={iframeRef}
+                title="Mobile storefront preview"
+                width={390}
+                height={844}
+                srcDoc={'<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>html,body{margin:0;scrollbar-width:none}body::-webkit-scrollbar{display:none}</style></head><body style="margin:0"><div id="storefront-preview-root"></div></body></html>'}
+                onLoad={onFrameLoad}
+              />
+              <span className="storefront-preview-island" aria-hidden="true" />
+              {previewRoot ? createPortal(<PublicStorefront store={store} />, previewRoot) : null}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <iframe
+            ref={iframeRef}
+            title="Desktop storefront preview"
+            width={1024}
+            height={720}
+            srcDoc={'<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>html,body{margin:0;scrollbar-width:none}body::-webkit-scrollbar{display:none}</style></head><body style="margin:0"><div id="storefront-preview-root"></div></body></html>'}
+            onLoad={onFrameLoad}
+          />
+          {previewRoot ? createPortal(<PublicStorefront store={store} />, previewRoot) : null}
+        </>
+      )}
     </div>
   );
 }

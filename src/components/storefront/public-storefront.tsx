@@ -14,7 +14,7 @@ import type {
   StorefrontTheme,
 } from "@/lib/storefront/types";
 
-type StorefrontView = {
+export type StorefrontView = {
   store_name: string;
   username: string;
   description: string;
