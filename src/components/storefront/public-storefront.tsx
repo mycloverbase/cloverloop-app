@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { SocialPlatformIcon } from "@/components/storefront/social-platform-icon";
 import { ProductCatalog } from "@/components/storefront/product-catalog";
+import { StorefrontBio } from "@/components/storefront/storefront-bio";
 import type {
   StorefrontCustomization,
   StorefrontProductDisplay,
@@ -28,74 +29,80 @@ type StorefrontView = {
 
 type StorefrontHeaderView = Pick<
   StorefrontView,
-  "store_name" | "username" | "profileImageUrl" | "bannerImageUrl" | "customization"
+  "store_name" | "username" | "description" | "profileImageUrl" | "bannerImageUrl" | "customization"
 >;
 
 function initials(name: string) {
   return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "C";
 }
 
-export function PublicStorefrontHeader({ store }: { store: StorefrontHeaderView }) {
+export function PublicStorefrontHeader({
+  store,
+  showDescription = true,
+}: {
+  store: StorefrontHeaderView;
+  showDescription?: boolean;
+}) {
   const hidden = new Set(store.customization.hiddenSections);
   return (
-    <header className={`storefront-hero${store.bannerImageUrl ? " storefront-hero-has-banner" : ""}`}>
-      {store.bannerImageUrl ? (
-        <Image
-          className="storefront-hero-banner"
-          src={store.bannerImageUrl}
-          alt=""
-          fill
-          unoptimized
-          priority
-          sizes="(max-width: 760px) 100vw, 1120px"
-        />
-      ) : null}
-      {store.profileImageUrl ? (
-        <Image
-          className="storefront-profile-image"
-          src={store.profileImageUrl}
-          alt={`${store.store_name} profile`}
-          width={176}
-          height={176}
-          unoptimized
-          priority
-        />
-      ) : (
-        <div className="storefront-profile-fallback" aria-hidden="true">{initials(store.store_name)}</div>
-      )}
-      <div className="storefront-hero-copy">
-        <h1>{store.store_name}</h1>
-        <p>@{store.username}</p>
-        {!hidden.has("social") && store.customization.socialLinks.length ? (
-          <nav className="storefront-social-icons" aria-label="Social links">
-            {store.customization.socialLinks.map((link) => (
-              <a
-                key={link.id}
-                className="storefront-social-icon-link"
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={link.label}
-                title={link.label}
-              >
-                <SocialIcon platform={link.platform} />
-              </a>
-            ))}
-          </nav>
+    <header className="storefront-profile-header">
+      <div className={`storefront-profile-banner${store.bannerImageUrl ? " has-image" : ""}`}>
+        {store.bannerImageUrl ? (
+          <Image
+            className="storefront-profile-banner-image"
+            src={store.bannerImageUrl}
+            alt=""
+            fill
+            unoptimized
+            priority
+            sizes="(max-width: 760px) 100vw, 1120px"
+          />
         ) : null}
       </div>
+      <div className="storefront-profile-layout">
+        {store.profileImageUrl ? (
+          <Image
+            className="storefront-profile-avatar"
+            src={store.profileImageUrl}
+            alt={`${store.store_name} profile`}
+            width={176}
+            height={176}
+            unoptimized
+            priority
+          />
+        ) : (
+          <div className="storefront-profile-avatar storefront-profile-avatar-fallback" aria-hidden="true">
+            {initials(store.store_name)}
+          </div>
+        )}
+        <div className="storefront-profile-copy">
+          <div className="storefront-profile-name">
+            <h1>{store.store_name}</h1>
+            <p>@{store.username}</p>
+          </div>
+          {showDescription && !hidden.has("about") && store.description.trim() ? (
+            <StorefrontBio description={store.description} />
+          ) : null}
+          {!hidden.has("social") && store.customization.socialLinks.length ? (
+            <nav className="storefront-profile-socials" aria-label="Social links">
+              {store.customization.socialLinks.map((link) => (
+                <a
+                  key={link.id}
+                  className="storefront-profile-social-link"
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  title={link.label}
+                >
+                  <SocialIcon platform={link.platform} />
+                </a>
+              ))}
+            </nav>
+          ) : null}
+        </div>
+      </div>
     </header>
-  );
-}
-
-function AboutSection({ store }: { store: StorefrontView }) {
-  if (!store.description.trim()) return null;
-  return (
-    <section className="storefront-section storefront-about" id="about" aria-labelledby="storefront-about-title">
-      <span className="storefront-eyebrow">A little about the creator</span>
-      <h2 id="storefront-about-title">About</h2>
-      <p>{store.description}</p>
-    </section>
   );
 }
 
@@ -137,7 +144,6 @@ function ContactSection({ store }: { store: StorefrontView }) {
 }
 
 const sectionComponents: Partial<Record<StorefrontSection, (props: { store: StorefrontView }) => React.ReactNode>> = {
-  about: AboutSection,
   products: ProductsSection,
   contact: ContactSection,
 };
@@ -161,7 +167,7 @@ export function PublicStorefront({ store }: { store: StorefrontView }) {
       style={style}
     >
       <div className="storefront-content">
-        <PublicStorefrontHeader store={store} />
+        <PublicStorefrontHeader store={store} showDescription={!hidden.has("about")} />
 
         <div className="storefront-sections">
           {orderedSections.map((section) => {

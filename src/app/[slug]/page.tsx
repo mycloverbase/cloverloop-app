@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { PublicLayout } from "@/components/public-layout";
 import { PublicStorefront } from "@/components/storefront/public-storefront";
 import { PublicCta } from "@/components/public-cta";
+import { OfficialSocialLinks } from "@/components/official-social-links";
 import { Breadcrumbs } from "@/components/site-header";
 import { TrackLink } from "@/components/track-link";
 import { companyPages, faqItems, featurePages, pageTitles, publicLinks, PRODUCTION_URL } from "@/lib/site";
@@ -198,7 +199,6 @@ function AboutBlocks({ blocks }: { blocks: NonNullable<(typeof companyPages)[str
 function CompanyPage({ slug }: { slug: string }) {
   const page = companyPages[slug];
   if (!page) return null;
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim();
   if (page.blocks) {
     return (
       <>
@@ -239,9 +239,15 @@ function CompanyPage({ slug }: { slug: string }) {
               )}
             </section>
           ))}
-          {slug === "contact" && supportEmail && (
-            <p><a className="subtle-link" href={`mailto:${supportEmail}`}>{supportEmail}</a></p>
-          )}
+          {slug === "contact" ? (
+            <div className="contact-information">
+              <p className="contact-email">
+                <strong>Email</strong>
+                <a href="mailto:info@cloverloop.in">info@cloverloop.in</a>
+              </p>
+              <OfficialSocialLinks />
+            </div>
+          ) : null}
           {slug === "help-center" && <Link href="/faq" className="button">Visit the FAQ <ArrowRight size={16} /></Link>}
           {slug === "founding-creators" && (
             <TrackLink href="/signup?ref=founder" event="signup_click" className="button">Join as a Founding Creator <ArrowRight size={16} /></TrackLink>

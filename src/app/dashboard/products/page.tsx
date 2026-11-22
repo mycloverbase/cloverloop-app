@@ -91,7 +91,8 @@ export default async function CreatorProductsPage() {
         storefrontStatus={storefront?.status ?? null}
         initialProducts={storefront?.products ?? []}
         subcategoryOptions={subcategoryOptions}
-        plan={entitlements.plan}
+        paidProductLimit={entitlements.paidProductLimit}
+        freeProductLimit={entitlements.freeProductLimit}
         initialFreeListingCount={freeListingCount}
         initialPaidListingCount={paidListingCount}
       />

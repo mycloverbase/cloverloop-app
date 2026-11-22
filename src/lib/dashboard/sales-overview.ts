@@ -7,6 +7,13 @@ function parseNonNegativeInteger(value: unknown): bigint | null {
   return BigInt(value);
 }
 
+export type SalesOverviewPeriod = "last_28_days" | "lifetime";
+
+export function parseSalesOverviewPeriod(value: string | string[] | undefined): SalesOverviewPeriod {
+  const period = Array.isArray(value) ? value[0] : value;
+  return period === "lifetime" ? "lifetime" : "last_28_days";
+}
+
 export function formatSalesOverview(data: unknown): {
   revenue: string;
   sales: string;

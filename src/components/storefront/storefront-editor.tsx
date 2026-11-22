@@ -958,7 +958,7 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
   );
 }
 
-function SectionManager({
+export function SectionManager({
   draft,
   locked,
   onVisibilityChange,
@@ -1024,7 +1024,7 @@ function SectionManager({
   );
 }
 
-function StorefrontPreviewFrame({
+export function StorefrontPreviewFrame({
   store,
   device,
 }: {

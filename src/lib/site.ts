@@ -20,7 +20,7 @@ export const publicLinks = {
     { label: "About", href: "/about" },
     { label: "Pricing", href: "/pricing" },
     { label: "Help Center", href: "/help-center" },
-    { label: "Email Us", href: "/contact" },
+    { label: "Contact", href: "/contact" },
     { label: "FAQ", href: "/faq" },
     { label: "Reviews", href: "/reviews" },
     { label: "Sitemap", href: "/sitemap" },
@@ -295,11 +295,11 @@ export const companyPages: Record<
     ],
   },
   contact: {
-    title: "Contact CloverLoop",
-    description: "Contact the CloverLoop support team.",
-    heading: "Contact CloverLoop",
+    title: "Get in touch with CloverLoop",
+    description: "Have a question about CloverLoop, need help getting started or want to discuss a partnership? We'd like to hear from you.",
+    heading: "Get in touch with CloverLoop",
     paragraphs: [
-      "Have a question about CloverLoop? Contact our support team.",
+      "Have a question about CloverLoop, need help getting started or want to discuss a partnership? We'd like to hear from you.",
     ],
   },
   reviews: {

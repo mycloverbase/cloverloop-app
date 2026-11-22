@@ -40,17 +40,19 @@ export function ProductCatalog({
       return firstIndex - secondIndex;
     });
   }, [products]);
-  const activeCategoryProducts = selectedCategory === "all"
+  const hasSingleCategory = categoryGroups.length === 1;
+  const activeCategory = hasSingleCategory ? categoryGroups[0][0] : selectedCategory;
+  const activeCategoryProducts = activeCategory === "all"
     ? products
-    : products.filter((product) => product.category === selectedCategory);
+    : products.filter((product) => product.category === activeCategory);
   const activeSubcategories = [...new Set(activeCategoryProducts.map((product) => product.subcategory))]
     .sort((first, second) => first.localeCompare(second));
   const visibleProducts = selectedSubcategory === "all"
     ? activeCategoryProducts
     : activeCategoryProducts.filter((product) => product.subcategory === selectedSubcategory);
-  const visibleCategoryGroups = selectedCategory === "all"
+  const visibleCategoryGroups = activeCategory === "all"
     ? categoryGroups
-    : [[selectedCategory, visibleProducts] as [string, StorefrontProductDisplay[]]];
+    : [[activeCategory, visibleProducts] as [string, StorefrontProductDisplay[]]];
 
   function chooseCategory(category: string) {
     setSelectedCategory(category);
@@ -59,29 +61,31 @@ export function ProductCatalog({
 
   return (
     <div className="storefront-catalog">
-      <nav className="storefront-catalog-filters" aria-label="Product categories">
-        <button
-          type="button"
-          className={selectedCategory === "all" ? "selected" : ""}
-          aria-pressed={selectedCategory === "all"}
-          onClick={() => chooseCategory("all")}
-        >
-          All <span>{products.length}</span>
-        </button>
-        {categoryGroups.map(([category, items]) => (
+      {categoryGroups.length > 1 ? (
+        <nav className="storefront-catalog-filters" aria-label="Product categories">
           <button
             type="button"
-            className={selectedCategory === category ? "selected" : ""}
-            aria-pressed={selectedCategory === category}
-            key={category}
-            onClick={() => chooseCategory(category)}
+            className={selectedCategory === "all" ? "selected" : ""}
+            aria-pressed={selectedCategory === "all"}
+            onClick={() => chooseCategory("all")}
           >
-            {category} <span>{items.length}</span>
+            All <span>{products.length}</span>
           </button>
-        ))}
-      </nav>
+          {categoryGroups.map(([category, items]) => (
+            <button
+              type="button"
+              className={selectedCategory === category ? "selected" : ""}
+              aria-pressed={selectedCategory === category}
+              key={category}
+              onClick={() => chooseCategory(category)}
+            >
+              {category} <span>{items.length}</span>
+            </button>
+          ))}
+        </nav>
+      ) : null}
 
-      {selectedCategory !== "all" ? (
+      {selectedCategory !== "all" || hasSingleCategory ? (
         <nav className="storefront-catalog-filters storefront-subcategory-filters" aria-label="Product subcategories">
           <button
             type="button"
@@ -116,7 +120,7 @@ export function ProductCatalog({
               : [[selectedSubcategory, categoryProducts] as [string, StorefrontProductDisplay[]]];
             return (
               <section className="storefront-catalog-category" key={category} aria-label={category}>
-                {selectedCategory === "all" ? <h3>{category}</h3> : null}
+                {activeCategory === "all" ? <h3>{category}</h3> : null}
                 {groups.map(([subcategory, groupedProducts]) => (
                   <section className="storefront-catalog-subcategory" key={`${category}-${subcategory}`}>
                     {selectedSubcategory === "all" ? (

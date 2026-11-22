@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, BookOpen, Mail, MessageSquareText } from "lucide-react";
-import { FeedbackForm } from "@/components/dashboard/feedback-form";
+import { CreatorSupportFlow } from "@/components/dashboard/creator-support-flow";
 import { SUPPORT_EMAIL } from "@/lib/help";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export default function DashboardHelpPage() {
         <div>
           <span className="eyebrow">Help &amp; support</span>
           <h1>How can we help?</h1>
-          <p>Find an answer, explore creator resources or contact the CloverLoop team.</p>
+          <p>Tell us what you&apos;re trying to do. We&apos;ll help you find the right solution.</p>
         </div>
       </header>
 
@@ -58,7 +58,7 @@ export default function DashboardHelpPage() {
         )}
       </section>
 
-      <FeedbackForm />
+      <CreatorSupportFlow />
     </div>
   );
 }

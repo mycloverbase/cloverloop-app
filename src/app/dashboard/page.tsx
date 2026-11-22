@@ -21,7 +21,8 @@ import {
 } from "@/lib/razorpay/oauth";
 import { getRazorpayCheckoutConnectionStatus } from "@/lib/razorpay/checkout";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { formatSalesOverview } from "@/lib/dashboard/sales-overview";
+import { formatSalesOverview, parseSalesOverviewPeriod } from "@/lib/dashboard/sales-overview";
+import { SalesOverviewPeriodSelector } from "@/components/dashboard/sales-overview-period-selector";
 
 export const metadata: Metadata = {
   title: "Dashboard | CloverLoop",
@@ -42,14 +43,27 @@ function completionItems(profile: Awaited<ReturnType<typeof requireCreatorContex
   ];
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ username?: string | string[]; referral?: string | string[] }>;
+  searchParams: Promise<{
+    username?: string | string[];
+    referral?: string | string[];
+    period?: string | string[];
+  }>;
 }) {
-  const { username: requestedValue, referral: referralValue } = await searchParams;
+  const {
+    username: requestedValue,
+    referral: referralValue,
+    period: periodValue,
+  } = await searchParams;
   const referralStatus = Array.isArray(referralValue) ? referralValue[0] : referralValue;
   const requestedUsername = Array.isArray(requestedValue) ? requestedValue[0] : requestedValue;
+  const salesPeriod = parseSalesOverviewPeriod(periodValue);
   const { supabase, user, profile } = await requireCreatorContext();
   let profileUsername = profile.username;
   let usernameMessage = "";
@@ -80,13 +94,15 @@ export default async function DashboardPage({
     entitlements,
     storefrontResponse,
     productCountResponse,
+    activePaidProductCountResponse,
+    onboardingProgressResponse,
     avatarUrl,
     salesOverviewResponse,
   ] = await Promise.all([
     getMyPlanEntitlements(supabase),
     supabase
       .from("creator_storefronts")
-      .select("id,username,status")
+      .select("id,username,status,store_name,profile_image_path,description,theme,customization")
       .eq("user_id", user.id)
       .maybeSingle(),
     supabase
@@ -94,8 +110,21 @@ export default async function DashboardPage({
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
       .is("deleted_at", null),
+    supabase
+      .from("storefront_products")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("is_active", true)
+      .eq("is_free", false)
+      .gt("price_paise", 0)
+      .is("deleted_at", null),
+    supabase
+      .from("creator_onboarding_progress")
+      .select("completed_steps,skipped_steps,completed_at")
+      .eq("user_id", user.id)
+      .maybeSingle(),
     getAvatarSignedUrl(supabase, profile.avatar_path),
-    supabase.rpc("get_my_sales_overview"),
+    supabase.rpc("get_my_sales_overview", { p_period: salesPeriod }),
   ]);
   if (storefrontResponse.error) {
     console.error("Could not load creator storefront status.", storefrontResponse.error);
@@ -104,6 +133,14 @@ export default async function DashboardPage({
   if (productCountResponse.error) {
     console.error("Could not load creator product listing count.", productCountResponse.error);
     throw new Error("Your product listing count could not be loaded. Please try again.");
+  }
+  if (activePaidProductCountResponse.error) {
+    console.error("Could not load active paid product count for onboarding progress.", activePaidProductCountResponse.error);
+    throw new Error("Your storefront setup progress could not be loaded. Please try again.");
+  }
+  if (onboardingProgressResponse.error) {
+    console.error("Could not load creator onboarding progress for the dashboard.", onboardingProgressResponse.error);
+    throw new Error("Your storefront setup progress could not be loaded. Please try again.");
   }
   if (salesOverviewResponse.error) {
     console.error("Could not load creator sales overview.", {
@@ -117,7 +154,9 @@ export default async function DashboardPage({
     throw new Error("Your sales overview could not be loaded. Please try again.");
   }
   const storefront = storefrontResponse.data;
+  const onboardingProgress = onboardingProgressResponse.data;
   const productCount = productCountResponse.count ?? 0;
+  const activePaidProductCount = activePaidProductCountResponse.count ?? 0;
   const plan = creatorPlans[entitlements.plan];
   const monthlyPlanPrice = `₹${(entitlements.monthlyPricePaise / 100).toLocaleString("en-IN")}/month`;
   const cumulativeGrossSalesLimit = entitlements.cumulativeGrossSalesLimitPaise === null
@@ -126,6 +165,39 @@ export default async function DashboardPage({
   const checklist = completionItems(profile);
   const completed = checklist.filter((item) => item.complete).length;
   const completionPercentage = Math.round((completed / checklist.length) * 100);
+  const customization = isRecord(storefront?.customization) ? storefront.customization : null;
+  const socialLinks = customization?.socialLinks;
+  const onboardingCompletedSteps = Array.isArray(onboardingProgress?.completed_steps)
+    ? onboardingProgress.completed_steps.filter((step): step is number => typeof step === "number")
+    : [];
+  const onboardingCompletedCount = new Set([
+    ...onboardingCompletedSteps.filter((step) => step !== 4 && step !== 7),
+    ...(storefront?.store_name?.trim() && storefront.username ? [1] : []),
+    ...(storefront?.profile_image_path || profile.avatar_path ? [2] : []),
+    ...(storefront?.description?.trim() ? [3] : []),
+    ...(activePaidProductCount > 0 ? [4] : []),
+    ...(Array.isArray(socialLinks) && socialLinks.length > 0 ? [5] : []),
+    ...(storefront && (
+      storefront.theme !== "minimal" ||
+      customization?.primaryColor !== "#2f7254" ||
+      customization?.accentColor !== "#a8c9a5" ||
+      customization?.backgroundColor !== "#ffffff" ||
+      customization?.bannerStyle !== "wide" ||
+      (Array.isArray(customization?.sectionOrder) &&
+        customization.sectionOrder.some((section, index) =>
+          section !== ["about", "products", "social", "contact"][index],
+        )) ||
+      (Array.isArray(customization?.hiddenSections) && customization.hiddenSections.length > 0)
+    )
+      ? [6]
+      : []),
+    ...(storefront?.status === "published" ? [7] : []),
+  ]).size;
+  const showOnboardingCard = Boolean(
+    onboardingProgress &&
+    !onboardingProgress.completed_at &&
+    storefront?.status !== "published",
+  );
   const storefrontStatus = storefront?.status === "published"
     ? "Published"
     : storefront?.status === "deletion_pending"
@@ -211,13 +283,28 @@ export default async function DashboardPage({
         </p>
       ) : null}
 
+      {showOnboardingCard ? (
+        <section className="dashboard-onboarding-card dashboard-card" aria-labelledby="dashboard-onboarding-title">
+          <div>
+            <span className="dashboard-card-label">Setup progress</span>
+            <h2 id="dashboard-onboarding-title">Your storefront is almost ready</h2>
+            <p>Complete your setup to start showcasing and selling your digital products.</p>
+            <div className="dashboard-onboarding-progress" role="progressbar" aria-label="Storefront setup progress" aria-valuemin={0} aria-valuemax={7} aria-valuenow={onboardingCompletedCount}>
+              <span style={{ width: `${(onboardingCompletedCount / 7) * 100}%` }} />
+            </div>
+            <small>{onboardingCompletedCount} of 7 steps complete</small>
+          </div>
+          <Link className="button" href="/onboarding">Continue setup <ArrowRight size={17} aria-hidden="true" /></Link>
+        </section>
+      ) : null}
+
       <section className="dashboard-sales-overview" aria-labelledby="dashboard-sales-overview-title">
         <div className="dashboard-sales-heading">
           <div>
             <span className="dashboard-card-label">At a glance</span>
             <h2 id="dashboard-sales-overview-title">Sales Overview</h2>
           </div>
-          <span className="dashboard-sales-period">All-time successful live payments</span>
+          <SalesOverviewPeriodSelector period={salesPeriod} />
         </div>
         <div className="dashboard-sales-grid">
           <article className="dashboard-card dashboard-sales-card">

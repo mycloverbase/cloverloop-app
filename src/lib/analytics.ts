@@ -18,6 +18,15 @@ export type AnalyticsEvent =
   | "free_product_claim_completed"
   | "free_product_email_sent"
   | "free_product_downloaded"
+  | "creator_onboarding_started"
+  | "creator_onboarding_step_viewed"
+  | "creator_onboarding_step_completed"
+  | "creator_onboarding_step_skipped"
+  | "creator_onboarding_product_creation_started"
+  | "creator_onboarding_first_paid_product_created"
+  | "creator_onboarding_publish_attempted"
+  | "creator_onboarding_storefront_published"
+  | "creator_onboarding_abandoned"
   | "page_view";
 
 declare global {

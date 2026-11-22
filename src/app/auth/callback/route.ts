@@ -95,19 +95,25 @@ export async function GET(request: NextRequest) {
     const accountCreatedAt = referralUser?.created_at ? Date.parse(referralUser.created_at) : Number.NaN;
     if (referralUserError || !referralUser) {
       console.error("Could not verify the founder referral account.", referralUserError);
-      response.headers.set("Location", new URL("/dashboard?referral=save-error", request.url).toString());
+      const referralErrorPath = new URL(nextPath, request.url);
+      referralErrorPath.searchParams.set("referral", "save-error");
+      response.headers.set("Location", referralErrorPath.toString());
     } else if (Number.isFinite(accountCreatedAt) && accountCreatedAt >= referralIssuedAt) {
       const admin = createSupabaseAdminClient();
       if (!admin) {
         console.error("Founder referral attribution could not be stored because Supabase admin access is unavailable.");
-        response.headers.set("Location", new URL("/dashboard?referral=save-error", request.url).toString());
+        const referralErrorPath = new URL(nextPath, request.url);
+        referralErrorPath.searchParams.set("referral", "save-error");
+        response.headers.set("Location", referralErrorPath.toString());
       } else {
         const { error: referralError } = await admin.rpc("record_founding_creator_referral", {
           requested_creator_id: referralUser.id,
         });
         if (referralError) {
           console.error("Could not store verified founder referral attribution.", referralError);
-          response.headers.set("Location", new URL("/dashboard?referral=save-error", request.url).toString());
+          const referralErrorPath = new URL(nextPath, request.url);
+          referralErrorPath.searchParams.set("referral", "save-error");
+          response.headers.set("Location", referralErrorPath.toString());
         } else {
           response.cookies.set(FOUNDER_REFERRAL_COOKIE, "", {
             httpOnly: true,

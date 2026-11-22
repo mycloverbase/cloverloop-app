@@ -11,7 +11,7 @@ import {
   uploadCreatorAvatarStorefrontAsset,
 } from "@/lib/account/profile-photo-storage";
 import type { StorefrontActionResult } from "@/lib/storefront/types";
-import { parseStorefrontDraft, safeImageCrop } from "@/lib/storefront/validation";
+import { parseStorefrontDraft } from "@/lib/storefront/validation";
 
 type StorefrontAuth =
   | {
@@ -254,48 +254,17 @@ export async function deleteStorefrontAction(): Promise<StorefrontActionResult> 
   };
 }
 
-function cropDimensions(
-  imageWidth: number,
-  imageHeight: number,
-  aspectRatio: number,
-  zoom: number,
-  horizontal: number,
-  vertical: number,
-) {
-  let baseWidth = imageWidth;
-  let baseHeight = imageHeight;
-  if (imageWidth / imageHeight > aspectRatio) {
-    baseWidth = Math.round(imageHeight * aspectRatio);
-  } else {
-    baseHeight = Math.round(imageWidth / aspectRatio);
-  }
-  const width = Math.max(1, Math.floor(baseWidth / zoom));
-  const height = Math.max(1, Math.floor(baseHeight / zoom));
-  return {
-    left: Math.max(0, Math.min(imageWidth - width, Math.round((imageWidth - width) * horizontal / 100))),
-    top: Math.max(0, Math.min(imageHeight - height, Math.round((imageHeight - height) * vertical / 100))),
-    width,
-    height,
-  };
-}
-
 export async function uploadStorefrontImageAction(formData: FormData): Promise<StorefrontActionResult> {
   const kind = formData.get("kind");
   const storefrontId = formData.get("storefront_id");
   const file = formData.get("image");
-  const zoom = safeImageCrop(formData.get("zoom"));
-  const horizontal = safeImageCrop(formData.get("horizontal"));
-  const vertical = safeImageCrop(formData.get("vertical"));
   if (
     (kind !== "profile" && kind !== "banner" && kind !== "product") ||
     typeof storefrontId !== "string" ||
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(storefrontId) ||
-    !(file instanceof File) ||
-    zoom === null || zoom < 1 || zoom > 3 ||
-    horizontal === null || horizontal < 0 || horizontal > 100 ||
-    vertical === null || vertical < 0 || vertical > 100
+    !(file instanceof File)
   ) {
-    return { ok: false, message: "Choose an image and adjust its crop before uploading." };
+    return { ok: false, message: "Choose a cropped image before uploading." };
   }
 
   const maximumSize = kind === "profile" ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
@@ -357,9 +326,11 @@ export async function uploadStorefrontImageAction(formData: FormData): Promise<S
     const aspectRatio = kind === "banner" ? 3 : kind === "product" ? 4 / 3 : 1;
     const outputSize = kind === "banner" ? { width: 1800, height: 600 } :
       kind === "product" ? { width: 960, height: 720 } : { width: 512, height: 512 };
+    if (Math.abs(metadata.width / metadata.height - aspectRatio) > 0.005) {
+      return { ok: false, message: "The cropped image has an unsupported aspect ratio. Reopen the cropper and try again." };
+    }
     image = await sharp(oriented.data)
-      .extract(cropDimensions(metadata.width, metadata.height, aspectRatio, zoom, horizontal, vertical))
-      .resize(outputSize.width, outputSize.height, { fit: "cover", withoutEnlargement: false })
+      .resize(outputSize.width, outputSize.height, { fit: "fill", withoutEnlargement: false })
       .webp({ quality: 84, effort: 4 })
       .toBuffer();
   } catch (imageError) {

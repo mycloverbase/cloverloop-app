@@ -1,5 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { formatSalesOverview } from "@/lib/dashboard/sales-overview";
+import {
+  formatSalesOverview,
+  parseSalesOverviewPeriod,
+} from "@/lib/dashboard/sales-overview";
+
+describe("parseSalesOverviewPeriod", () => {
+  it("defaults to the last 28 days and accepts lifetime", () => {
+    expect(parseSalesOverviewPeriod(undefined)).toBe("last_28_days");
+    expect(parseSalesOverviewPeriod("lifetime")).toBe("lifetime");
+  });
+
+  it("uses the first value and defaults invalid periods", () => {
+    expect(parseSalesOverviewPeriod(["lifetime", "last_28_days"])).toBe("lifetime");
+    expect(parseSalesOverviewPeriod("invalid")).toBe("last_28_days");
+  });
+});
 
 describe("formatSalesOverview", () => {
   it("formats paise and transaction counts using Indian number grouping", () => {

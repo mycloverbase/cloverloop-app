@@ -30,7 +30,6 @@ import {
 } from "@/app/dashboard/products/actions";
 import { ImageCropUploader } from "@/components/storefront/image-crop-uploader";
 import { StorefrontProductCard } from "@/components/storefront/storefront-product-card";
-import type { CreatorPlanKey } from "@/lib/account/types";
 import {
   PRODUCT_FILE_ACCEPT,
   validateProductFileMetadata,
@@ -85,9 +84,14 @@ type ProductManagerProps = {
   storefrontStatus: string | null;
   initialProducts: CreatorStorefrontProduct[];
   subcategoryOptions: StorefrontSubcategoryOption[];
-  plan: CreatorPlanKey;
+  paidProductLimit: number | null;
+  freeProductLimit: number | null;
   initialFreeListingCount: number;
   initialPaidListingCount: number;
+  onCreateStarted?: () => void;
+  onProductSaved?: (product: CreatorStorefrontProduct) => void;
+  onProductDeleted?: (productId: string) => void;
+  onFirstPaidProductCreated?: () => void;
 };
 
 function blankForm(): ProductForm {
@@ -162,9 +166,14 @@ export function ProductManager({
   storefrontStatus,
   initialProducts,
   subcategoryOptions,
-  plan,
+  paidProductLimit,
+  freeProductLimit,
   initialFreeListingCount,
   initialPaidListingCount,
+  onCreateStarted,
+  onProductSaved,
+  onProductDeleted,
+  onFirstPaidProductCreated,
 }: ProductManagerProps) {
   const router = useRouter();
   const [products, setProducts] = useState(initialProducts);
@@ -185,9 +194,8 @@ export function ProductManager({
   const productFormRef = useRef<HTMLFormElement>(null);
   const formScrollTarget = useRef<"top" | "editor" | null>(null);
 
-  const limitedPlan = plan === "free";
-  const canCreateLeadMagnet = !limitedPlan || freeListingCount < 5;
-  const canCreatePaidProduct = !limitedPlan || paidListingCount < 1;
+  const canCreateLeadMagnet = freeProductLimit === null || freeListingCount < freeProductLimit;
+  const canCreatePaidProduct = paidProductLimit === null || paidListingCount < paidProductLimit;
   const percentage = (count: number, limit: number) => Math.min(100, Math.round((count / limit) * 100));
   const categoriesInProducts = [...new Set(products.map((product) => product.category))].sort();
   const filterCategories = [...new Set([...PRODUCT_CATEGORIES, ...categoriesInProducts])];
@@ -235,6 +243,7 @@ export function ProductManager({
     setFeedback("");
     formScrollTarget.current = "editor";
     setForm(blankForm());
+    onCreateStarted?.();
   }
 
   function startEdit(product: CreatorStorefrontProduct) {
@@ -322,9 +331,8 @@ export function ProductManager({
       return;
     }
     if (
-      limitedPlan &&
-      ((form.isFree && !form.countedAsFree && freeListingCount >= 5) ||
-        (!form.isFree && !form.countedAsPaid && paidListingCount >= 1))
+      ((form.isFree && !form.countedAsFree && freeProductLimit !== null && freeListingCount >= freeProductLimit) ||
+        (!form.isFree && !form.countedAsPaid && paidProductLimit !== null && paidListingCount >= paidProductLimit))
     ) {
       rejectForm(form.isFree
         ? "You have reached the Lead Magnet listing limit on your current plan. Upgrade to Creator to add more listings."
@@ -412,6 +420,14 @@ export function ProductManager({
         countedAsPaid: form.countedAsPaid || !input.isFree,
         createdAt: form.createdAt ?? now,
       };
+      onProductSaved?.(saved);
+      if (
+        saved.isActive &&
+        !saved.isFree &&
+        !products.some((product) => product.isActive && !product.isFree && product.pricePaise > 0)
+      ) {
+        onFirstPaidProductCreated?.();
+      }
       setProducts((current) => [saved, ...current.filter((item) => item.id !== saved.id)]);
       if (!form.countedAsFree && saved.countedAsFree) setFreeListingCount((count) => count + 1);
       if (!form.countedAsPaid && saved.countedAsPaid) setPaidListingCount((count) => count + 1);
@@ -450,9 +466,19 @@ export function ProductManager({
       setError(result.message);
       return;
     }
-    setProducts((current) => current.map((item) =>
-      item.id === product.id ? { ...item, isActive: !item.isActive } : item,
-    ));
+    const updatedProduct = { ...product, isActive: !product.isActive };
+    if (
+      updatedProduct.isActive &&
+      !updatedProduct.isFree &&
+      updatedProduct.pricePaise > 0 &&
+      !products.some((item) =>
+        item.id !== updatedProduct.id && item.isActive && !item.isFree && item.pricePaise > 0,
+      )
+    ) {
+      onFirstPaidProductCreated?.();
+    }
+    onProductSaved?.(updatedProduct);
+    setProducts((current) => current.map((item) => item.id === product.id ? updatedProduct : item));
     setFeedback(result.message);
     router.refresh();
   }
@@ -469,6 +495,7 @@ export function ProductManager({
       return;
     }
     setProducts((current) => current.filter((item) => item.id !== product.id));
+    onProductDeleted?.(product.id);
     setFeedback(result.message);
     router.refresh();
   }
@@ -502,20 +529,20 @@ export function ProductManager({
         <article className="product-usage-card">
           <div className="product-usage-heading">
             <span className="product-usage-icon"><CreditCard size={17} aria-hidden="true" /></span>
-            <div><strong>Paid products</strong><span>{limitedPlan ? `${paidListingCount}/1` : `${paidListingCount} listed`}</span></div>
+            <div><strong>Paid products</strong><span>{paidProductLimit === null ? `${paidListingCount} listed` : `${paidListingCount}/${paidProductLimit}`}</span></div>
           </div>
-          {limitedPlan ? <div className="product-usage-track" role="progressbar" aria-label="Paid Product listing allowance" aria-valuemin={0} aria-valuemax={1} aria-valuenow={Math.min(paidListingCount, 1)}><span style={{ width: `${percentage(paidListingCount, 1)}%` }} /></div> : null}
-          <p>{limitedPlan ? "One lifetime listing on your current plan." : "Unlimited listings on your current plan."}</p>
+          {paidProductLimit !== null ? <div className="product-usage-track" role="progressbar" aria-label="Paid Product listing allowance" aria-valuemin={0} aria-valuemax={paidProductLimit} aria-valuenow={Math.min(paidListingCount, paidProductLimit)}><span style={{ width: `${percentage(paidListingCount, paidProductLimit)}%` }} /></div> : null}
+          <p>{paidProductLimit === null ? "Unlimited listings on your current plan." : `${paidProductLimit} paid listing${paidProductLimit === 1 ? "" : "s"} available on your current plan.`}</p>
         </article>
         <article className="product-usage-card">
           <div className="product-usage-heading">
             <span className="product-usage-icon"><Download size={17} aria-hidden="true" /></span>
-            <div><strong>Lead Magnets</strong><span>{limitedPlan ? `${freeListingCount}/5` : `${freeListingCount} listed`}</span></div>
+            <div><strong>Lead Magnets</strong><span>{freeProductLimit === null ? `${freeListingCount} listed` : `${freeListingCount}/${freeProductLimit}`}</span></div>
           </div>
-          {limitedPlan ? <div className="product-usage-track" role="progressbar" aria-label="Lead Magnet lifetime listing allowance" aria-valuemin={0} aria-valuemax={5} aria-valuenow={Math.min(freeListingCount, 5)}><span style={{ width: `${percentage(freeListingCount, 5)}%` }} /></div> : null}
-          <p>{limitedPlan ? "Five listings per account lifetime, not a monthly quota." : "Unlimited listings on your current plan."}</p>
+          {freeProductLimit !== null ? <div className="product-usage-track" role="progressbar" aria-label="Lead Magnet listing allowance" aria-valuemin={0} aria-valuemax={freeProductLimit} aria-valuenow={Math.min(freeListingCount, freeProductLimit)}><span style={{ width: `${percentage(freeListingCount, freeProductLimit)}%` }} /></div> : null}
+          <p>{freeProductLimit === null ? "Unlimited listings on your current plan." : `${freeProductLimit} Lead Magnet listing${freeProductLimit === 1 ? "" : "s"} available on your current plan.`}</p>
         </article>
-        {limitedPlan && (!canCreateLeadMagnet || !canCreatePaidProduct) ? (
+        {(!canCreateLeadMagnet || !canCreatePaidProduct) ? (
           <div className="product-usage-warning" role="status">
             <AlertCircle size={18} aria-hidden="true" />
             <span>You have reached a product listing limit on your current plan. Upgrade to add more listings.</span>

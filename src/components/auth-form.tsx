@@ -45,8 +45,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       ? requestedUsername
       : "";
   const onboardingPath = storefrontUsername
-    ? `/dashboard?username=${encodeURIComponent(storefrontUsername)}`
-    : "/dashboard";
+    ? `/onboarding?flow=signup&username=${encodeURIComponent(storefrontUsername)}`
+    : "/onboarding?flow=signup";
 
   useEffect(() => {
     const dialog = agreementDialogRef.current;
