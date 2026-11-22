@@ -912,7 +912,6 @@ export function CreatorOnboardingWizard(props: Props) {
                   }}
                   onMove={moveSection}
                   onDrop={reorderSections}
-                  onBannerStyleChange={(style) => updateCustomization("bannerStyle", style)}
                 />
                 <div className="onboarding-live-preview">
                   <h2>Live preview</h2>

@@ -751,7 +751,6 @@ export function StorefrontEditor({ initialStorefront }: { initialStorefront: Sto
                 }}
                 onMove={moveSection}
                 onDrop={reorderSections}
-                onBannerStyleChange={(style) => updateCustomization("bannerStyle", style)}
               />
 
               <section className="storefront-step-fields storefront-final-preview" aria-labelledby="storefront-final-title">
@@ -967,14 +966,12 @@ export function SectionManager({
   onVisibilityChange,
   onMove,
   onDrop,
-  onBannerStyleChange,
 }: {
   draft: StorefrontDraftInput;
   locked: boolean;
   onVisibilityChange: (section: StorefrontSection, visible: boolean) => void;
   onMove: (section: StorefrontSection, direction: -1 | 1) => void;
   onDrop: (dragged: StorefrontSection, dropped: StorefrontSection) => void;
-  onBannerStyleChange: (style: StorefrontCustomization["bannerStyle"]) => void;
 }) {
   const draggedSection = useRef<StorefrontSection | null>(null);
   return (
@@ -1016,13 +1013,6 @@ export function SectionManager({
           );
         })}
       </div>
-      <label className="dashboard-field storefront-banner-style">
-        <span>Banner display style</span>
-        <select value={draft.customization.bannerStyle} onChange={(event) => onBannerStyleChange(event.target.value as StorefrontCustomization["bannerStyle"])}>
-          <option value="wide">Wide</option>
-          <option value="compact">Compact</option>
-        </select>
-      </label>
     </fieldset>
   );
 }

@@ -62,6 +62,13 @@ export function getCreatorName(displayName: string, email: string): string {
   return displayName.trim() || email.split("@")[0]?.trim() || "Creator";
 }
 
+export async function getExistingCreatorProfile(
+  client: AccountSupabaseClient,
+  userId: string,
+): Promise<CreatorProfile | null> {
+  return loadProfile(client, userId);
+}
+
 function validUsername(value: string | null): string | null {
   if (!value) return null;
   const username = value.toLowerCase();
@@ -128,12 +135,15 @@ export async function ensureCreatorProfile(
     throw new Error("Your creator profile could not be created. Please try again.");
   }
 
-  const created = await loadProfile(client, user.id);
-  if (!created) throw new Error("Your creator profile could not be created. Please try again.");
-  return created;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 250));
+    const created = await loadProfile(client, user.id);
+    if (created) return created;
+  }
+  throw new Error("Your creator profile could not be created. Please try again.");
 }
 
-export const requireCreatorContext = cache(async function requireCreatorContext() {
+export const requireCreatorSession = cache(async function requireCreatorSession() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) redirect("/login?error=configuration");
 
@@ -147,6 +157,11 @@ export const requireCreatorContext = cache(async function requireCreatorContext(
     redirect("/creator-agreement/accept?next=%2Fdashboard");
   }
 
+  return { supabase, user };
+});
+
+export const requireCreatorContext = cache(async function requireCreatorContext() {
+  const { supabase, user } = await requireCreatorSession();
   const profile = await ensureCreatorProfile(supabase, user);
   return { supabase, user, profile };
 });

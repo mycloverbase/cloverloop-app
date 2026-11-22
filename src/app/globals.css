@@ -6964,10 +6964,6 @@ a {
   height: 34px;
 }
 
-.storefront-banner-style {
-  max-width: 260px;
-}
-
 .storefront-preview-controls {
   display: flex;
   justify-content: center;
@@ -7280,6 +7276,7 @@ a {
   color: #46564c;
   font-size: 0.94rem;
   line-height: 1.65;
+  text-align: justify;
   white-space: pre-wrap;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
@@ -8739,6 +8736,17 @@ a {
   overflow-x: clip;
   background: var(--dashboard-canvas);
   color: var(--ink);
+}
+
+.creator-profile-loading {
+  display: grid;
+  min-height: 100vh;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  background: #f7f8f5;
+  color: #174c3b;
+  font-weight: 650;
 }
 
 .creator-dashboard .dashboard-topbar {
@@ -10762,6 +10770,11 @@ a {
     overflow-x: clip;
   }
 
+  .storefront-shell .storefront-catalog-filters {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+
   .storefront-shell .storefront-content,
   .storefront-shell .storefront-catalog,
   .storefront-shell .storefront-catalog-groups,
@@ -11130,6 +11143,10 @@ a {
 .creator-dashboard .product-pricing-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   max-width: 720px;
+}
+
+.creator-dashboard .product-pricing-grid .product-choice-tile {
+  min-height: 0;
 }
 
 .creator-dashboard .product-choice-tile {

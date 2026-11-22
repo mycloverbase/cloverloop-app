@@ -64,4 +64,15 @@ describe("ensureCreatorProfile", () => {
       { onConflict: "user_id", ignoreDuplicates: true },
     );
   });
+
+  it("waits briefly for a newly created profile to become visible", async () => {
+    const { client } = createClient(
+      [null, null, { user_id: userId }],
+      [null],
+    );
+
+    const profile = await ensureCreatorProfile(client, user);
+
+    expect(profile.user_id).toBe(userId);
+  });
 });

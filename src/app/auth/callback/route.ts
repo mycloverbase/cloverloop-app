@@ -57,17 +57,6 @@ export async function GET(request: NextRequest) {
     failure.headers.set("X-Robots-Tag", "noindex, nofollow");
     return failure;
   }
-  if (marketingConsent !== null) {
-    const { error: consentError } = await supabase.rpc("save_my_marketing_consent", {
-      requested_consent: marketingConsent,
-    });
-    if (consentError) {
-      console.error("Could not save marketing consent after authentication.", consentError);
-      const failure = clearAcceptanceProof(NextResponse.redirect(new URL("/login?error=consent", request.url)));
-      failure.headers.set("X-Robots-Tag", "noindex, nofollow");
-      return failure;
-    }
-  }
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   let agreementAccepted = false;
   if (userError || !user) {
@@ -85,6 +74,18 @@ export async function GET(request: NextRequest) {
     }
   } else {
     agreementAccepted = await creatorAgreementIsAccepted(supabase);
+  }
+
+  if (agreementAccepted && marketingConsent !== null) {
+    const { error: consentError } = await supabase.rpc("save_my_marketing_consent", {
+      requested_consent: marketingConsent,
+    });
+    if (consentError) {
+      console.error("Could not save marketing consent after authentication.", consentError);
+      const failure = clearAcceptanceProof(NextResponse.redirect(new URL("/login?error=consent", request.url)));
+      failure.headers.set("X-Robots-Tag", "noindex, nofollow");
+      return failure;
+    }
   }
 
   const referralIssuedAt = getFounderReferralIssuedAt(
