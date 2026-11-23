@@ -197,6 +197,7 @@ export function ProductManager({
   const canCreateLeadMagnet = freeProductLimit === null || freeListingCount < freeProductLimit;
   const canCreatePaidProduct = paidProductLimit === null || paidListingCount < paidProductLimit;
   const percentage = (count: number, limit: number) => Math.min(100, Math.round((count / limit) * 100));
+  const listedPaidProductCount = products.filter((product) => !product.isFree).length;
   const categoriesInProducts = [...new Set(products.map((product) => product.category))].sort();
   const filterCategories = [...new Set([...PRODUCT_CATEGORIES, ...categoriesInProducts])];
   const subcategoriesForForm = form
@@ -529,10 +530,10 @@ export function ProductManager({
         <article className="product-usage-card">
           <div className="product-usage-heading">
             <span className="product-usage-icon"><CreditCard size={17} aria-hidden="true" /></span>
-            <div><strong>Paid products</strong><span>{paidProductLimit === null ? `${paidListingCount} listed` : `${paidListingCount}/${paidProductLimit}`}</span></div>
+            <div><strong>Paid products</strong><span>{listedPaidProductCount} listed</span></div>
           </div>
           {paidProductLimit !== null ? <div className="product-usage-track" role="progressbar" aria-label="Paid Product listing allowance" aria-valuemin={0} aria-valuemax={paidProductLimit} aria-valuenow={Math.min(paidListingCount, paidProductLimit)}><span style={{ width: `${percentage(paidListingCount, paidProductLimit)}%` }} /></div> : null}
-          <p>{paidProductLimit === null ? "Unlimited listings on your current plan." : `${paidProductLimit} paid listing${paidProductLimit === 1 ? "" : "s"} available on your current plan.`}</p>
+          <p>{paidProductLimit === null ? "Unlimited listings on your current plan." : `${paidListingCount}/${paidProductLimit} paid listing slot${paidProductLimit === 1 ? "" : "s"} used on your current plan.`}</p>
         </article>
         <article className="product-usage-card">
           <div className="product-usage-heading">
