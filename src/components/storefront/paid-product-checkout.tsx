@@ -22,6 +22,11 @@ type RazorpayCheckoutResult = {
   razorpay_signature?: string;
 };
 
+type RazorpayCheckoutInstance = {
+  open: () => void;
+  on: (event: "payment.failed", handler: (response: unknown) => void) => void;
+};
+
 type RazorpayCheckoutOptions = {
   key: string;
   amount: number;
@@ -37,9 +42,7 @@ type RazorpayCheckoutOptions = {
 
 declare global {
   interface Window {
-    Razorpay?: new (options: RazorpayCheckoutOptions) => {
-      open: () => void;
-    };
+    Razorpay?: new (options: RazorpayCheckoutOptions) => RazorpayCheckoutInstance;
   }
 }
 
@@ -84,6 +87,18 @@ function getErrorMessage(value: unknown, fallback: string): string {
     return value.error;
   }
   return fallback;
+}
+
+function getFailedPaymentId(value: unknown): string | null {
+  if (!value || typeof value !== "object" || !("error" in value)) return null;
+  const error = value.error;
+  if (!error || typeof error !== "object" || !("metadata" in error)) return null;
+  const metadata = error.metadata;
+  if (!metadata || typeof metadata !== "object" || !("payment_id" in metadata)) return null;
+  const paymentId = metadata.payment_id;
+  return typeof paymentId === "string" && /^pay_[A-Za-z0-9]+$/.test(paymentId)
+    ? paymentId
+    : null;
 }
 
 function isPurchaseEmailStatus(value: unknown): value is PurchaseEmailStatus {
@@ -168,6 +183,7 @@ export function PaidProductCheckout({
       throw new Error("Razorpay Checkout could not be loaded. Please try again.");
     }
 
+    let paymentFailed = false;
     const checkoutWindow = new window.Razorpay({
       key: order.publicKey,
       amount: order.amount,
@@ -190,9 +206,37 @@ export function PaidProductCheckout({
       },
       modal: {
         ondismiss: () => {
-          setStatusMessage("Checkout was closed. No payment confirmation was received.");
+          if (!paymentFailed) {
+            setStatusMessage("Checkout was closed. No payment confirmation was received.");
+          }
         },
       },
+    });
+    checkoutWindow.on("payment.failed", (result) => {
+      paymentFailed = true;
+      setError("");
+      const paymentId = getFailedPaymentId(result);
+      if (!paymentId) {
+        setStatusMessage(
+          "The payment could not be completed. Please try another payment method or retry.",
+        );
+        return;
+      }
+
+      void verifyPayment(
+        {
+          razorpay_order_id: order.razorpayOrderId,
+          razorpay_payment_id: paymentId,
+        },
+        order,
+        token,
+      ).catch((caught: unknown) => {
+        setError(
+          caught instanceof Error
+            ? caught.message
+            : "Payment status could not be checked. Please retry.",
+        );
+      });
     });
     checkoutWindow.open();
   }
@@ -265,7 +309,9 @@ export function PaidProductCheckout({
       throw new Error(getErrorMessage(data, "Payment verification could not complete."));
     }
     if (response.status === 402) {
-      setStatusMessage(getErrorMessage(data, "The payment did not complete."));
+      setStatusMessage(
+        `${getErrorMessage(data, "The payment did not complete.")} Please try another payment method or reopen checkout.`,
+      );
       return;
     }
     await pollOrderStatus(order, token);

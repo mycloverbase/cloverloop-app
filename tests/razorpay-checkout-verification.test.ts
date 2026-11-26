@@ -147,6 +147,44 @@ describe("POST /api/checkout/verify-payment", () => {
     expect(admin.rpc).not.toHaveBeenCalled();
   });
 
+  it("records a failed payment attempt and returns a retryable failure", async () => {
+    const admin = makeAdmin();
+    mocks.createSupabaseAdminClient.mockReturnValue(admin);
+    mocks.razorpayApiRequest.mockImplementation(async (_token: string, path: string) => {
+      if (path.includes("/orders/")) {
+        return {
+          id: checkoutOrder.razorpay_order_id,
+          amount: checkoutOrder.amount_paise,
+          currency: checkoutOrder.currency,
+          receipt: checkoutOrder.id,
+        };
+      }
+      return {
+        id: "pay_test123",
+        order_id: checkoutOrder.razorpay_order_id,
+        amount: checkoutOrder.amount_paise,
+        currency: checkoutOrder.currency,
+        status: "failed",
+        captured: false,
+      };
+    });
+
+    const response = await POST(makeRequest());
+    const attemptQuery = admin.from.mock.results[1]?.value;
+
+    expect(response.status).toBe(402);
+    expect(await response.json()).toMatchObject({ status: "failed" });
+    expect(attemptQuery.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        order_id: checkoutOrder.id,
+        razorpay_payment_id: "pay_test123",
+        payment_status: "failed",
+        amount_paise: checkoutOrder.amount_paise,
+      }),
+    );
+    expect(admin.rpc).not.toHaveBeenCalled();
+  });
+
   it("uses only the selected environment when verifying a Live Mode order", async () => {
     vi.stubEnv("RAZORPAY_OAUTH_MODE", "live");
     const admin = makeAdmin();
