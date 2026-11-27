@@ -189,7 +189,14 @@ export function PaidProductCheckout({
       amount: order.amount,
       currency: order.currency,
       name: order.storefrontName || storefrontName,
-      description: order.productDescription || productDescription || productName,
+      description: (
+        order.productDescription ||
+        productDescription ||
+        productName
+      )
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 255),
       order_id: order.razorpayOrderId,
       prefill: { name: order.customerName, email: order.customerEmail },
       theme: { color: "#1b4332" },
