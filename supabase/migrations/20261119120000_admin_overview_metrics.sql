@@ -27,6 +27,7 @@ begin
       select count(*)::text
       from public.razorpay_checkout_orders order_row
       where order_row.environment = 'live'
+        and order_row.order_status = 'paid'
         and order_row.created_at >= period.period_start
         and order_row.created_at < period.period_end
     ),
@@ -44,6 +45,7 @@ begin
       from public.creator_storefronts storefront
       where storefront.first_published_at >= period.period_start
         and storefront.first_published_at < period.period_end
+        and storefront.status = 'published'
     ),
     (
       select count(*)::text

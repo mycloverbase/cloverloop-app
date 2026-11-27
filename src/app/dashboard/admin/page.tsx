@@ -50,7 +50,7 @@ export default async function AdminDashboardPage() {
     { label: "Total orders", value: metrics.totalOrders, icon: ShoppingBag },
     { label: "Total gross sales", value: metrics.grossSales, icon: ChartNoAxesCombined },
     { label: "Published storefronts", value: metrics.publishedStorefronts, icon: Store },
-    { label: "Total creators", value: metrics.totalCreators, icon: UsersRound },
+    { label: "Total users", value: metrics.totalCreators, icon: UsersRound },
   ];
 
   return (
