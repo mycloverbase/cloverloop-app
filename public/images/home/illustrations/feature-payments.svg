@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" fill="none">
+  <rect width="480" height="270" fill="#F4F3ED"/>
+  <circle cx="440" cy="236" r="96" fill="#E8F0E6"/>
+  <circle cx="30" cy="40" r="76" fill="#ECF1E8"/>
+
+  <g transform="rotate(-10 118 177)">
+    <rect x="60" y="146" width="124" height="78" rx="12" fill="#173F32" fill-opacity=".1"/>
+    <rect x="56" y="138" width="124" height="78" rx="12" fill="#173F32"/>
+    <rect x="70" y="154" width="20" height="15" rx="3" fill="#A8C9A5"/>
+    <path d="M70 161.5h20M80 154v15" stroke="#173F32" stroke-width="1"/>
+    <rect x="70" y="186" width="64" height="5" rx="2.5" fill="#F4F3ED" fill-opacity=".75"/>
+    <rect x="70" y="198" width="38" height="4" rx="2" fill="#F4F3ED" fill-opacity=".45"/>
+    <circle cx="160" cy="198" r="8" fill="#A8C9A5" fill-opacity=".9"/>
+  </g>
+
+  <rect x="154" y="38" width="180" height="214" rx="14" fill="#173F32" fill-opacity=".07"/>
+  <rect x="150" y="30" width="180" height="214" rx="14" fill="#fff" stroke="#E2E8E1"/>
+  <circle cx="176" cy="60" r="14" fill="#EDF4ED"/>
+  <text x="176" y="65.5" text-anchor="middle" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="15" font-weight="700" fill="#2F7254">₹</text>
+  <rect x="198" y="52" width="80" height="7" rx="3.5" fill="#173F32"/>
+  <rect x="198" y="65" width="54" height="5" rx="2.5" fill="#DCE3DB"/>
+  <path d="M164 90h152" stroke="#EDF0EC"/>
+
+  <rect x="168" y="106" width="70" height="6" rx="3" fill="#C9D3C9"/>
+  <rect x="276" y="106" width="36" height="6" rx="3" fill="#9FB3A3"/>
+  <rect x="168" y="130" width="56" height="6" rx="3" fill="#C9D3C9"/>
+  <rect x="284" y="130" width="28" height="6" rx="3" fill="#9FB3A3"/>
+  <rect x="168" y="154" width="84" height="6" rx="3" fill="#C9D3C9"/>
+  <rect x="280" y="154" width="32" height="6" rx="3" fill="#9FB3A3"/>
+  <path d="M168 178h144" stroke="#D5DED5" stroke-dasharray="4 4"/>
+
+  <rect x="162" y="192" width="156" height="36" rx="8" fill="#EDF4ED"/>
+  <rect x="174" y="206" width="48" height="7" rx="3.5" fill="#173F32"/>
+  <rect x="266" y="204" width="40" height="11" rx="3.5" fill="#2F7254"/>
+
+  <circle cx="330" cy="40" r="24" fill="#F4F3ED"/>
+  <circle cx="330" cy="40" r="19" fill="#2F7254"/>
+  <path d="M321.5 40l5.5 5.5 11-11" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
