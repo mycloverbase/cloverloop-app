@@ -36,6 +36,7 @@ const reservedStorefrontUsernames = new Set([
   "privacy",
   "refunds",
   "resources",
+  "review",
   "reviews",
   "robots",
   "sell-digital-downloads",

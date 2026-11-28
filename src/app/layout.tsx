@@ -5,6 +5,7 @@ import { AnalyticsBootstrap } from "@/components/analytics-bootstrap";
 import { AuthFlowTracker } from "@/components/auth-flow-tracker";
 import { SiteAnalytics } from "@/components/site-analytics";
 import "./globals.css";
+import "./platform-polish.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(PRODUCTION_URL),

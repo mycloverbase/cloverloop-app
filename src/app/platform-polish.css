@@ -1,0 +1,501 @@
+/*
+  Consistency layer loaded after globals.css. It normalises spacing, headings and shared
+  components across the creator dashboard, auth and buyer-facing pages without touching markup.
+*/
+
+:root {
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-card: 0 1px 2px rgb(22 53 37 / 4%), 0 6px 18px -10px rgb(22 53 37 / 14%);
+  --focus-ring: 0 0 0 3px rgb(47 114 84 / 18%);
+}
+
+/* ---------- Dashboard rhythm ---------- */
+
+.creator-dashboard .dashboard-page-content {
+  display: grid;
+  align-content: start;
+  gap: 22px;
+}
+
+.creator-dashboard .dashboard-page-content > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.creator-dashboard .dashboard-page-heading {
+  margin-bottom: 4px;
+}
+
+.creator-dashboard .eyebrow,
+.creator-dashboard .dashboard-eyebrow {
+  color: #367158;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.creator-dashboard .dashboard-card {
+  box-shadow: var(--shadow-card);
+}
+
+.creator-dashboard .dashboard-sales-heading,
+.creator-dashboard .dashboard-quick-actions .dashboard-section-heading {
+  align-items: flex-end;
+  margin-bottom: 14px;
+}
+
+.creator-dashboard .dashboard-sales-heading h2,
+.creator-dashboard .dashboard-section-heading h2 {
+  margin: 4px 0 0;
+  color: #1d3128;
+  font-size: 1.2rem;
+  font-weight: 660;
+  letter-spacing: -0.02em;
+}
+
+/* Setup progress */
+
+.creator-dashboard .dashboard-onboarding-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 32px;
+  border-color: #cfe0d1;
+  background: linear-gradient(120deg, #f4f9f3, #ffffff 70%);
+}
+
+.creator-dashboard .dashboard-onboarding-card h2 {
+  margin: 6px 0 4px;
+}
+
+.creator-dashboard .dashboard-onboarding-card p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.creator-dashboard .dashboard-onboarding-progress {
+  width: min(100%, 440px);
+  height: 8px;
+  overflow: hidden;
+  margin: 16px 0 8px;
+  border-radius: 999px;
+  background: #e3ebe3;
+}
+
+.creator-dashboard .dashboard-onboarding-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2f7254, #4f9a72);
+}
+
+.creator-dashboard .dashboard-onboarding-card small {
+  color: #5d6c64;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.creator-dashboard .dashboard-onboarding-card .button {
+  flex: 0 0 auto;
+}
+
+/* Plan and profile cards */
+
+.dashboard-plan-facts {
+  display: grid;
+  gap: 9px;
+  margin: 14px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-plan-facts li {
+  position: relative;
+  padding-left: 24px;
+  color: #4f5d55;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.dashboard-plan-facts li::before {
+  position: absolute;
+  top: 0.42em;
+  left: 3px;
+  width: 11px;
+  height: 6px;
+  border-bottom: 2px solid #2f7254;
+  border-left: 2px solid #2f7254;
+  content: "";
+  transform: rotate(-45deg);
+}
+
+.dashboard-checklist-bio {
+  margin: 16px 0 0;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  color: #5d6c64;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.dashboard-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin-top: 14px;
+}
+
+.dashboard-card-links > a {
+  margin: 0 !important;
+}
+
+@media (min-width: 1100px) {
+  .creator-dashboard .dashboard-account-overview:has(> :nth-child(4)) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1099px) {
+  .creator-dashboard .dashboard-account-overview:has(> :nth-child(4)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.dashboard-review-policy {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: #64736d;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.dashboard-review-policy svg {
+  flex: none;
+  margin-top: 2px;
+  color: #2f7254;
+}
+
+/* ---------- Storefront editor ---------- */
+
+.creator-dashboard .storefront-step-fields {
+  padding-block: 0;
+}
+
+.creator-dashboard .storefront-step-fields + .storefront-step-fields,
+.creator-dashboard .storefront-section-manager + .storefront-step-fields,
+.creator-dashboard .storefront-step-content > .storefront-section-manager {
+  margin-top: 24px;
+  padding-top: 24px;
+}
+
+.storefront-image-preview {
+  position: relative;
+}
+
+.storefront-image-default-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 88%);
+  padding: 3px 9px;
+  color: #2f5a44;
+  font-size: 0.7rem;
+  font-weight: 650;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.creator-dashboard .storefront-theme-swatch {
+  min-height: 84px;
+}
+
+.storefront-theme-swatch-minimal {
+  border: 1px solid #e3e8e2;
+  background:
+    radial-gradient(circle at 50% 44%, #6c9a78 0 6px, #fff 6.5px 8.5px, transparent 9px),
+    linear-gradient(#26352d, #26352d) 50% 66% / 30% 4px no-repeat,
+    linear-gradient(#e7ece6, #e7ece6) 8% 94% / 19% 18% no-repeat,
+    linear-gradient(#e7ece6, #e7ece6) 36% 94% / 19% 18% no-repeat,
+    linear-gradient(#e7ece6, #e7ece6) 64% 94% / 19% 18% no-repeat,
+    linear-gradient(#e7ece6, #e7ece6) 92% 94% / 19% 18% no-repeat,
+    linear-gradient(#d7e7d3, #d7e7d3) 50% 9% / 90% 32% no-repeat,
+    #fff;
+}
+
+.storefront-theme-swatch-editorial {
+  border: 1px solid #e3e1d8;
+  border-left: 1px solid #e3e1d8;
+  background:
+    linear-gradient(#6c9a78, #6c9a78) 9% 47% / 13% 26% no-repeat,
+    linear-gradient(#26352d, #26352d) 46% 46% / 44% 7px no-repeat,
+    linear-gradient(#26352d, #26352d) 50% 68% / 90% 1px no-repeat,
+    linear-gradient(#e3e0d6, #e3e0d6) 6% 94% / 27% 18% no-repeat,
+    linear-gradient(#e3e0d6, #e3e0d6) 50% 94% / 27% 18% no-repeat,
+    linear-gradient(#e3e0d6, #e3e0d6) 94% 94% / 27% 18% no-repeat,
+    linear-gradient(#e2e6dc, #e2e6dc) 50% 9% / 90% 28% no-repeat,
+    #fbfaf6;
+}
+
+.storefront-theme-swatch-bold {
+  background:
+    radial-gradient(circle at 15% 46%, #a8c9a5 0 7px, transparent 7.5px),
+    linear-gradient(#fff, #fff) 46% 48% / 34% 5px no-repeat,
+    linear-gradient(#173f32, #173f32) 50% 47% / 92% 30% no-repeat,
+    linear-gradient(#cfe0cb, #cfe0cb) 50% 6% / 92% 26% no-repeat,
+    linear-gradient(#dfe6de, #dfe6de) 6% 95% / 20% 20% no-repeat,
+    linear-gradient(#dfe6de, #dfe6de) 35% 95% / 20% 20% no-repeat,
+    linear-gradient(#dfe6de, #dfe6de) 65% 95% / 20% 20% no-repeat,
+    linear-gradient(#dfe6de, #dfe6de) 94% 95% / 20% 20% no-repeat,
+    #fff;
+}
+
+/* ---------- Forms (dashboard, auth, checkout) ---------- */
+
+.creator-dashboard input[type="text"],
+.creator-dashboard input[type="email"],
+.creator-dashboard input[type="password"],
+.creator-dashboard input[type="url"],
+.creator-dashboard input[type="tel"],
+.creator-dashboard input[type="number"],
+.creator-dashboard input[type="search"],
+.creator-dashboard select,
+.creator-dashboard textarea {
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.creator-dashboard input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]):focus-visible,
+.creator-dashboard select:focus-visible,
+.creator-dashboard textarea:focus-visible {
+  border-color: #2f7254;
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.creator-dashboard [aria-invalid="true"] {
+  border-color: #c2483a !important;
+}
+
+/* ---------- Marketing ---------- */
+
+.blog-index-heading h1 {
+  margin: 13px 0 12px;
+  color: var(--forest);
+  font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.14;
+}
+
+.resource-card > h2 {
+  margin: 8px 0;
+  color: var(--forest);
+  font-size: 1.05rem;
+  font-weight: 630;
+  line-height: 1.4;
+}
+
+.resource-card > p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* ---------- Auth ---------- */
+
+@media (min-width: 981px) {
+  main .auth-art {
+    align-items: stretch;
+    padding: 20px 20px 20px 0;
+  }
+
+  main .auth-art img {
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 40px);
+    border-radius: 22px;
+    object-fit: cover;
+    object-position: 50% 40%;
+  }
+
+  main .auth-art::after {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    left: 0;
+    height: 42%;
+    border-radius: 0 0 22px 22px;
+    background: linear-gradient(180deg, transparent, rgb(12 34 25 / 72%));
+    content: "";
+    pointer-events: none;
+  }
+
+  main .auth-art p {
+    z-index: 1;
+    right: calc(20px + 7%);
+    bottom: calc(20px + 6%);
+    left: 7%;
+    max-width: 520px;
+    color: #fff;
+    font-size: clamp(1.4rem, 2.2vw, 2rem);
+    font-weight: 680;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    text-align: left;
+  }
+}
+
+/* ---------- Download and buyer status pages ---------- */
+
+main.free-product-download-page {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgb(168 201 165 / 28%), transparent 70%),
+    #f5f3e6;
+}
+
+.download-brand img {
+  display: block;
+  width: 138px;
+  height: auto;
+}
+
+main.free-product-download-page .free-product-download-card {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: min(100%, 500px);
+  border: 1px solid #dfe5d8;
+  border-radius: 20px;
+  padding: 36px 32px 32px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 1px 2px rgb(20 43 29 / 5%), 0 24px 50px -28px rgb(20 43 29 / 30%);
+}
+
+.download-state-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 10px;
+  place-items: center;
+  border-radius: 16px;
+  background: #e8f1e7;
+  color: #2f7254;
+}
+
+.download-state-expired .download-state-icon,
+.download-state-error .download-state-icon {
+  background: #fbeee9;
+  color: #b4533e;
+}
+
+main.free-product-download-page .free-product-download-card h1 {
+  margin: 6px 0 4px;
+  color: #173a2d;
+  font-size: clamp(1.35rem, 3vw, 1.65rem);
+  font-weight: 680;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+main.free-product-download-page .free-product-download-card p {
+  max-width: 380px;
+  margin: 4px 0 0;
+  color: #56665c;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+main.free-product-download-page .free-product-download-card .button {
+  min-width: 220px;
+  margin-top: 18px;
+}
+
+.download-footnote {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #6b786f;
+  font-size: 0.78rem;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 760px) {
+  .creator-dashboard .dashboard-page-content {
+    gap: 18px;
+  }
+
+  .creator-dashboard .storefront-management-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .creator-dashboard .storefront-management-heading .button {
+    align-self: flex-start;
+  }
+
+  .creator-dashboard .dashboard-onboarding-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .creator-dashboard .dashboard-onboarding-card .button {
+    width: 100%;
+  }
+
+  .creator-dashboard .dashboard-sales-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .creator-dashboard .dashboard-sales-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .creator-dashboard .dashboard-sales-card {
+    padding: 16px;
+  }
+
+  .creator-dashboard .dashboard-sales-icon {
+    display: none;
+  }
+
+  .creator-dashboard .dashboard-sales-value {
+    font-size: clamp(1.15rem, 5.6vw, 1.6rem);
+    overflow-wrap: anywhere;
+  }
+
+  .creator-dashboard .storefront-image-settings > div:first-child .storefront-image-preview {
+    width: min(100%, 200px);
+  }
+
+  .creator-dashboard .storefront-step-fields + .storefront-step-fields,
+  .creator-dashboard .storefront-section-manager + .storefront-step-fields,
+  .creator-dashboard .storefront-step-content > .storefront-section-manager {
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .creator-dashboard *,
+  .creator-dashboard *::before,
+  .creator-dashboard *::after {
+    transition-duration: 0ms !important;
+  }
+}

@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/razorpay-webhook-process",
       "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/review-invitations",
+      "schedule": "30 5 * * *"
     }
   ]
 }

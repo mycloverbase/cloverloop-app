@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChartNoAxesCombined, Crown, ShoppingBag, Store, UsersRound } from "lucide-react";
+import { ChartNoAxesCombined, Crown, MessageSquareWarning, ShoppingBag, Store, UsersRound } from "lucide-react";
 import { formatAdminOverviewMetrics } from "@/lib/dashboard/admin-overview";
 import { requireCreatorContext } from "@/lib/account/server";
 
@@ -28,6 +28,12 @@ const adminActions = [
     title: "Restore storefront",
     description: "Review pending storefront deletions and restore eligible storefronts as unpublished.",
     icon: Store,
+  },
+  {
+    href: "/dashboard/admin/reviews",
+    title: "Review moderation",
+    description: "Handle creator reports and hide or restore verified buyer reviews.",
+    icon: MessageSquareWarning,
   },
 ];
 

@@ -6,13 +6,15 @@ export function StorefrontBio({ description }: { description: string }) {
   const bioRef = useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [canExpand, setCanExpand] = useState(false);
+  const collapsedText = description.replace(/\s*\n+\s*/g, " ");
+  const hasParagraphs = collapsedText !== description;
 
   useEffect(() => {
     const bio = bioRef.current;
     if (!bio) return;
 
     const measureOverflow = () => {
-      if (!expanded) setCanExpand(bio.scrollHeight > bio.clientHeight + 1);
+      if (!expanded) setCanExpand(hasParagraphs || bio.scrollHeight > bio.clientHeight + 1);
     };
 
     const observer = new ResizeObserver(measureOverflow);
@@ -22,7 +24,7 @@ export function StorefrontBio({ description }: { description: string }) {
       observer.disconnect();
       cancelAnimationFrame(frame);
     };
-  }, [description, expanded]);
+  }, [description, expanded, hasParagraphs]);
 
   return (
     <div className="storefront-profile-bio-wrap">
@@ -30,7 +32,7 @@ export function StorefrontBio({ description }: { description: string }) {
         ref={bioRef}
         className={`storefront-profile-bio${expanded ? " is-expanded" : ""}`}
       >
-        {description}
+        {expanded ? description : collapsedText}
       </p>
       {canExpand ? (
         <button

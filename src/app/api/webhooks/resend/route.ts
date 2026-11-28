@@ -28,6 +28,21 @@ function getOrderIdFromTags(value: unknown): string | null {
   return null;
 }
 
+function getReviewInvitationIdFromTags(value: unknown): string | null {
+  if (Array.isArray(value)) {
+    for (const tag of value) {
+      if (isRecord(tag) && tag.name === "cloverloop_review_invitation_id" && isUuid(tag.value)) {
+        return tag.value;
+      }
+    }
+    return null;
+  }
+  if (isRecord(value) && isUuid(value.cloverloop_review_invitation_id)) {
+    return value.cloverloop_review_invitation_id;
+  }
+  return null;
+}
+
 function jsonResponse(status: number) {
   return new NextResponse(null, {
     status,
@@ -78,6 +93,21 @@ export async function POST(request: Request) {
 
   const admin = createSupabaseAdminClient();
   if (!admin) return jsonResponse(503);
+
+  const reviewInvitationId = getReviewInvitationIdFromTags(event.data.tags);
+  if (reviewInvitationId) {
+    const { error } = await admin.rpc("record_resend_review_invitation_event", {
+      p_event_id: eventId,
+      p_event_type: event.type,
+      p_invitation_id: reviewInvitationId,
+      p_provider_email_id: providerEmailId,
+    });
+    if (error) {
+      console.error("Resend review invitation event could not be persisted.", { code: error.code });
+      return jsonResponse(503);
+    }
+    return jsonResponse(200);
+  }
 
   const { error } = await admin.rpc("record_resend_purchase_email_event", {
     p_event_id: eventId,

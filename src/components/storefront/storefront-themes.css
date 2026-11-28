@@ -1,0 +1,936 @@
+/*
+  Storefront themes. Selectors start with `main.storefront-shell` / `main.storefront-theme-*`
+  so they outrank the older storefront rules in globals.css regardless of stylesheet order.
+*/
+
+/* ---------- Shared base ---------- */
+
+main.storefront-shell {
+  --sf-ink: color-mix(in srgb, var(--store-primary) 18%, #141a17);
+  --sf-body: color-mix(in srgb, var(--store-primary) 10%, #424c46);
+  --sf-muted: color-mix(in srgb, var(--store-primary) 8%, #6b746f);
+  --sf-line: color-mix(in srgb, var(--store-primary) 12%, #e5e9e3);
+  --sf-tint: color-mix(in srgb, var(--store-accent) 22%, #ffffff);
+  --sf-radius: 14px;
+  --sf-banner-radius: 18px;
+  --sf-avatar: 132px;
+  --sf-avatar-overlap: 58px;
+  --sf-gutter: clamp(16px, 4vw, 40px);
+  --sf-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  color: var(--sf-body);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+main.storefront-shell .storefront-content {
+  width: min(100%, 1200px);
+  padding: 0 var(--sf-gutter) 24px;
+}
+
+main.storefront-shell .storefront-profile-header {
+  margin: 0;
+  padding-top: 16px;
+}
+
+main.storefront-shell .storefront-profile-banner {
+  isolation: isolate;
+  aspect-ratio: 4 / 1;
+  min-height: 150px;
+  border-radius: var(--sf-banner-radius);
+  background: color-mix(in srgb, var(--store-accent) 30%, #f4f3ed);
+}
+
+main.storefront-shell .storefront-profile-banner.is-default::after {
+  position: absolute;
+  inset: 0;
+  background: var(--store-accent);
+  content: "";
+  mix-blend-mode: color;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+main.storefront-shell .storefront-profile-banner.is-default.is-neutral::after {
+  opacity: 1;
+}
+
+main.storefront-shell.storefront-banner-compact .storefront-profile-banner,
+main.storefront-shell .storefront-profile-header.is-compact .storefront-profile-banner {
+  aspect-ratio: 7 / 1;
+  min-height: 110px;
+}
+
+main.storefront-shell .storefront-profile-layout {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 24px;
+  margin-top: calc(var(--sf-avatar-overlap) * -1);
+  padding-inline: clamp(16px, 3vw, 36px);
+}
+
+main.storefront-shell .storefront-profile-avatar {
+  width: var(--sf-avatar);
+  height: var(--sf-avatar);
+  border: 5px solid var(--store-background);
+  box-shadow: 0 1px 2px rgb(16 24 20 / 8%), 0 10px 26px -8px rgb(16 24 20 / 24%);
+  font-size: calc(var(--sf-avatar) * 0.26);
+}
+
+main.storefront-shell .storefront-profile-copy {
+  padding-top: calc(var(--sf-avatar-overlap) + 14px);
+}
+
+main.storefront-shell .storefront-profile-name h1 {
+  margin: 0;
+  color: var(--sf-ink);
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+main.storefront-shell .storefront-profile-name p {
+  margin-top: 4px;
+  color: var(--sf-muted);
+  font-size: 0.92rem;
+  font-weight: 550;
+}
+
+main.storefront-shell .storefront-profile-bio {
+  max-width: 720px;
+  margin-top: 14px;
+  color: var(--sf-body);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  text-align: left;
+  -webkit-line-clamp: 3;
+}
+
+main.storefront-shell .storefront-profile-bio-toggle,
+main.storefront-shell .storefront-profile-bio-toggle[aria-expanded="true"] {
+  position: static;
+  display: inline-block;
+  margin-top: 6px;
+  padding: 0;
+  background: transparent;
+  color: var(--store-primary);
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+main.storefront-shell .storefront-profile-bio-toggle:not([aria-expanded="true"])::before {
+  content: none;
+}
+
+main.storefront-shell .storefront-profile-socials {
+  gap: 8px;
+  margin-top: 16px;
+}
+
+main.storefront-shell .storefront-profile-social-link {
+  width: 38px;
+  height: 38px;
+  border-color: var(--sf-line);
+  background: #fff;
+}
+
+main.storefront-shell .storefront-sections {
+  margin-top: clamp(28px, 4vw, 44px);
+}
+
+main.storefront-shell .storefront-section {
+  border-bottom: 0;
+  padding: 0 0 clamp(28px, 4vw, 40px);
+}
+
+main.storefront-shell .storefront-section h2 {
+  margin: 0;
+  color: var(--sf-ink);
+  font-size: clamp(1.3rem, 2.2vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+main.storefront-shell .storefront-section-heading {
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+main.storefront-shell .storefront-product-count {
+  color: var(--sf-muted);
+  font-size: 0.88rem;
+  font-weight: 550;
+}
+
+main.storefront-shell .storefront-catalog-filters {
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 2px 1px 4px;
+}
+
+main.storefront-shell .storefront-catalog-filters button {
+  min-height: 36px;
+  border: 1px solid var(--sf-line);
+  background: #fff;
+  padding: 0 14px;
+  color: var(--sf-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+main.storefront-shell .storefront-catalog-filters button:hover {
+  border-color: color-mix(in srgb, var(--store-primary) 40%, var(--sf-line));
+}
+
+main.storefront-shell .storefront-catalog-filters button.selected {
+  border-color: var(--store-primary);
+  background: var(--store-primary);
+  color: #fff;
+}
+
+main.storefront-shell .storefront-catalog-filters button span {
+  opacity: 0.6;
+  font-size: 0.74rem;
+}
+
+main.storefront-shell .storefront-subcategory-filters {
+  margin-top: -8px;
+}
+
+main.storefront-shell .storefront-subcategory-filters button {
+  min-height: 30px;
+  padding: 0 11px;
+  font-size: 0.76rem;
+}
+
+main.storefront-shell .storefront-product-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+main.storefront-shell .storefront-product-card {
+  border: 1px solid var(--sf-line);
+  border-radius: var(--sf-radius);
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(16 24 20 / 4%);
+}
+
+main.storefront-shell .storefront-product-card > img,
+main.storefront-shell .storefront-product-image-placeholder {
+  aspect-ratio: 4 / 3;
+  transition: transform 260ms ease;
+}
+
+main.storefront-shell .storefront-product-image-placeholder {
+  background:
+    radial-gradient(circle at 30% 30%, rgb(255 255 255 / 70%), transparent 55%),
+    linear-gradient(140deg, var(--sf-tint), color-mix(in srgb, var(--store-accent) 55%, #ffffff));
+}
+
+main.storefront-shell .storefront-product-copy {
+  gap: 6px;
+  padding: 15px 16px 16px;
+}
+
+main.storefront-shell .storefront-product-category {
+  overflow: hidden;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main.storefront-shell .storefront-product-copy h3 {
+  color: var(--sf-ink);
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+main.storefront-shell .storefront-product-copy p {
+  min-height: 3em;
+  color: var(--sf-muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  -webkit-line-clamp: 2;
+}
+
+main.storefront-shell .storefront-product-price-row {
+  align-items: center;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+main.storefront-shell .storefront-product-price-row strong {
+  color: var(--sf-ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+main.storefront-shell .storefront-product-price-row span {
+  border-radius: 999px;
+  background: var(--sf-tint);
+  padding: 3px 9px;
+  color: var(--store-primary);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+main.storefront-shell a.storefront-product-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--store-primary) 28%, var(--sf-line));
+  box-shadow: 0 1px 2px rgb(16 24 20 / 5%), 0 18px 34px -16px rgb(16 24 20 / 26%);
+}
+
+main.storefront-shell .storefront-empty-products {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  border: 1px dashed color-mix(in srgb, var(--store-primary) 22%, var(--sf-line));
+  border-radius: var(--sf-radius);
+  padding: 40px 20px;
+  background: color-mix(in srgb, var(--sf-tint) 45%, transparent);
+  color: var(--sf-muted);
+  text-align: center;
+}
+
+main.storefront-shell .storefront-empty-products svg {
+  color: var(--store-primary);
+}
+
+main.storefront-shell .storefront-empty-products p {
+  margin: 0;
+}
+
+main.storefront-shell .storefront-contact {
+  align-items: center;
+  border: 1px solid var(--sf-line);
+  border-radius: calc(var(--sf-radius) + 2px);
+  padding: 22px 24px;
+  background: var(--sf-tint);
+}
+
+main.storefront-shell .storefront-contact h2 {
+  margin-top: 4px;
+  font-size: 1.25rem;
+}
+
+main.storefront-shell .storefront-contact-button {
+  min-height: 44px;
+  border-radius: 10px;
+  padding: 0 18px;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+main.storefront-shell .storefront-footer {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  border-top: 1px solid var(--sf-line);
+  padding: 24px 0 8px;
+}
+
+main.storefront-shell .storefront-footer a,
+main.storefront-shell .storefront-footer a + a {
+  display: inline-flex;
+  margin: 0;
+  color: var(--sf-muted);
+  font-size: 0.78rem;
+}
+
+main.storefront-shell .storefront-footer-badge {
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--sf-line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 6px 12px;
+}
+
+main.storefront-shell .storefront-footer-badge strong {
+  color: var(--sf-ink);
+  font-weight: 650;
+}
+
+main.storefront-shell .storefront-footer a:hover {
+  color: var(--store-primary);
+}
+
+/* Product detail */
+
+main.storefront-shell .product-detail-page {
+  max-width: none;
+  padding: 28px 0 56px;
+  color: var(--sf-ink);
+}
+
+main.storefront-shell .product-detail-back {
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+}
+
+main.storefront-shell .product-detail-cover {
+  border-color: var(--sf-line);
+  border-radius: calc(var(--sf-radius) + 6px);
+  box-shadow: 0 1px 2px rgb(16 24 20 / 5%), 0 22px 44px -24px rgb(16 24 20 / 30%);
+}
+
+main.storefront-shell .product-detail-title-row {
+  margin-top: 26px;
+}
+
+main.storefront-shell .product-detail-title-row h1,
+main.storefront-shell .product-detail-description h2,
+main.storefront-shell .product-detail-purchase h2,
+main.storefront-shell .product-detail-specifications h2,
+main.storefront-shell .product-detail-file-info dd,
+main.storefront-shell .product-detail-creator {
+  color: var(--sf-ink);
+}
+
+main.storefront-shell .product-detail-title-row h1 {
+  font-size: clamp(1.85rem, 3.4vw, 2.7rem);
+}
+
+main.storefront-shell .product-detail-description h2,
+main.storefront-shell .product-detail-specifications h2 {
+  font-size: 1.08rem;
+  font-weight: 650;
+}
+
+main.storefront-shell .product-detail-purchase h2 {
+  font-size: 1.2rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+main.storefront-shell .product-detail-type {
+  border-color: var(--sf-line);
+  background: var(--sf-tint);
+}
+
+main.storefront-shell .product-detail-description {
+  margin-top: 24px;
+}
+
+main.storefront-shell .product-detail-description p {
+  color: var(--sf-body);
+}
+
+main.storefront-shell .product-detail-specifications,
+main.storefront-shell .product-detail-file-info div,
+main.storefront-shell .product-detail-creator {
+  border-color: var(--sf-line);
+}
+
+main.storefront-shell .product-detail-purchase {
+  top: 24px;
+  border-color: var(--sf-line);
+  border-top-width: 4px;
+  border-top-color: var(--store-accent);
+  border-radius: calc(var(--sf-radius) + 6px);
+  box-shadow: 0 1px 2px rgb(16 24 20 / 5%), 0 24px 48px -24px rgb(16 24 20 / 28%);
+}
+
+main.storefront-shell .product-detail-price {
+  margin: 10px 0 18px;
+}
+
+main.storefront-shell .storefront-profile-header.is-compact {
+  --sf-avatar: 84px;
+  --sf-avatar-overlap: 34px;
+}
+
+main.storefront-shell .storefront-profile-header.is-compact .storefront-profile-copy {
+  padding-top: calc(var(--sf-avatar-overlap) + 10px);
+}
+
+main.storefront-shell .storefront-profile-header.is-compact .storefront-profile-name h1 {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+}
+
+/* ---------- Minimal ---------- */
+
+main.storefront-theme-minimal {
+  --sf-avatar: 124px;
+  --sf-avatar-overlap: 62px;
+}
+
+main.storefront-theme-minimal .storefront-profile-layout {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+main.storefront-theme-minimal .storefront-profile-copy,
+main.storefront-theme-minimal .storefront-profile-header.is-compact .storefront-profile-copy {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+main.storefront-theme-minimal .storefront-profile-bio-wrap {
+  max-width: 640px;
+}
+
+main.storefront-theme-minimal .storefront-profile-bio {
+  text-align: center;
+}
+
+main.storefront-theme-minimal .storefront-product-card {
+  box-shadow: none;
+}
+
+/* ---------- Editorial ---------- */
+
+main.storefront-theme-editorial {
+  --sf-radius: 4px;
+  --sf-banner-radius: 4px;
+  --sf-avatar: 128px;
+  --sf-avatar-overlap: 52px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+main.storefront-theme-editorial .storefront-profile-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--sf-ink) 16%, transparent);
+  padding-bottom: 30px;
+}
+
+main.storefront-theme-editorial .storefront-profile-header.is-compact {
+  padding-bottom: 20px;
+}
+
+main.storefront-theme-editorial .storefront-profile-avatar {
+  border-radius: 6px;
+}
+
+main.storefront-theme-editorial .storefront-profile-name h1,
+main.storefront-theme-editorial .storefront-section h2,
+main.storefront-theme-editorial .storefront-product-copy h3,
+main.storefront-theme-editorial .product-detail-title-row h1,
+main.storefront-theme-editorial .product-detail-purchase h2,
+main.storefront-theme-editorial .product-detail-price,
+main.storefront-theme-editorial .storefront-contact h2 {
+  font-family: var(--sf-serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+main.storefront-theme-editorial .storefront-profile-name h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+main.storefront-theme-editorial .storefront-profile-name p {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+main.storefront-theme-editorial .storefront-profile-bio {
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+main.storefront-theme-editorial .storefront-section {
+  display: block;
+}
+
+main.storefront-theme-editorial .storefront-products .storefront-section-heading {
+  display: flex;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--sf-ink);
+  padding-bottom: 12px;
+}
+
+main.storefront-theme-editorial .storefront-section h2 {
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+}
+
+main.storefront-theme-editorial .storefront-product-count {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+main.storefront-theme-editorial .storefront-catalog-filters {
+  gap: 4px 22px;
+  margin-bottom: 26px;
+}
+
+main.storefront-theme-editorial .storefront-catalog-filters button,
+main.storefront-theme-editorial .storefront-catalog-filters button.selected {
+  min-height: 32px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  padding: 0 0 2px;
+  color: var(--sf-muted);
+  font-size: 0.86rem;
+}
+
+main.storefront-theme-editorial .storefront-catalog-filters button.selected {
+  border-bottom-color: var(--store-primary);
+  color: var(--sf-ink);
+}
+
+main.storefront-theme-editorial .storefront-product-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px 28px;
+}
+
+main.storefront-theme-editorial .storefront-product-card,
+main.storefront-theme-editorial a.storefront-product-card:hover {
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+main.storefront-theme-editorial .storefront-product-card > img,
+main.storefront-theme-editorial .storefront-product-image-placeholder {
+  border: 1px solid var(--sf-line);
+  border-radius: 4px;
+}
+
+main.storefront-theme-editorial .storefront-product-copy {
+  gap: 7px;
+  padding: 16px 0 0;
+}
+
+main.storefront-theme-editorial .storefront-product-copy h3 {
+  font-size: 1.22rem;
+  line-height: 1.3;
+}
+
+main.storefront-theme-editorial a.storefront-product-card:hover h3 {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+main.storefront-theme-editorial .storefront-product-copy p {
+  font-size: 0.9rem;
+}
+
+main.storefront-theme-editorial .storefront-product-price-row {
+  border-top: 1px solid var(--sf-line);
+  padding-top: 10px;
+}
+
+main.storefront-theme-editorial .storefront-product-price-row span {
+  background: transparent;
+  padding: 0;
+  color: var(--sf-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+main.storefront-theme-editorial .storefront-section.storefront-contact {
+  display: flex;
+  justify-content: space-between;
+  border-width: 1px 0;
+  border-color: var(--sf-ink);
+  border-radius: 0;
+  background: transparent;
+  padding-inline: 0;
+}
+
+main.storefront-theme-editorial .storefront-contact-button {
+  border-radius: 2px;
+}
+
+/* ---------- Bold ---------- */
+
+main.storefront-theme-bold {
+  --sf-radius: 18px;
+  --sf-banner-radius: 0;
+  --sf-avatar: 136px;
+  --sf-avatar-overlap: 68px;
+}
+
+main.storefront-theme-bold .storefront-profile-header {
+  overflow: hidden;
+  margin-top: 16px;
+  border-radius: 26px;
+  background: var(--store-primary);
+  padding: 0 0 32px;
+}
+
+main.storefront-theme-bold .storefront-profile-header.is-compact {
+  padding-bottom: 22px;
+}
+
+main.storefront-theme-bold .storefront-profile-layout {
+  padding-inline: clamp(20px, 3.4vw, 40px);
+}
+
+main.storefront-theme-bold .storefront-profile-avatar {
+  border-color: var(--store-primary);
+  outline: 3px solid var(--store-accent);
+  outline-offset: -8px;
+}
+
+main.storefront-theme-bold .storefront-profile-name h1 {
+  color: #fff;
+  font-size: clamp(1.9rem, 3.8vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+main.storefront-theme-bold .storefront-profile-name p {
+  color: color-mix(in srgb, var(--store-accent) 75%, #ffffff);
+  font-weight: 650;
+}
+
+main.storefront-theme-bold .storefront-profile-bio {
+  color: rgb(255 255 255 / 84%);
+}
+
+main.storefront-theme-bold .storefront-profile-bio-toggle,
+main.storefront-theme-bold .storefront-profile-bio-toggle[aria-expanded="true"] {
+  color: #fff;
+}
+
+main.storefront-theme-bold .storefront-profile-social-link {
+  border-color: rgb(255 255 255 / 24%);
+  background: rgb(255 255 255 / 10%);
+  color: #fff;
+}
+
+main.storefront-theme-bold .storefront-profile-social-link:hover {
+  border-color: #fff;
+  background: #fff;
+  color: var(--store-primary);
+}
+
+main.storefront-theme-bold .storefront-section h2 {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+main.storefront-theme-bold .storefront-product-count {
+  border-radius: 999px;
+  background: var(--sf-tint);
+  padding: 5px 12px;
+  color: var(--store-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+main.storefront-theme-bold .storefront-catalog-filters button {
+  min-height: 40px;
+  border-color: transparent;
+  background: var(--sf-tint);
+  padding: 0 16px;
+  color: var(--sf-ink);
+  font-weight: 700;
+}
+
+main.storefront-theme-bold .storefront-catalog-filters button.selected {
+  background: var(--store-primary);
+  color: #fff;
+}
+
+main.storefront-theme-bold .storefront-product-card {
+  border: 0;
+  box-shadow: 0 1px 2px rgb(16 24 20 / 6%), 0 12px 30px -16px rgb(16 24 20 / 30%);
+}
+
+main.storefront-theme-bold a.storefront-product-card:hover {
+  box-shadow: 0 1px 2px rgb(16 24 20 / 6%), 0 24px 44px -18px rgb(16 24 20 / 38%);
+}
+
+main.storefront-theme-bold a.storefront-product-card:hover > img {
+  transform: scale(1.04);
+}
+
+main.storefront-theme-bold .storefront-product-copy {
+  padding: 16px 18px 18px;
+}
+
+main.storefront-theme-bold .storefront-product-copy h3 {
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+main.storefront-theme-bold .storefront-product-price-row strong {
+  color: var(--store-primary);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+main.storefront-theme-bold .storefront-product-price-row span {
+  background: var(--store-accent);
+  color: var(--sf-ink);
+}
+
+main.storefront-theme-bold .storefront-contact {
+  border: 0;
+  background: var(--store-primary);
+}
+
+main.storefront-theme-bold .storefront-contact h2 {
+  color: #fff;
+}
+
+main.storefront-theme-bold .storefront-contact .storefront-eyebrow {
+  color: color-mix(in srgb, var(--store-accent) 75%, #ffffff);
+}
+
+main.storefront-theme-bold .storefront-contact-button {
+  background: #fff;
+  color: var(--store-primary);
+}
+
+main.storefront-theme-bold .product-detail-title-row h1 {
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1024px) {
+  main.storefront-shell .storefront-product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  main.storefront-theme-editorial .storefront-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  main.storefront-shell {
+    --sf-gutter: 16px;
+    --sf-avatar: 96px;
+    --sf-avatar-overlap: 44px;
+  }
+
+  main.storefront-shell .storefront-profile-header {
+    margin-inline: calc(var(--sf-gutter) * -1);
+    padding-top: 0;
+  }
+
+  main.storefront-shell .storefront-profile-banner {
+    aspect-ratio: 5 / 2;
+    min-height: 0;
+    border-radius: 0;
+  }
+
+  main.storefront-shell.storefront-banner-compact .storefront-profile-banner,
+  main.storefront-shell .storefront-profile-header.is-compact .storefront-profile-banner {
+    aspect-ratio: 4 / 1;
+  }
+
+  main.storefront-shell .storefront-profile-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding-inline: calc(var(--sf-gutter) + 4px);
+  }
+
+  main.storefront-shell .storefront-profile-avatar {
+    width: var(--sf-avatar);
+    height: var(--sf-avatar);
+    border-width: 4px;
+  }
+
+  main.storefront-shell .storefront-profile-copy,
+  main.storefront-shell .storefront-profile-header.is-compact .storefront-profile-copy {
+    padding-top: 0;
+  }
+
+  main.storefront-shell .storefront-profile-header.is-compact {
+    --sf-avatar: 68px;
+    --sf-avatar-overlap: 30px;
+  }
+
+  main.storefront-shell .storefront-profile-bio {
+    font-size: 0.94rem;
+  }
+
+  main.storefront-shell .storefront-sections {
+    margin-top: 28px;
+  }
+
+  main.storefront-shell .storefront-product-grid,
+  main.storefront-theme-editorial .storefront-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  main.storefront-theme-editorial .storefront-product-grid {
+    gap: 26px 14px;
+  }
+
+  main.storefront-shell .storefront-product-copy {
+    padding: 11px 12px 13px;
+  }
+
+  main.storefront-theme-editorial .storefront-product-copy {
+    padding: 11px 0 0;
+  }
+
+  main.storefront-shell .storefront-product-copy h3 {
+    font-size: 0.9rem;
+  }
+
+  main.storefront-theme-editorial .storefront-product-copy h3 {
+    font-size: 1.02rem;
+  }
+
+  main.storefront-shell .storefront-product-copy p {
+    font-size: 0.78rem;
+  }
+
+  main.storefront-shell .storefront-product-price-row strong {
+    font-size: 0.95rem;
+  }
+
+  main.storefront-shell .storefront-contact {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  main.storefront-theme-editorial .storefront-contact {
+    padding-inline: 0;
+  }
+
+  main.storefront-theme-bold .storefront-profile-header {
+    margin-top: 0;
+    border-radius: 0 0 24px 24px;
+    padding-bottom: 26px;
+  }
+
+  main.storefront-shell .product-detail-page {
+    padding-top: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  main.storefront-shell .storefront-product-price-row span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main.storefront-shell .storefront-product-card,
+  main.storefront-shell .storefront-product-card > img {
+    transition: none;
+  }
+}

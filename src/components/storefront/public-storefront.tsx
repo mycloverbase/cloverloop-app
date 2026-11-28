@@ -1,18 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import {
-  Mail,
-} from "lucide-react";
+import { Mail, PackageOpen } from "lucide-react";
 import { SocialPlatformIcon } from "@/components/storefront/social-platform-icon";
 import { ProductCatalog } from "@/components/storefront/product-catalog";
 import { StorefrontBio } from "@/components/storefront/storefront-bio";
-import type {
-  StorefrontCustomization,
-  StorefrontProductDisplay,
-  StorefrontSection,
-  StorefrontTheme,
+import {
+  DEFAULT_STOREFRONT_BANNER_URL,
+  type StorefrontCustomization,
+  type StorefrontProductDisplay,
+  type StorefrontSection,
+  type StorefrontTheme,
 } from "@/lib/storefront/types";
+import "./storefront-themes.css";
 
 export type StorefrontView = {
   store_name: string;
@@ -32,6 +32,14 @@ type StorefrontHeaderView = Pick<
   "store_name" | "username" | "description" | "profileImageUrl" | "bannerImageUrl" | "customization"
 >;
 
+function isNeutralColor(hex: string) {
+  const match = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!match) return false;
+  const value = Number.parseInt(match[1], 16);
+  const channels = [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+  return Math.max(...channels) - Math.min(...channels) < 24;
+}
+
 function initials(name: string) {
   return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "C";
 }
@@ -39,14 +47,23 @@ function initials(name: string) {
 export function PublicStorefrontHeader({
   store,
   showDescription = true,
+  compact = false,
 }: {
   store: StorefrontHeaderView;
   showDescription?: boolean;
+  compact?: boolean;
 }) {
   const hidden = new Set(store.customization.hiddenSections);
+  const showBio = showDescription && !compact;
   return (
-    <header className="storefront-profile-header">
-      <div className={`storefront-profile-banner${store.bannerImageUrl ? " has-image" : ""}`}>
+    <header className={`storefront-profile-header${compact ? " is-compact" : ""}`}>
+      <div
+        className={`storefront-profile-banner ${
+          store.bannerImageUrl
+            ? "has-image"
+            : `is-default${isNeutralColor(store.customization.accentColor) ? " is-neutral" : ""}`
+        }`}
+      >
         {store.bannerImageUrl ? (
           <Image
             className="storefront-profile-banner-image"
@@ -55,9 +72,19 @@ export function PublicStorefrontHeader({
             fill
             unoptimized
             priority
-            sizes="(max-width: 760px) 100vw, 1120px"
+            sizes="(max-width: 760px) 100vw, 1240px"
           />
-        ) : null}
+        ) : (
+          <Image
+            className="storefront-profile-banner-image"
+            src={DEFAULT_STOREFRONT_BANNER_URL}
+            alt=""
+            fill
+            unoptimized
+            priority
+            sizes="(max-width: 760px) 100vw, 1240px"
+          />
+        )}
       </div>
       <div className="storefront-profile-layout">
         {store.profileImageUrl ? (
@@ -80,10 +107,10 @@ export function PublicStorefrontHeader({
             <h1>{store.store_name}</h1>
             <p>@{store.username}</p>
           </div>
-          {showDescription && !hidden.has("about") && store.description.trim() ? (
+          {showBio && !hidden.has("about") && store.description.trim() ? (
             <StorefrontBio description={store.description} />
           ) : null}
-          {!hidden.has("social") && store.customization.socialLinks.length ? (
+          {!compact && !hidden.has("social") && store.customization.socialLinks.length ? (
             <nav className="storefront-profile-socials" aria-label="Social links">
               {store.customization.socialLinks.map((link) => (
                 <a
@@ -113,11 +140,19 @@ function ProductsSection({ store }: { store: StorefrontView }) {
         <div>
           <h2 id="storefront-products-title">Products</h2>
         </div>
+        {store.products.length ? (
+          <span className="storefront-product-count">
+            {store.products.length} {store.products.length === 1 ? "product" : "products"}
+          </span>
+        ) : null}
       </div>
       {store.products.length ? (
         <ProductCatalog products={store.products} storefrontUsername={store.username} />
       ) : (
-        <p className="storefront-empty-products">No products are currently available.</p>
+        <div className="storefront-empty-products">
+          <PackageOpen size={26} strokeWidth={1.6} aria-hidden="true" />
+          <p>New products are on the way. Check back soon.</p>
+        </div>
       )}
     </section>
   );
@@ -176,13 +211,19 @@ export function PublicStorefront({ store }: { store: StorefrontView }) {
           })}
         </div>
 
-        <footer className="storefront-footer">
-          <a href="https://cloverloop.in" rel="noopener noreferrer">
-            Powered by CloverLoop
-          </a>
-          <Link href="/signup">Start your own store</Link>
-        </footer>
+        <StorefrontFooter />
       </div>
     </main>
+  );
+}
+
+export function StorefrontFooter({ showSignupLink = true }: { showSignupLink?: boolean }) {
+  return (
+    <footer className="storefront-footer">
+      <a className="storefront-footer-badge" href="https://cloverloop.in" rel="noopener noreferrer">
+        Powered by <strong>CloverLoop</strong>
+      </a>
+      {showSignupLink ? <Link href="/signup">Start your own store</Link> : null}
+    </footer>
   );
 }

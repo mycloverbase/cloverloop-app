@@ -13,7 +13,7 @@ import {
 } from "react";
 import { ImagePlus, LoaderCircle, Trash2, Upload, X } from "lucide-react";
 import { uploadStorefrontImageAction } from "@/app/dashboard/storefront/actions";
-import type { StorefrontImageKind } from "@/lib/storefront/types";
+import { DEFAULT_STOREFRONT_BANNER_URL, type StorefrontImageKind } from "@/lib/storefront/types";
 
 const imageLimits: Record<StorefrontImageKind, number> = {
   profile: 5 * 1024 * 1024,
@@ -432,6 +432,12 @@ export function ImageCropUploader({
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt={`${labels[kind]} preview`} />
+        ) : kind === "banner" ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={DEFAULT_STOREFRONT_BANNER_URL} alt="Default banner preview" />
+            <span className="storefront-image-default-tag">Default banner</span>
+          </>
         ) : (
           <span className="storefront-image-empty">
             {kind === "product" ? <ImagePlus size={27} aria-hidden="true" /> : null}

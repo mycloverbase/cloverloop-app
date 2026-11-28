@@ -1,6 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useSyncExternalStore, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { AlertCircle, Download, LoaderCircle, ShieldCheck } from "lucide-react";
+import { useCallback, useEffect, useRef, useSyncExternalStore, useState, type ReactNode } from "react";
 
 type Ticket = {
   orderId: string;
@@ -96,22 +99,53 @@ export function PurchaseDownload() {
     }
   }, [busy, ticket]);
 
+  const state = !ticket ? "expired" : message ? "error" : "ready";
+
   return (
-    <main className="free-product-download-page">
-      <section className="free-product-download-card" aria-live="polite">
-        <span className="eyebrow">CloverLoop secure download</span>
-        <h1>Your product is ready</h1>
+    <DownloadShell>
+      <section className={`free-product-download-card download-state-${state}`} aria-live="polite">
+        <span className="download-state-icon" aria-hidden="true">
+          {state === "ready" ? <Download size={22} /> : <AlertCircle size={22} />}
+        </span>
+        <span className="eyebrow">Secure download</span>
+        <h1>
+          {state === "expired"
+            ? "This download link has expired"
+            : state === "error"
+              ? "We couldn't start your download"
+              : "Your product is ready"}
+        </h1>
         <p>
-          {ticket
-            ? message || "Your purchase has been verified. Use the button below to securely download your product."
-            : "This download link is invalid or has expired. Check your purchase email or contact support."}
+          {state === "expired"
+            ? "This download link is invalid or has expired. Check your purchase email for the latest link, or contact support."
+            : message || "Your purchase has been verified. Use the button below to securely download your product."}
         </p>
         {ticket ? (
           <button className="button" type="button" onClick={() => void startDownload()} disabled={busy}>
-            {busy ? "Preparing download…" : "Download Product"}
+            {busy ? (
+              <><LoaderCircle className="spin" size={17} aria-hidden="true" /> Preparing download…</>
+            ) : state === "error" ? (
+              "Try again"
+            ) : (
+              <><Download size={17} aria-hidden="true" /> Download product</>
+            )}
           </button>
         ) : null}
       </section>
+    </DownloadShell>
+  );
+}
+
+export function DownloadShell({ children }: { children: ReactNode }) {
+  return (
+    <main className="free-product-download-page">
+      <Link className="download-brand" href="/" aria-label="CloverLoop home">
+        <Image src="/images/brand/logo.png" alt="CloverLoop" width={143} height={54} priority />
+      </Link>
+      {children}
+      <p className="download-footnote">
+        <ShieldCheck size={14} aria-hidden="true" /> Links are private to you and expire for your security.
+      </p>
     </main>
   );
 }

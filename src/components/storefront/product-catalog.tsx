@@ -50,9 +50,13 @@ export function ProductCatalog({
   const visibleProducts = selectedSubcategory === "all"
     ? activeCategoryProducts
     : activeCategoryProducts.filter((product) => product.subcategory === selectedSubcategory);
-  const visibleCategoryGroups = activeCategory === "all"
-    ? categoryGroups
-    : [[activeCategory, visibleProducts] as [string, StorefrontProductDisplay[]]];
+  const orderedProducts = (activeCategory === "all"
+    ? categoryGroups.map(([, categoryProducts]) => categoryProducts)
+    : [visibleProducts]
+  ).flatMap((categoryProducts) =>
+    productGroups(categoryProducts.filter((product) => visibleProducts.includes(product)))
+      .flatMap(([, groupedProducts]) => groupedProducts),
+  );
 
   function chooseCategory(category: string) {
     setSelectedCategory(category);
@@ -85,7 +89,7 @@ export function ProductCatalog({
         </nav>
       ) : null}
 
-      {selectedCategory !== "all" || hasSingleCategory ? (
+      {(selectedCategory !== "all" || hasSingleCategory) && activeSubcategories.length > 1 ? (
         <nav className="storefront-catalog-filters storefront-subcategory-filters" aria-label="Product subcategories">
           <button
             type="button"
@@ -113,33 +117,14 @@ export function ProductCatalog({
       ) : null}
 
       {visibleProducts.length ? (
-        <div className="storefront-catalog-groups">
-          {visibleCategoryGroups.map(([category, categoryProducts]) => {
-            const groups = selectedSubcategory === "all"
-              ? productGroups(categoryProducts)
-              : [[selectedSubcategory, categoryProducts] as [string, StorefrontProductDisplay[]]];
-            return (
-              <section className="storefront-catalog-category" key={category} aria-label={category}>
-                {activeCategory === "all" ? <h3>{category}</h3> : null}
-                {groups.map(([subcategory, groupedProducts]) => (
-                  <section className="storefront-catalog-subcategory" key={`${category}-${subcategory}`}>
-                    {selectedSubcategory === "all" ? (
-                      <h4>{subcategory}<span>{groupedProducts.length}</span></h4>
-                    ) : null}
-                    <div className="storefront-product-grid">
-                      {groupedProducts.map((product) => (
-                        <StorefrontProductCard
-                          key={product.id}
-                          product={product}
-                          storefrontUsername={storefrontUsername}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                ))}
-              </section>
-            );
-          })}
+        <div className="storefront-product-grid">
+          {orderedProducts.map((product) => (
+            <StorefrontProductCard
+              key={product.id}
+              product={product}
+              storefrontUsername={storefrontUsername}
+            />
+          ))}
         </div>
       ) : (
         <p className="storefront-empty-products">No products are currently available.</p>

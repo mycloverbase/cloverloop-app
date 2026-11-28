@@ -1,7 +1,9 @@
 "use client";
 
+import { AlertCircle, LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { track } from "@/lib/analytics";
+import { DownloadShell } from "@/components/purchase-download";
 
 declare global {
   interface Window {
@@ -88,18 +90,30 @@ export function FreeProductDownload() {
     return () => window.clearTimeout(timeout);
   }, [token, startDownload]);
 
+  const preparing = message === "Preparing your secure download…";
+  const state = !token ? "expired" : preparing || busy ? "loading" : "error";
+
   return (
-    <main className="free-product-download-page">
-      <section className="free-product-download-card" aria-live="polite">
-        <span className="eyebrow">CloverLoop secure download</span>
-        <h1>Your download</h1>
+    <DownloadShell>
+      <section className={`free-product-download-card download-state-${state}`} aria-live="polite">
+        <span className="download-state-icon" aria-hidden="true">
+          {state === "loading" ? <LoaderCircle className="spin" size={22} /> : <AlertCircle size={22} />}
+        </span>
+        <span className="eyebrow">Secure download</span>
+        <h1>
+          {state === "expired"
+            ? "This download link has expired"
+            : state === "loading"
+              ? "Preparing your download"
+              : "We couldn't start your download"}
+        </h1>
         <p>{token ? message : "This download link is invalid or has expired. Request a new link from the product storefront."}</p>
-        {token && message !== "Preparing your secure download…" && !busy ? (
+        {state === "error" ? (
           <button className="button" type="button" onClick={() => void startDownload()}>
             Try again
           </button>
         ) : null}
       </section>
-    </main>
+    </DownloadShell>
   );
 }

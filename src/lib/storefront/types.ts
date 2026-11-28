@@ -125,6 +125,8 @@ export type StorefrontActionResult =
   | { ok: true; message: string; url?: string; path?: string; imageUrl?: string; storefrontId?: string; deleteAfter?: string }
   | { ok: false; message: string };
 
+export const DEFAULT_STOREFRONT_BANNER_URL = "/images/storefront/default-banner.webp";
+
 export const DEFAULT_STOREFRONT_CUSTOMIZATION: StorefrontCustomization = {
   primaryColor: "#2f7254",
   accentColor: "#a8c9a5",

@@ -5,6 +5,7 @@ describe("isReservedStorefrontUsername", () => {
   it("recognizes reserved names regardless of case", () => {
     expect(isReservedStorefrontUsername("pricing")).toBe(true);
     expect(isReservedStorefrontUsername("LOGIN")).toBe(true);
+    expect(isReservedStorefrontUsername("review")).toBe(true);
   });
 
   it("allows non-reserved storefront names to be checked for redirects", () => {

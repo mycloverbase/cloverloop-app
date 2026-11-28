@@ -208,3 +208,25 @@ export async function restoreStorefrontAction(formData: FormData) {
   revalidatePath(`/${data}`);
   redirect("/dashboard/admin/storefront-recovery?result=restored");
 }
+
+export async function moderateProductReviewAction(formData: FormData) {
+  const reviewId = formText(formData, "review_id");
+  const action = formText(formData, "moderation_action");
+  const note = formText(formData, "note");
+  if (!creatorIdPattern.test(reviewId) || !["hide", "restore", "dismiss_reports"].includes(action) || note.length > 500) {
+    redirect("/dashboard/admin/reviews?result=invalid");
+  }
+  const supabase = await getAdminClient();
+  if (!supabase) redirect("/dashboard?error=admin");
+  const { error } = await supabase.rpc("admin_moderate_product_review", {
+    p_review_id: reviewId,
+    p_action: action,
+    p_note: note || null,
+  });
+  if (error) {
+    console.error("Could not moderate a product review.", { code: error.code });
+    redirect("/dashboard/admin/reviews?result=failed");
+  }
+  revalidatePath("/dashboard/admin/reviews");
+  redirect(`/dashboard/admin/reviews?result=${action}`);
+}
